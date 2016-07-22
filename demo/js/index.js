@@ -150,7 +150,14 @@ var BooleanControl = L.Control.extend({
     L.DomEvent
       .on(form, 'submit', function (evt) {
         L.DomEvent.stop(evt);
-        run(parseInt(form['op'].value));
+        var radios = Array.prototype.slice.call(
+          form.querySelectorAll('input[type=radio]'));
+        for (var i = 0, len = radios.length; i < len; i++) {
+          if (radios[i].checked) {
+            run(parseInt(radios[i].value));
+            break;
+          }
+        }
       })
       .on(form['clear'], 'click', function(evt) {
         L.DomEvent.stop(evt);
