@@ -1,4 +1,4 @@
-# Martinez polygon clipping
+# MRF(Martinez-Rueda-Feito) polygon clipping
 
 ### Authors
 
@@ -8,3 +8,4 @@
 ### Based on
 
 * [A new algorithm for computing Boolean operations on polygons](http://www.cs.ucr.edu/~vbz/cs230papers/martinez_boolean.pdf) (2008, 2012) by Francisco Martinez, Antonio Jesus Rueda, Francisco Ramon Feito (and its C++ code)
+
