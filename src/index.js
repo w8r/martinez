@@ -156,7 +156,7 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-    throw new Error('Sorry, edges of the same polygon overlap?');
+    throw new Error('Edges of the same polygon overlap');
   }
 
   // The line segments associated to se1 and se2 intersect
@@ -179,7 +179,7 @@ function possibleIntersection(se1, se2, queue) {
   var leftCoincide  = false;
   var rightCoincide = false;
 
-  if (se1.point === se2.point) {
+  if (equals(se1.point, se2.point)) {
     leftCoincide = true; // linked
   } else if (compareEvents(se1, se2) === 1) {
     events.push(se2, se1);
@@ -187,7 +187,7 @@ function possibleIntersection(se1, se2, queue) {
     events.push(se1, se2);
   }
 
-  if (se1.otherEvent.point === se2.otherEvent.point) {
+  if (equals(se1.otherEvent.point, se2.otherEvent.point)) {
     rightCoincide = true;
   } else if (compareEvents(se1.otherEvent, se2.otherEvent) === 1) {
     events.push(se2.otherEvent, se1.otherEvent);
@@ -311,7 +311,6 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
     if (event.left) {
       sweepLine.insert(event);
-
       // _renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.findIter(event);
@@ -353,6 +352,10 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
 
+      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+
+      if (!(prev && next)) continue;
+
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
@@ -362,7 +365,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       next.next();
       sweepLine.remove(event);
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (next.data() && prev.data()) {
         possibleIntersection(prev.data(), next.data(), eventQueue);
@@ -607,6 +610,9 @@ module.exports.intersection = function(subject, clipping) {
 };
 
 
+/**
+ * @enum {Number}
+ */
 module.exports.operations = {
   INTERSECTION: INTERSECTION,
   DIFFERENCE:   DIFFERENCE,

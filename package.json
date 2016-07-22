@@ -8,7 +8,7 @@
     "lint": "eslint ./src/",
     "test:watch": "nodemon --exec 'npm run test && npm run lint'",
     "start": "watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv & serve",
-    "build:js": "browserify ./index.js -o ./dist/martinez-src.js -dv"
+    "build": "browserify -s martinez ./index.js -o ./dist/martinez.js"
   },
   "keywords": [
     "polygon",
@@ -33,8 +33,10 @@
     "nodemon": "^1.9.2",
     "serve": "^1.4.0",
     "smokestack": "^3.4.1",
+    "superagent": "^2.1.0",
     "tap": "^6.2.0",
     "tap-status": "^1.0.1",
+    "turf": "^3.0.14",
     "uglifyjs": "^2.4.10",
     "watchify": "^3.7.0"
   },
