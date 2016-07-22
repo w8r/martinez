@@ -1,4 +1,4 @@
-# Martinez polygon clipping
+# MRF(Martinez-Rueda-Feito) polygon clipping
 
 ### Authors
 
