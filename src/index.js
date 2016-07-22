@@ -156,6 +156,7 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
+    console.warn(se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
     throw new Error('Edges of the same polygon overlap');
   }
 
