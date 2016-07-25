@@ -16,9 +16,6 @@ var compareSegments = require('./compare_segments');
 var intersection    = require('./segment_intersection');
 var equals          = require('./equals');
 
-window.tree = require('functional-red-black-tree');
-window.tree2 = Tree;
-
 var max = Math.max;
 var min = Math.min;
 
