@@ -671,6 +671,11 @@ module.exports = function sweepEventsComp(e1, e2) {
   // Event with lower y-coordinate is processed first
   if (p1[1] !== p2[1]) return p1[1] > p2[1] ? 1 : -1;
 
+  return specialCases(e1, e2, p1, p2);
+};
+
+
+function specialCases(e1, e2, p1, p2) {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
   if (e1.left !== e2.left)
@@ -681,12 +686,11 @@ module.exports = function sweepEventsComp(e1, e2) {
   // not collinear
   if (signedArea (p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
-    return e1.isAbove(e2.otherEvent.point) ? 1 : -1;
+    return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
   //return e1.isSubject ? -1 : 1;
-};
-
+}
 },{"./signed_area":13}],8:[function(require,module,exports){
 var signedArea    = require('./signed_area');
 var compareEvents = require('./compare_events');
@@ -1059,7 +1063,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
-      event.pos = sweepLine.findIter(event);
+      event.iterator = sweepLine.findIter(event);
 
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
@@ -1220,6 +1224,7 @@ function connectEdges(sortedEvents) {
     var initial = resultEvents[i].point;
     contour.push(initial);
 
+    try {
     while (!equals(resultEvents[pos].otherEvent.point, initial)) {
       processed[pos] = true;
 
@@ -1241,6 +1246,10 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
+
+    } catch (e) {
+      console.log(pos || 0, resultEvents, resultEvents.length, e);
+    }
 
     // depth is even
     /* eslint-disable no-bitwise */
@@ -1330,6 +1339,7 @@ function boolean(subject, clipping, operation) {
   var sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
   return connectEdges(sortedEvents);
 }
+
 
 module.exports = boolean;
 
@@ -1604,16 +1614,6 @@ function SweepEvent(point, left, otherEvent, isSubject, edgeType) {
    * @type {Boolean}
    */
   this.resultInOut = false;
-
-  /**
-   * @type {Boolean}
-   */
-  this.processed = false;
-
-  /**
-   * @type {Number}
-   */
-  this.depth = 0;
 }
 
 

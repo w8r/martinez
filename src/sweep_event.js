@@ -74,16 +74,6 @@ function SweepEvent(point, left, otherEvent, isSubject, edgeType) {
    * @type {Boolean}
    */
   this.resultInOut = false;
-
-  /**
-   * @type {Boolean}
-   */
-  this.processed = false;
-
-  /**
-   * @type {Number}
-   */
-  this.depth = 0;
 }
 
 

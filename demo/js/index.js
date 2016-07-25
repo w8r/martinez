@@ -5,13 +5,15 @@ require('./polygoncontrol');
 require('./booleanopcontrol');
 var martinez = require('../../');
 var xhr = require('superagent');
+// var turf = require('turf');
+var jsts = window.jsts = require('jsts');
 
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 
 console.log(mode);
 
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
+var file = mode === 'geo' ? 'indonesia.json' : 'horseshoe.json';
 
 
 
@@ -65,6 +67,9 @@ function clear() {
   results.clearLayers();
 }
 
+var reader = new jsts.io.GeoJSONReader();
+var writer = new jsts.io.GeoJSONWriter();
+
 
 function run (op) {
   var layers = drawnItems.getLayers();
@@ -77,9 +82,19 @@ function run (op) {
   subject = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
 
-  var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
 
-  //console.log('result', JSON.stringify(result, 0, 2));
+  console.time('martinez');
+  var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
+  console.timeEnd('martinez');
+
+  console.time('jsts');
+  var s = reader.read(subject);
+  var c = reader.read(clipping);
+  var res = writer.write(s.geometry.intersection(c.geometry));
+
+  console.timeEnd('jsts');
+
+  //console.log('result', result, res);
 
   results.clearLayers();
   results.addData({

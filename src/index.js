@@ -315,7 +315,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
-      event.pos = sweepLine.findIter(event);
+      event.iterator = sweepLine.findIter(event);
 
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
@@ -476,6 +476,7 @@ function connectEdges(sortedEvents) {
     var initial = resultEvents[i].point;
     contour.push(initial);
 
+    try {
     while (!equals(resultEvents[pos].otherEvent.point, initial)) {
       processed[pos] = true;
 
@@ -497,6 +498,10 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
+
+    } catch (e) {
+      console.log(pos || 0, resultEvents, resultEvents.length, e);
+    }
 
     // depth is even
     /* eslint-disable no-bitwise */
@@ -586,6 +591,7 @@ function boolean(subject, clipping, operation) {
   var sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
   return connectEdges(sortedEvents);
 }
+
 
 module.exports = boolean;
 
