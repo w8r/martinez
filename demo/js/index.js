@@ -13,7 +13,7 @@ var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 console.log(mode);
 
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'indonesia.json' : 'horseshoe.json';
+var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
 
 
 
