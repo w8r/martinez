@@ -34,7 +34,9 @@ module.exports = function compareSegments(le1, le2) {
   if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
 
   // Just a consistent criterion is used
-  if (equals(le1.point, le2.point)) return 0;
+  if (equals(le1.point, le2.point)) {
+    return le1.contourId > le2.contourId ? -1 : 1;
+  }
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
 };

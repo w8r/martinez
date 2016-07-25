@@ -34,6 +34,10 @@ function specialCases(e1, e2, p1, p2) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
+
+  if (e1.isSubject === e2.isSubject) {
+    return e1.contourId > e2.contourId ? -1 : 1;
+  }
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
   //return e1.isSubject ? -1 : 1;
 }

@@ -16,6 +16,9 @@ var compareSegments = require('./compare_segments');
 var intersection    = require('./segment_intersection');
 var equals          = require('./equals');
 
+window.tree = require('functional-red-black-tree');
+window.tree2 = Tree;
+
 var max = Math.max;
 var min = Math.min;
 
@@ -26,13 +29,18 @@ var min = Math.min;
  * @param  {Queue}           eventQueue
  * @param  {Array.<Number>}  bbox
  */
-function processSegment(s1, s2, isSubject, eventQueue, bbox) {
+function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
+  // var e = 1e5;
+  // s1 = [Math.round(s1[0] * e) / e, Math.round(s1[1] * e) / e];
+  // s2 = [Math.round(s2[0] * e) / e, Math.round(s2[1] * e) / e];
   // Possible degenerate condition.
-  if (equals(s1, s2)) return;
+  // if (equals(s1, s2)) return;
 
   var e1 = new SweepEvent(s1, false, undefined, isSubject);
   var e2 = new SweepEvent(s2, false, e1,        isSubject);
   e1.otherEvent = e2;
+
+  e1.contourId = e2.contourId = depth;
 
   if (compareEvents(e1, e2) > 0) {
     e2.left = true;
@@ -51,16 +59,18 @@ function processSegment(s1, s2, isSubject, eventQueue, bbox) {
   eventQueue.push(e2);
 }
 
+var contourId = 0;
 
-function processPolygon(polygon, isSubject, queue, bbox) {
+function processPolygon(polygon, isSubject, depth, queue, bbox) {
   var i, len;
   if (typeof polygon[0][0] === 'number') {
     for (i = 0, len = polygon.length - 1; i < len; i++) {
-      processSegment(polygon[i], polygon[i + 1], isSubject, queue, bbox);
+      processSegment(polygon[i], polygon[i + 1], isSubject, depth + 1, queue, bbox);
     }
   } else {
     for (i = 0, len = polygon.length; i < len; i++) {
-      processPolygon(polygon[i], isSubject, queue, bbox);
+      contourId++;
+      processPolygon(polygon[i], isSubject, contourId, queue, bbox);
     }
   }
 }
@@ -68,9 +78,10 @@ function processPolygon(polygon, isSubject, queue, bbox) {
 
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
+  contourId = 0;
 
-  processPolygon(subject,  true,  eventQueue, sbbox);
-  processPolygon(clipping, false, eventQueue, cbbox);
+  processPolygon(subject,  true,  0, eventQueue, sbbox);
+  processPolygon(clipping, false, 0, eventQueue, cbbox);
 
   return eventQueue;
 }
@@ -156,8 +167,10 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-    console.warn(se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-    throw new Error('Edges of the same polygon overlap');
+    // console.warn('Edges of the same polygon overlap',
+    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    //throw new Error('Edges of the same polygon overlap');
+    return 0;
   }
 
   // The line segments associated to se1 and se2 intersect
@@ -411,9 +424,8 @@ function connectEdges(sortedEvents) {
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
-      (!event.left && event.otherEvent.otherEvent.inResult)) {
+      (!event.left && event.otherEvent.inResult)) {
       resultEvents.push(event);
-      resultEvents.push(event.otherEvent);
     }
   }
 

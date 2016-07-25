@@ -4,7 +4,7 @@ require('./coordinates');
 require('./polygoncontrol');
 require('./booleanopcontrol');
 var martinez = require('../../');
-var martinez = require('../../');
+//var martinez = require('../../dist/martinez.min');
 var xhr = require('superagent');
 // var turf = require('turf');
 var jsts = window.jsts = require('jsts');
