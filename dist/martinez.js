@@ -1225,8 +1225,7 @@ function connectEdges(sortedEvents) {
     var initial = resultEvents[i].point;
     contour.push(initial);
 
-    try {
-    while (!equals(resultEvents[pos].otherEvent.point, initial)) {
+    while (pos >= i) {
       processed[pos] = true;
 
       if (resultEvents[pos].left) {
@@ -1244,13 +1243,14 @@ function connectEdges(sortedEvents) {
       pos = nextPos(pos, resultEvents, processed);
     }
 
+    pos = pos === -1 ? i : pos;
+
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
 
-    } catch (e) {
-      console.log(pos || 0, resultEvents, resultEvents.length, e);
-    }
+
+
 
     // depth is even
     /* eslint-disable no-bitwise */
@@ -1272,8 +1272,9 @@ function connectEdges(sortedEvents) {
  */
 function nextPos(pos, resultEvents, processed) {
   var newPos = pos + 1;
-  while (newPos < resultEvents.length
-    && equals(resultEvents[newPos].point, resultEvents[pos].point)) {
+  var length = resultEvents.length;
+  while (newPos < length &&
+         equals(resultEvents[newPos].point, resultEvents[pos].point)) {
     if (!processed[newPos]) {
       return newPos;
     } else {

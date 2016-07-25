@@ -12,7 +12,7 @@ L.Coordinates = L.Control.extend({
 
   _onMouseMove: function(e) {
     this._container.innerHTML = '<span style="padding: 5px">' +
-      e.latlng.lng + ', ' + e.latlng.lat + '</span>';
+      e.latlng.lng.toFixed(3) + ', ' + e.latlng.lat.toFixed(3) + '</span>';
   }
 
 });
