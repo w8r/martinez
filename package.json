@@ -8,6 +8,7 @@
     "lint": "eslint ./src/",
     "test:watch": "nodemon --exec 'npm run test && npm run lint'",
     "start": "watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv & serve",
+    "start:win": "start watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv && start serve",
     "build": "browserify -s martinez ./index.js -o ./dist/martinez.js"
   },
   "keywords": [
@@ -28,6 +29,7 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "eslint": "^3.1.0",
+    "jsts": "^1.2.0",
     "leaflet": "^1.0.0-rc.2",
     "leaflet-editable": "^1.0.0-rc.1",
     "nodemon": "^1.9.2",
@@ -36,7 +38,6 @@
     "superagent": "^2.1.0",
     "tap": "^6.2.0",
     "tap-status": "^1.0.1",
-    "turf": "^3.0.14",
     "uglifyjs": "^2.4.10",
     "watchify": "^3.7.0"
   },
