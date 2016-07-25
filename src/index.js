@@ -27,9 +27,6 @@ var min = Math.min;
  * @param  {Array.<Number>}  bbox
  */
 function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
-  // var e = 1e5;
-  // s1 = [Math.round(s1[0] * e) / e, Math.round(s1[1] * e) / e];
-  // s2 = [Math.round(s2[0] * e) / e, Math.round(s2[1] * e) / e];
   // Possible degenerate condition.
   // if (equals(s1, s2)) return;
 
