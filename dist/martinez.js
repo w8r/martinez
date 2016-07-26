@@ -978,7 +978,9 @@ function possibleIntersection(se1, se2, queue) {
       edgeType.DIFFERENT_TRANSITION;
 
     if (leftCoincide && !rightCoincide) {
-      divideSegment(events[2].otherEvent, events[1].point, queue);
+      // honestly no idea, but changing events selection from [2, 1]
+      // to [0, 1] fixes the overlapping self-intersecting polygons issue
+      divideSegment(events[0].otherEvent, events[1].point, queue);
     }
     return 2;
   }
