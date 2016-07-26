@@ -1,14 +1,22 @@
 var L = require('leaflet');
 var LeafletEditable = require('leaflet-editable');
-var martinez = require('../../');
+require('./coordinates');
+require('./polygoncontrol');
+require('./booleanopcontrol');
+var martinez = window.martinez = require('../../');
+//var martinez = require('../../dist/martinez.min');
+var xhr = require('superagent');
+// var turf = require('turf');
+var jsts = window.jsts = require('jsts');
+
+var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
+
+console.log(mode);
+
+var path = '../test/fixtures/';
+var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
 
 
-// var two_triangles = require('../../test/fixtures/two_shapes.json');
-// var oneInside = require('../../test/fixtures/one_inside.json');
-// var twoPointedTriangles = require('../../test/fixtures/two_pointed_triangles.json');
-// var selfIntersecting = require('../../test/fixtures/self_intersecting.json');
-// var holes = require('../../test/fixtures/hole_hole.json');
-var canada = require('../../test/fixtures/indonesia.json');
 
 var div = document.createElement('div');
 div.id = 'image-map';
@@ -21,84 +29,47 @@ var map = window.map = L.map('image-map', {
   maxZoom: 20,
   center: [0, 0],
   zoom: 1,
-  //crs: L.CRS.EPSG4326,
+  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.CRS.Simple,
   editable: true
 });
 
-L.EditControl = L.Control.extend({
-
-  options: {
-    position: 'topleft',
-    callback: null,
-    kind: '',
-    html: ''
-  },
-
-  onAdd: function (map) {
-    var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
-        link = L.DomUtil.create('a', '', container);
-
-    link.href = '#';
-    link.title = 'Create a new ' + this.options.kind;
-    link.innerHTML = this.options.html;
-    L.DomEvent.on(link, 'click', L.DomEvent.stop)
-              .on(link, 'click', function () {
-                window.LAYER = this.options.callback.call(map.editTools);
-              }, this);
-
-    return container;
-  }
-
-});
-
-L.NewPolygonControl = L.EditControl.extend({
-  options: {
-    position: 'topleft',
-    callback: map.editTools.startPolygon,
-    kind: 'polygon',
-    html: '▰'
-  }
-});
-
-map.addControl(new L.NewPolygonControl());
-
-L.Coordinates = L.Control.extend({
-  options: {
-    position: 'bottomright'
-  },
-
-  onAdd: function(map) {
-    this._container = L.DomUtil.create('div', 'leaflet-bar');
-    this._container.style.background = '#ffffff';
-    map.on('mousemove', this._onMouseMove, this);
-    return this._container;
-  },
-
-  _onMouseMove: function(e) {
-    this._container.innerHTML = '<span style="padding: 5px">' +
-      e.latlng.lng + ', ' + e.latlng.lat + '</span>';
-  }
-
-});
-
-new L.Coordinates().addTo(map);
+map.addControl(new L.NewPolygonControl({
+  callback: map.editTools.startPolygon
+}));
+map.addControl(new L.Coordinates());
+map.addControl(new L.BooleanControl({
+  callback: run,
+  clear: clear
+}));
 
 var drawnItems = window.drawnItems = L.geoJson().addTo(map);
 
-//drawnItems.addData(oneInside);
-//drawnItems.addData(twoPointedTriangles);
-//drawnItems.addData(selfIntersecting);
-//drawnItems.addData(holes);
-drawnItems.addData(canada);
+function loadData(path) {
+  console.log(path);
+  // var two_triangles = require('../../test/fixtures/two_shapes.json');
+  // var oneInside = require('../../test/fixtures/one_inside.json');
+  // var twoPointedTriangles = require('../../test/fixtures/two_pointed_triangles.json');
+  // var selfIntersecting = require('../../test/fixtures/self_intersecting.json');
+  // var holes = require('../../test/fixtures/hole_hole.json');
+  //var data =  require('../../test/fixtures/indonesia.json');
+  xhr
+    .get(path)
+    .set('Accept', 'application/json')
+    .end(function(e, r) {
+      if (!e) {
+        drawnItems.addData(r.body);
+        map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
+      }
+    });
+}
 
-map.on('editable:created', function(evt) {
-  drawnItems.addLayer(evt.layer);
-  evt.layer.on('click', function(e) {
-    if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
-      this.editor.newHole(e.latlng);
-    }
-  });
-});
+function clear() {
+  drawnItems.clearLayers();
+  results.clearLayers();
+}
+
+var reader = new jsts.io.GeoJSONReader();
+var writer = new jsts.io.GeoJSONWriter();
 
 
 function run (op) {
@@ -109,12 +80,15 @@ function run (op) {
 
   console.log('input', subject, clipping, op);
 
-  subject = JSON.parse(JSON.stringify(subject));
+  subject  = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
 
-  var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
 
-  //console.log('result', JSON.stringify(result, 0, 2));
+  console.time('martinez');
+  var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
+  console.timeEnd('martinez');
+
+  //console.log('result', result, res);
 
   results.clearLayers();
   results.addData({
@@ -124,57 +98,40 @@ function run (op) {
       'coordinates': result
     }
   });
+
+  L.Util.requestAnimFrame(function() {
+    console.time('jsts');
+    var s = reader.read(subject);
+    var c = reader.read(clipping);
+    var res;
+    if (op === martinez.operations.INTERSECTION) {
+      res = s.geometry.intersection(c.geometry);
+    } else if (op === martinez.operations.UNION) {
+      res = s.geometry.union(c.geometry);
+    } else if (op === martinez.operations.DIFFERENCE) {
+      res = s.geometry.difference(c.geometry);
+    } else {
+      res = s.geometry.symDifference(c.geometry);
+    }
+    res = writer.write(res);
+    console.timeEnd('jsts');
+  });
 }
 
+//drawnItems.addData(oneInside);
+//drawnItems.addData(twoPointedTriangles);
+//drawnItems.addData(selfIntersecting);
+//drawnItems.addData(holes);
+//drawnItems.addData(data);
 
-var BooleanControl = L.Control.extend({
-  options: {
-    position: 'topright'
-  },
-
-  onAdd: function(map) {
-    var container = this._container = L.DomUtil.create('div', 'leaflet-bar');
-    this._container.style.background = '#ffffff';
-    this._container.style.padding = '10px';
-    container.innerHTML = [
-      '<form>',
-        '<ul style="list-style:none; padding-left: 0">',
-          '<li>','<label>', '<input type="radio" name="op" value="0" checked />',  ' Intersection', '</label>', '</li>',
-          '<li>','<label>', '<input type="radio" name="op" value="1" />',  ' Union', '</label>', '</li>',
-          '<li>','<label>', '<input type="radio" name="op" value="2" />',  ' Difference', '</label>', '</li>',
-          '<li>','<label>', '<input type="radio" name="op" value="3" />',  ' Xor', '</label>', '</li>',
-        '</ul>',
-        '<input type="submit" value="Run">', '<input name="clear" type="button" value="Clear layers">',
-      '</form>'].join('');
-    var form = container.querySelector('form');
-    L.DomEvent
-      .on(form, 'submit', function (evt) {
-        L.DomEvent.stop(evt);
-        var radios = Array.prototype.slice.call(
-          form.querySelectorAll('input[type=radio]'));
-        for (var i = 0, len = radios.length; i < len; i++) {
-          if (radios[i].checked) {
-            run(parseInt(radios[i].value));
-            break;
-          }
-        }
-      })
-      .on(form['clear'], 'click', function(evt) {
-        L.DomEvent.stop(evt);
-        drawnItems.clearLayers();
-        results.clearLayers();
-      });
-
-    L.DomEvent
-      .disableClickPropagation(this._container)
-      .disableScrollPropagation(this._container);
-    return this._container;
-  }
-
+map.on('editable:created', function(evt) {
+  drawnItems.addLayer(evt.layer);
+  evt.layer.on('click', function(e) {
+    if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+      this.editor.newHole(e.latlng);
+    }
+  });
 });
-
-var booleancontrol = new BooleanControl();
-map.addControl(booleancontrol);
 
 var results = window.results = L.geoJson(null, {
   style: function(feature) {
@@ -185,6 +142,4 @@ var results = window.results = L.geoJson(null, {
   }
 }).addTo(map);
 
-L.Util.requestAnimFrame(function() {
-  map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
-});
+loadData(path + file);

@@ -26,13 +26,15 @@ var min = Math.min;
  * @param  {Queue}           eventQueue
  * @param  {Array.<Number>}  bbox
  */
-function processSegment(s1, s2, isSubject, eventQueue, bbox) {
+function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
   // Possible degenerate condition.
-  if (equals(s1, s2)) return;
+  // if (equals(s1, s2)) return;
 
   var e1 = new SweepEvent(s1, false, undefined, isSubject);
   var e2 = new SweepEvent(s2, false, e1,        isSubject);
   e1.otherEvent = e2;
+
+  e1.contourId = e2.contourId = depth;
 
   if (compareEvents(e1, e2) > 0) {
     e2.left = true;
@@ -51,16 +53,18 @@ function processSegment(s1, s2, isSubject, eventQueue, bbox) {
   eventQueue.push(e2);
 }
 
+var contourId = 0;
 
-function processPolygon(polygon, isSubject, queue, bbox) {
+function processPolygon(polygon, isSubject, depth, queue, bbox) {
   var i, len;
   if (typeof polygon[0][0] === 'number') {
     for (i = 0, len = polygon.length - 1; i < len; i++) {
-      processSegment(polygon[i], polygon[i + 1], isSubject, queue, bbox);
+      processSegment(polygon[i], polygon[i + 1], isSubject, depth + 1, queue, bbox);
     }
   } else {
     for (i = 0, len = polygon.length; i < len; i++) {
-      processPolygon(polygon[i], isSubject, queue, bbox);
+      contourId++;
+      processPolygon(polygon[i], isSubject, contourId, queue, bbox);
     }
   }
 }
@@ -68,9 +72,10 @@ function processPolygon(polygon, isSubject, queue, bbox) {
 
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
+  contourId = 0;
 
-  processPolygon(subject,  true,  eventQueue, sbbox);
-  processPolygon(clipping, false, eventQueue, cbbox);
+  processPolygon(subject,  true,  0, eventQueue, sbbox);
+  processPolygon(clipping, false, 0, eventQueue, cbbox);
 
   return eventQueue;
 }
@@ -155,8 +160,13 @@ function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-    throw new Error('Sorry, edges of the same polygon overlap?');
+  if (nintersections === 2 && se1.isSubject === se2.isSubject){
+    if(se1.contourId === se2.contourId){
+    console.warn('Edges of the same polygon overlap',
+      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    }
+    //throw new Error('Edges of the same polygon overlap');
+    return 0;
   }
 
   // The line segments associated to se1 and se2 intersect
@@ -179,7 +189,7 @@ function possibleIntersection(se1, se2, queue) {
   var leftCoincide  = false;
   var rightCoincide = false;
 
-  if (se1.point === se2.point) {
+  if (equals(se1.point, se2.point)) {
     leftCoincide = true; // linked
   } else if (compareEvents(se1, se2) === 1) {
     events.push(se2, se1);
@@ -187,7 +197,7 @@ function possibleIntersection(se1, se2, queue) {
     events.push(se1, se2);
   }
 
-  if (se1.otherEvent.point === se2.otherEvent.point) {
+  if (equals(se1.otherEvent.point, se2.otherEvent.point)) {
     rightCoincide = true;
   } else if (compareEvents(se1.otherEvent, se2.otherEvent) === 1) {
     events.push(se2.otherEvent, se1.otherEvent);
@@ -311,12 +321,11 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
     if (event.left) {
       sweepLine.insert(event);
-
       // _renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
-      event.pos = sweepLine.findIter(event);
+      event.iterator = sweepLine.findIter(event);
 
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
@@ -353,6 +362,10 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
 
+      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+
+      if (!(prev && next)) continue;
+
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
@@ -362,7 +375,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       next.next();
       sweepLine.remove(event);
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (next.data() && prev.data()) {
         possibleIntersection(prev.data(), next.data(), eventQueue);
@@ -407,9 +420,8 @@ function connectEdges(sortedEvents) {
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
-      (!event.left && event.otherEvent.otherEvent.inResult)) {
+      (!event.left && event.otherEvent.inResult)) {
       resultEvents.push(event);
-      resultEvents.push(event.otherEvent);
     }
   }
 
@@ -473,7 +485,7 @@ function connectEdges(sortedEvents) {
     var initial = resultEvents[i].point;
     contour.push(initial);
 
-    while (!equals(resultEvents[pos].otherEvent.point, initial)) {
+    while (pos >= i) {
       processed[pos] = true;
 
       if (resultEvents[pos].left) {
@@ -491,9 +503,14 @@ function connectEdges(sortedEvents) {
       pos = nextPos(pos, resultEvents, processed);
     }
 
+    pos = pos === -1 ? i : pos;
+
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
+
+
+
 
     // depth is even
     /* eslint-disable no-bitwise */
@@ -515,8 +532,9 @@ function connectEdges(sortedEvents) {
  */
 function nextPos(pos, resultEvents, processed) {
   var newPos = pos + 1;
-  while (newPos < resultEvents.length
-    && equals(resultEvents[newPos].point, resultEvents[pos].point)) {
+  var length = resultEvents.length;
+  while (newPos < length &&
+         equals(resultEvents[newPos].point, resultEvents[pos].point)) {
     if (!processed[newPos]) {
       return newPos;
     } else {
@@ -584,6 +602,7 @@ function boolean(subject, clipping, operation) {
   return connectEdges(sortedEvents);
 }
 
+
 module.exports = boolean;
 
 
@@ -607,6 +626,9 @@ module.exports.intersection = function(subject, clipping) {
 };
 
 
+/**
+ * @enum {Number}
+ */
 module.exports.operations = {
   INTERSECTION: INTERSECTION,
   DIFFERENCE:   DIFFERENCE,

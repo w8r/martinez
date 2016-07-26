@@ -76,7 +76,7 @@ tap.test('compare segments', (t) => {
     var se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), false);
 
     t.notEqual(se1.isSubject, se2.isSubject);
-    t.equal(compareSegments(se1, se2), 1);
+    t.equal(compareSegments(se1, se2), -1);
 
     t.end();
   });

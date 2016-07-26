@@ -18,8 +18,6 @@ tap.test('fill event queue', (t) => {
     t.strictSame(cbbox, [ 54.5, -198, 239.5, 33.5 ], 'clipping bbox');
     t.end();
   });
-  console.log(sbbox);
-  console.log(cbbox);
 
   t.test('point 0', (t) => {
     currentPoint = q.pop();

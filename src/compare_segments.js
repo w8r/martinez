@@ -30,11 +30,18 @@ module.exports = function compareSegments(le1, le2) {
     return le1.isBelow(le2.point) ? -1 : 1;
   }
 
-  // Segments are collinear
-  if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
-
-  // Just a consistent criterion is used
-  if (le1.point === le2.point) return 0;
+  if (le1.isSubject === le2.isSubject){
+    if (equals(le1.point, le2.point)) {
+      if (le1.contourId === le2.contourId){
+        return 0;
+      } else {
+        return le1.contourId > le2.contourId ? 1 : -1;
+      }
+    } else {
+      // Segments are collinear
+      if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
+    }
+  }
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
 };
