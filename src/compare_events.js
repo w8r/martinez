@@ -39,7 +39,7 @@ function specialCases(e1, e2, p1, p2) {
     if(e1.contourId === e2.contourId){
       return 0;
     } else {
-        return e1.contourId > e2.contourId ? -1 : 1;
+      return e1.contourId > e2.contourId ? 1 : -1;
     }
   }
 

@@ -3,7 +3,7 @@ var LeafletEditable = require('leaflet-editable');
 require('./coordinates');
 require('./polygoncontrol');
 require('./booleanopcontrol');
-var martinez = require('../../');
+var martinez = window.martinez = require('../../');
 //var martinez = require('../../dist/martinez.min');
 var xhr = require('superagent');
 // var turf = require('turf');
@@ -80,7 +80,7 @@ function run (op) {
 
   console.log('input', subject, clipping, op);
 
-  subject = JSON.parse(JSON.stringify(subject));
+  subject  = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
 
 
@@ -99,12 +99,23 @@ function run (op) {
     }
   });
 
-  console.time('jsts');
-  var s = reader.read(subject);
-  var c = reader.read(clipping);
-  var res = writer.write(s.geometry.intersection(c.geometry));
-
-  console.timeEnd('jsts');
+  L.Util.requestAnimFrame(function() {
+    console.time('jsts');
+    var s = reader.read(subject);
+    var c = reader.read(clipping);
+    var res;
+    if (op === martinez.operations.INTERSECTION) {
+      res = s.geometry.intersection(c.geometry);
+    } else if (op === martinez.operations.UNION) {
+      res = s.geometry.union(c.geometry);
+    } else if (op === martinez.operations.DIFFERENCE) {
+      res = s.geometry.difference(c.geometry);
+    } else {
+      res = s.geometry.symDifference(c.geometry);
+    }
+    res = writer.write(res);
+    console.timeEnd('jsts');
+  });
 }
 
 //drawnItems.addData(oneInside);

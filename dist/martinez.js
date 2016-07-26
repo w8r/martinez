@@ -690,11 +690,17 @@ function specialCases(e1, e2, p1, p2) {
   }
 
   if (e1.isSubject === e2.isSubject) {
-    return e1.contourId > e2.contourId ? -1 : 1;
+    if(e1.contourId === e2.contourId){
+      return 0;
+    } else {
+      return e1.contourId > e2.contourId ? 1 : -1;
+    }
   }
+
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
   //return e1.isSubject ? -1 : 1;
 }
+
 },{"./signed_area":13}],8:[function(require,module,exports){
 var signedArea    = require('./signed_area');
 var compareEvents = require('./compare_events');
@@ -728,12 +734,17 @@ module.exports = function compareSegments(le1, le2) {
     return le1.isBelow(le2.point) ? -1 : 1;
   }
 
-  // Segments are collinear
-  if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
-
-  // Just a consistent criterion is used
-  if (equals(le1.point, le2.point)) {
-    return le1.contourId > le2.contourId ? -1 : 1;
+  if (le1.isSubject === le2.isSubject){
+    if (equals(le1.point, le2.point)) {
+      if (le1.contourId === le2.contourId){
+        return 0;
+      } else {
+        return le1.contourId > le2.contourId ? 1 : -1;
+      }
+    } else {
+      // Segments are collinear
+      if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
+    }
   }
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
@@ -914,9 +925,11 @@ function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-    // console.warn('Edges of the same polygon overlap',
-    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+  if (nintersections === 2 && se1.isSubject === se2.isSubject){
+    if(se1.contourId === se2.contourId){
+    console.warn('Edges of the same polygon overlap',
+      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    }
     //throw new Error('Edges of the same polygon overlap');
     return 0;
   }
