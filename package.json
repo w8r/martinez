@@ -1,7 +1,7 @@
 {
   "name": "martinez",
   "version": "0.1.0",
-  "description": "F. Martínez polygon clipping algorithm",
+  "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
   "main": "index.js",
   "scripts": {
     "test": "tap test/*.test.js -R spec",
@@ -21,6 +21,11 @@
     "geometry",
     "martinez"
   ],
+  "repository":{
+    "url": "git+https://github.com/w8r/martinez.git",
+    "type": "git"
+  },
+  "homepage": "https://github.com/w8r/martinez",
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
   "devDependencies": {
