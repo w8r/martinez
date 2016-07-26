@@ -27,13 +27,13 @@ var intersection = {
 
 ### API
 
-* **`.intersection(<Geometry>, <Geometry>) => <Geometry>`
-* **`.union(<Geometry>, <Geometry>)        => <Geometry>`
-* **`.difference(<Geometry>, <Geometry>)   => <Geometry>`
-* **`.xor(<Geometry>, <Geometry>)          => <Geometry>`
-* **`.boolean(<Geometry>, <Geometry>, <Operation>) => <Geometry>`
+* **`.intersection(<Geometry>, <Geometry>) => <Geometry>`**
+* **`.union(<Geometry>, <Geometry>)        => <Geometry>`**
+* **`.difference(<Geometry>, <Geometry>)   => <Geometry>`**
+* **`.xor(<Geometry>, <Geometry>)          => <Geometry>`**
+* **`.boolean(<Geometry>, <Geometry>, <Operation>) => <Geometry>`**
 
-`<Geometry>` is [GeoJSON](http://geojson.org/geojson-spec.html) [`'Polygon'`](http://geojson.org/geojson-spec.html#id4) or [`'MultiPolygon'`](http://geojson.org/geojson-spec.html#id7) coordinates structure.
+`<Geometry>` is [GeoJSON](http://geojson.org/geojson-spec.html) [`'Polygon'`](http://geojson.org/geojson-spec.html#id4) or [`'MultiPolygon'`](http://geojson.org/geojson-spec.html#id7) <u>**coordinates**</u> structure.
 `<Operation>` is an enum of `{ INTERSECTION: 0, UNION: 1, DIFFERENCE: 2, XOR: 3 }` in case you have to decide programmatically
 which operation do you need
 
