@@ -1,6 +1,6 @@
 {
   "name": "martinez",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "F. Martínez polygon clipping algorithm",
   "main": "index.js",
   "scripts": {
