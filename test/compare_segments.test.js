@@ -4,11 +4,11 @@ var compareEvents   = require('../src/compare_events');
 var Tree            = require('bintrees').RBTree;
 var SweepEvent      = require('../src/sweep_event');
 
-tap.test('compare segments', (t) => {
+tap.test('compare segments', function(t) {
 
-  t.test('not collinear', (t) => {
+  t.test('not collinear', function(t) {
 
-    t.test('shared left point - right point first', (t) => {
+    t.test('shared left point - right point first', function(t) {
       var tree = new Tree(compareSegments);
       var pt = [0.0, 0.0];
       var se1 = new SweepEvent(pt, true, new SweepEvent([1, 1], false));
@@ -23,7 +23,7 @@ tap.test('compare segments', (t) => {
       t.end();
     });
 
-    t.test('different left point - right point y coord to sort', (t) => {
+    t.test('different left point - right point y coord to sort', function(t) {
       var tree = new Tree(compareSegments);
       var se1 = new SweepEvent([0, 1], true, new SweepEvent([1, 1], false));
       var se2 = new SweepEvent([0, 2], true, new SweepEvent([2, 3], false));
@@ -37,7 +37,7 @@ tap.test('compare segments', (t) => {
       t.end();
     });
 
-    t.test('events order in sweep line', (t) => {
+    t.test('events order in sweep line', function(t) {
       var tree = new Tree(compareSegments);
       var se1 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
       var se2 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
@@ -58,7 +58,7 @@ tap.test('compare segments', (t) => {
       t.end();
     });
 
-    t.test('first point is below', (t) => {
+    t.test('first point is below', function(t) {
       var se2 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
       var se1 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
 
@@ -71,7 +71,7 @@ tap.test('compare segments', (t) => {
     t.end();
   });
 
-  t.test('collinear segments', (t) => {
+  t.test('collinear segments', function(t) {
     var se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
     var se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), false);
 
@@ -81,7 +81,7 @@ tap.test('compare segments', (t) => {
     t.end();
   });
 
-  t.test('collinear shared left point', (t) => {
+  t.test('collinear shared left point', function(t) {
     var pt = [0, 1];
 
     var se1 = new SweepEvent(pt, true, new SweepEvent([5, 1], false), false);
@@ -96,7 +96,7 @@ tap.test('compare segments', (t) => {
   });
 
 
-  t.test('collinear same polygon different left points', (t) => {
+  t.test('collinear same polygon different left points', function(t) {
     var se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
     var se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), true);
 

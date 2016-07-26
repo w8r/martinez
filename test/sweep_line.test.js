@@ -8,7 +8,7 @@ var SweepEvent = require('../src/sweep_event');
 var subject  = data.features[0];
 var clipping = data.features[1];
 
-tap.test('sweep line', (t) => {
+tap.test('sweep line', function(t) {
 
   var s = subject.geometry.coordinates;
   var c = clipping.geometry.coordinates;

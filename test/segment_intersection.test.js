@@ -1,7 +1,7 @@
 var tap = require('tap');
 var intersection = require('../src/segment_intersection');
 
-tap.test('intersection', (t) => {
+tap.test('intersection', function(t) {
 
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [2, 2]), null, 'null if no intersections');
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [10, 2]), null, 'null if no intersections');

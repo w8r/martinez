@@ -14,9 +14,9 @@ var compareSegments = require('../src/compare_segments');
 var subject = shapes.features[0];
 var clipping = shapes.features[1];
 
-tap.test('divide segments', (t) => {
+tap.test('divide segments', function(t) {
 
-  t.test('divide 2 segments', (t) => {
+  t.test('divide 2 segments', function(t) {
     var se1 = new SweepEvent([0, 0], true, new SweepEvent([5,5], false), true);
     var se2 = new SweepEvent([0, 5], true, new SweepEvent([5,0], false), false);
     var q = new Queue(null, compareEvents);
@@ -38,7 +38,7 @@ tap.test('divide segments', (t) => {
     t.end();
   });
 
-  t.test('possible intersections', (t) => {
+  t.test('possible intersections', function(t) {
 
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
@@ -73,7 +73,7 @@ tap.test('divide segments', (t) => {
     t.end();
   });
 
-  t.test('possible intersections on 2 polygons', (t) => {
+  t.test('possible intersections on 2 polygons', function(t) {
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
 

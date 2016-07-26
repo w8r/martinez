@@ -3,9 +3,9 @@ var sweepEventsComp = require('../src/compare_events');
 var SweepEvent = require('../src/sweep_event');
 var Queue = require('tinyqueue');
 
-tap.test('queue', (t) => {
+tap.test('queue', function(t) {
 
-  t.test('queue should process lest(by x) sweep event first', (t) => {
+  t.test('queue should process lest(by x) sweep event first', function(t) {
     var queue = eventQueue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0] };
     var e2 = { point: [0.5, 0.5] };
@@ -19,7 +19,7 @@ tap.test('queue', (t) => {
     t.end();
   });
 
-  t.test('queue should process lest(by y) sweep event first', (t) => {
+  t.test('queue should process lest(by y) sweep event first', function(t) {
     var queue = eventQueue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0] };
     var e2 = { point: [0.0, 0.5] };
@@ -34,7 +34,7 @@ tap.test('queue', (t) => {
   });
 
 
-  t.test('queue should pop least(by left prop) sweep event first', (t) => {
+  t.test('queue should pop least(by left prop) sweep event first', function(t) {
     var queue = eventQueue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0], left: true };
     var e2 = { point: [0.0, 0.0], left: false };
@@ -51,7 +51,7 @@ tap.test('queue', (t) => {
   t.end();
 });
 
-tap.test('sweep event comparison x coordinates', (t) => {
+tap.test('sweep event comparison x coordinates', function(t) {
   var e1 = { point: [0.0, 0.0] };
   var e2 = { point: [0.5, 0.5] };
 
@@ -61,7 +61,7 @@ tap.test('sweep event comparison x coordinates', (t) => {
   t.end();
 });
 
-tap.test('sweep event comparison y coordinates', (t) => {
+tap.test('sweep event comparison y coordinates', function(t) {
   var e1 = { point: [0.0, 0.0] };
   var e2 = { point: [0.0, 0.5] };
 
@@ -71,7 +71,7 @@ tap.test('sweep event comparison y coordinates', (t) => {
   t.end();
 });
 
-tap.test('sweep event comparison not left first', (t) => {
+tap.test('sweep event comparison not left first', function(t) {
   var e1 = { point: [0.0, 0.0], left: true };
   var e2 = { point: [0.0, 0.0], left: false };
 
@@ -81,7 +81,7 @@ tap.test('sweep event comparison not left first', (t) => {
   t.end();
 });
 
-tap.test('sweep event comparison shared start point not collinear edges', (t) => {
+tap.test('sweep event comparison shared start point not collinear edges', function(t) {
   var e1 = new SweepEvent([0.0, 0.0], true, new SweepEvent([1, 1], false));
   var e2 = new SweepEvent([0.0, 0.0], true, new SweepEvent([2, 3], false));
 
@@ -91,7 +91,7 @@ tap.test('sweep event comparison shared start point not collinear edges', (t) =>
   t.end();
 });
 
-tap.test('sweep event comparison collinear edges', (t) => {
+tap.test('sweep event comparison collinear edges', function(t) {
   var e1 = new SweepEvent([0.0, 0.0], true, new SweepEvent([1, 1], false), true);
   var e2 = new SweepEvent([0.0, 0.0], true, new SweepEvent([2, 2], false), false);
 
