@@ -88,13 +88,6 @@ function run (op) {
   var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
   console.timeEnd('martinez');
 
-  console.time('jsts');
-  var s = reader.read(subject);
-  var c = reader.read(clipping);
-  var res = writer.write(s.geometry.intersection(c.geometry));
-
-  console.timeEnd('jsts');
-
   //console.log('result', result, res);
 
   results.clearLayers();
@@ -105,6 +98,13 @@ function run (op) {
       'coordinates': result
     }
   });
+
+  console.time('jsts');
+  var s = reader.read(subject);
+  var c = reader.read(clipping);
+  var res = writer.write(s.geometry.intersection(c.geometry));
+
+  console.timeEnd('jsts');
 }
 
 //drawnItems.addData(oneInside);
