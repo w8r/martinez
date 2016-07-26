@@ -8,6 +8,35 @@
 The algorithm is specifically *fast* and *capable* of working with polygons of all types: multipolygons (without cascading),
 polygons with holes, self-intersecting polygons and degenerate polygons with overlapping edges.
 
+### Example
+
+```js
+var martinez = require('martinez-polygon-clipping');
+var gj1 = { "type": "Feature", ..., "geometry": { "type": "Polygon", "coordinates": [ [ [x, y], ... ] ]};
+var gj2 = { "type": "Feature", ..., "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [x, y], ...] ] ]};
+
+var intersection = {
+  "type": "Feature",
+  "properties": { ... },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": martinez.intersection(gj1.geometry.coordinates, gj2.geometry.coordinates)
+  }
+};
+```
+
+### API
+
+* **`.intersection(<Geometry>, <Geometry>) => <Geometry>`
+* **`.union(<Geometry>, <Geometry>)        => <Geometry>`
+* **`.difference(<Geometry>, <Geometry>)   => <Geometry>`
+* **`.xor(<Geometry>, <Geometry>)          => <Geometry>`
+* **`.boolean(<Geometry>, <Geometry>, <Operation>) => <Geometry>`
+
+`<Geometry>` is [GeoJSON](http://geojson.org/geojson-spec.html) [`'Polygon'`](http://geojson.org/geojson-spec.html#id4) or [`'MultiPolygon'`](http://geojson.org/geojson-spec.html#id7) coordinates structure.
+`<Operation>` is an enum of `{ INTERSECTION: 0, UNION: 1, DIFFERENCE: 2, XOR: 3 }` in case you have to decide programmatically
+which operation do you need
+
 ### Authors
 
 * [Alexander Milevski](https://github.com/w8r/)
