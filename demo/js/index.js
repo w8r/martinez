@@ -1,22 +1,12 @@
-var L = require('leaflet');
-var LeafletEditable = require('leaflet-editable');
 require('./coordinates');
 require('./polygoncontrol');
 require('./booleanopcontrol');
 var martinez = window.martinez = require('../../');
 //var martinez = require('../../dist/martinez.min');
 var xhr = require('superagent');
-// var turf = require('turf');
-var jsts = window.jsts = require('jsts');
-
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
-
-console.log(mode);
-
 var path = '../test/fixtures/';
 var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
-
-
 
 var div = document.createElement('div');
 div.id = 'image-map';
