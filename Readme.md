@@ -29,7 +29,7 @@ var intersection = {
 
 * **`.intersection(<Geometry>, <Geometry>) => <Geometry>`**
 * **`.union(<Geometry>, <Geometry>)        => <Geometry>`**
-* **`.difference(<Geometry>, <Geometry>)   => <Geometry>`**
+* **`.diff(<Geometry>, <Geometry>)         => <Geometry>`**
 * **`.xor(<Geometry>, <Geometry>)          => <Geometry>`**
 * **`.boolean(<Geometry>, <Geometry>, <Operation>) => <Geometry>`**
 
