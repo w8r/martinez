@@ -19,6 +19,8 @@ var equals          = require('./equals');
 var max = Math.max;
 var min = Math.min;
 
+global.Tree = Tree;
+
 /**
  * @param  {<Array.<Number>} s1
  * @param  {<Array.<Number>} s2
@@ -414,11 +416,13 @@ function addHole(contour, idx) {
 }
 
 
-function connectEdges(sortedEvents) {
-  // copy the events in the result polygon to resultEvents array
+/**
+ * @param  {Array.<SweepEvent>} sortedEvents
+ * @return {Array.<SweepEvent>}
+ */
+function orderEvents(sortedEvents) {
+  var i, len;
   var resultEvents = [];
-  var event, i, len;
-
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
@@ -442,12 +446,28 @@ function connectEdges(sortedEvents) {
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     resultEvents[i].pos = i;
+  }
+
+  for (i = 0, len = resultEvents.length; i < len; i++) {
     if (!resultEvents[i].left) {
       var temp = resultEvents[i].pos;
       resultEvents[i].pos = resultEvents[i].otherEvent.pos;
       resultEvents[i].otherEvent.pos = temp;
     }
   }
+
+  return resultEvents;
+}
+
+
+/**
+ * @param  {Array.<SweepEvent>} sortedEvents
+ * @return {Array.<*>} polygons
+ */
+function connectEdges(sortedEvents) {
+  var event, i, len;
+  var resultEvents = orderEvents(sortedEvents);
+
 
   // "false"-filled array
   var processed = Array(resultEvents.length);
@@ -510,8 +530,6 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
-
-
 
 
     // depth is even

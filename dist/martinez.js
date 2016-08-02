@@ -763,6 +763,7 @@ module.exports = function equals(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
 },{}],11:[function(require,module,exports){
+(function (global){
 var INTERSECTION    = 0;
 var UNION           = 1;
 var DIFFERENCE      = 2;
@@ -783,6 +784,8 @@ var equals          = require('./equals');
 
 var max = Math.max;
 var min = Math.min;
+
+global.Tree = Tree;
 
 /**
  * @param  {<Array.<Number>} s1
@@ -1179,11 +1182,13 @@ function addHole(contour, idx) {
 }
 
 
-function connectEdges(sortedEvents) {
-  // copy the events in the result polygon to resultEvents array
+/**
+ * @param  {Array.<SweepEvent>} sortedEvents
+ * @return {Array.<SweepEvent>}
+ */
+function orderEvents(sortedEvents) {
+  var i, len;
   var resultEvents = [];
-  var event, i, len;
-
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
@@ -1207,12 +1212,28 @@ function connectEdges(sortedEvents) {
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     resultEvents[i].pos = i;
+  }
+
+  for (i = 0, len = resultEvents.length; i < len; i++) {
     if (!resultEvents[i].left) {
       var temp = resultEvents[i].pos;
       resultEvents[i].pos = resultEvents[i].otherEvent.pos;
       resultEvents[i].otherEvent.pos = temp;
     }
   }
+
+  return resultEvents;
+}
+
+
+/**
+ * @param  {Array.<SweepEvent>} sortedEvents
+ * @return {Array.<*>} polygons
+ */
+function connectEdges(sortedEvents) {
+  var event, i, len;
+  var resultEvents = orderEvents(sortedEvents);
+
 
   // "false"-filled array
   var processed = Array(resultEvents.length);
@@ -1275,8 +1296,6 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = contourId;
-
-
 
 
     // depth is even
@@ -1411,6 +1430,7 @@ module.exports.subdivideSegments    = subdivideSegments;
 module.exports.divideSegment        = divideSegment;
 module.exports.possibleIntersection = possibleIntersection;
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compare_events":7,"./compare_segments":8,"./edge_type":9,"./equals":10,"./segment_intersection":12,"./sweep_event":14,"bintrees":2,"tinyqueue":6}],12:[function(require,module,exports){
 var EPSILON = 1e-9;
 

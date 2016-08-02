@@ -6,7 +6,7 @@ var martinez = window.martinez = require('../../');
 var xhr = require('superagent');
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
+var file = mode === 'geo' ? 'asia.json' : 'shape_border.json';
 
 var div = document.createElement('div');
 div.id = 'image-map';
@@ -89,7 +89,7 @@ function run (op) {
     }
   });
 
-  L.Util.requestAnimFrame(function() {
+  setTimeout(function() {
     console.time('jsts');
     var s = reader.read(subject);
     var c = reader.read(clipping);
@@ -105,7 +105,7 @@ function run (op) {
     }
     res = writer.write(res);
     console.timeEnd('jsts');
-  });
+  }, 500);
 }
 
 //drawnItems.addData(oneInside);
