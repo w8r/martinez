@@ -653,6 +653,7 @@ function swap(data, i, j) {
 
 },{}],7:[function(require,module,exports){
 var signedArea = require('./signed_area');
+var equals = require('./equals');
 
 /**
  * @param  {SweepEvent} e1
@@ -689,19 +690,21 @@ function specialCases(e1, e2, p1, p2) {
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
 
-  if (e1.isSubject === e2.isSubject) {
-    if(e1.contourId === e2.contourId){
-      return 0;
-    } else {
-      return e1.contourId > e2.contourId ? 1 : -1;
-    }
-  }
-
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
-  //return e1.isSubject ? -1 : 1;
+
+  // uncomment this if you want to play with multipolygons
+  // if (e1.isSubject === e2.isSubject) {
+  //   if(equals(e1.point, e2.point) && e1.contourId === e2.contourId) {
+  //     return 0;
+  //   } else {
+  //     return e1.contourId > e2.contourId ? 1 : -1;
+  //   }
+  // }
+  //
+  // return e1.isSubject ? -1 : 1;
 }
 
-},{"./signed_area":13}],8:[function(require,module,exports){
+},{"./equals":10,"./signed_area":13}],8:[function(require,module,exports){
 var signedArea    = require('./signed_area');
 var compareEvents = require('./compare_events');
 var equals        = require('./equals');
@@ -734,17 +737,16 @@ module.exports = function compareSegments(le1, le2) {
     return le1.isBelow(le2.point) ? -1 : 1;
   }
 
-  if (le1.isSubject === le2.isSubject){
+  if (le1.isSubject === le2.isSubject) { // same polygon
     if (equals(le1.point, le2.point)) {
-      if (le1.contourId === le2.contourId){
+      if (equals(le1.otherEvent.point, le2.otherEvent.point)) {
         return 0;
       } else {
         return le1.contourId > le2.contourId ? 1 : -1;
       }
-    } else {
-      // Segments are collinear
-      if (le1.isSubject !== le2.isSubject) return (le1.isSubject && !le2.isSubject) ? 1 : -1;
     }
+  } else { // Segments are collinear, but belong to separate polygons
+    return le1.isSubject ? -1 : 1;
   }
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
@@ -763,7 +765,6 @@ module.exports = function equals(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
 },{}],11:[function(require,module,exports){
-(function (global){
 var INTERSECTION    = 0;
 var UNION           = 1;
 var DIFFERENCE      = 2;
@@ -785,7 +786,10 @@ var equals          = require('./equals');
 var max = Math.max;
 var min = Math.min;
 
-global.Tree = Tree;
+// global.Tree = Tree;
+// global.compareSegments = compareSegments;
+// global.SweepEvent = SweepEvent;
+// global.signedArea = require('./signed_area');
 
 /**
  * @param  {<Array.<Number>} s1
@@ -1019,6 +1023,12 @@ function divideSegment(se, p, queue)  {
   var r = new SweepEvent(p, false, se,            se.isSubject);
   var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
+  if (equals(se.point, se.otherEvent.point)) {
+    console.warn('what is that?', se);
+  }
+
+  r.contourId = l.contourId = se.contourId;
+
   // avoid a rounding error. The left event would be processed after the right event
   if (compareEvents(l, se.otherEvent) > 0) {
     se.otherEvent.left = true;
@@ -1090,17 +1100,25 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine.insert(event);
+      var ins = sweepLine.insert(event);
       // _renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
       event.iterator = sweepLine.findIter(event);
 
+      // Cannot get out of the tree what we just put there
+      if (!prev || !next) {
+        var iterators = findIterBrute(sweepLine);
+        prev = iterators[0];
+        next = iterators[1];
+      }
+
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
-        prev = sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.iterator(); //findIter(sweepLine.max());
+        prev.prev();
         prev.next();
       }
       next.next();
@@ -1139,7 +1157,8 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
-        prev = sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.iterator();
+        prev.prev(); // sweepLine.findIter(sweepLine.max());
         prev.next();
       }
       next.next();
@@ -1153,6 +1172,20 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
   }
   return sortedEvents;
+}
+
+function findIterBrute(sweepLine, q) {
+  var prev = sweepLine.iterator();
+  var next = sweepLine.iterator();
+  var it   = sweepLine.iterator(), data;
+  while((data = it.next()) !== null) {
+    prev.next();
+    next.next();
+    if (data === event) {
+      break;
+    }
+  }
+  return [prev, next];
 }
 
 
@@ -1430,7 +1463,6 @@ module.exports.subdivideSegments    = subdivideSegments;
 module.exports.divideSegment        = divideSegment;
 module.exports.possibleIntersection = possibleIntersection;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compare_events":7,"./compare_segments":8,"./edge_type":9,"./equals":10,"./segment_intersection":12,"./sweep_event":14,"bintrees":2,"tinyqueue":6}],12:[function(require,module,exports){
 var EPSILON = 1e-9;
 

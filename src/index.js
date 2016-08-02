@@ -19,7 +19,10 @@ var equals          = require('./equals');
 var max = Math.max;
 var min = Math.min;
 
-global.Tree = Tree;
+// global.Tree = Tree;
+// global.compareSegments = compareSegments;
+// global.SweepEvent = SweepEvent;
+// global.signedArea = require('./signed_area');
 
 /**
  * @param  {<Array.<Number>} s1
@@ -253,6 +256,12 @@ function divideSegment(se, p, queue)  {
   var r = new SweepEvent(p, false, se,            se.isSubject);
   var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
+  if (equals(se.point, se.otherEvent.point)) {
+    console.warn('what is that?', se);
+  }
+
+  r.contourId = l.contourId = se.contourId;
+
   // avoid a rounding error. The left event would be processed after the right event
   if (compareEvents(l, se.otherEvent) > 0) {
     se.otherEvent.left = true;
@@ -324,17 +333,25 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine.insert(event);
+      var ins = sweepLine.insert(event);
       // _renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.findIter(event);
       prev = sweepLine.findIter(event);
       event.iterator = sweepLine.findIter(event);
 
+      // Cannot get out of the tree what we just put there
+      if (!prev || !next) {
+        var iterators = findIterBrute(sweepLine);
+        prev = iterators[0];
+        next = iterators[1];
+      }
+
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
-        prev = sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.iterator(); //findIter(sweepLine.max());
+        prev.prev();
         prev.next();
       }
       next.next();
@@ -373,7 +390,8 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       if (prev.data() !== sweepLine.min()) {
         prev.prev();
       } else {
-        prev = sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.iterator();
+        prev.prev(); // sweepLine.findIter(sweepLine.max());
         prev.next();
       }
       next.next();
@@ -387,6 +405,20 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
   }
   return sortedEvents;
+}
+
+function findIterBrute(sweepLine, q) {
+  var prev = sweepLine.iterator();
+  var next = sweepLine.iterator();
+  var it   = sweepLine.iterator(), data;
+  while((data = it.next()) !== null) {
+    prev.next();
+    next.next();
+    if (data === event) {
+      break;
+    }
+  }
+  return [prev, next];
 }
 
 

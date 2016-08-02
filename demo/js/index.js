@@ -6,7 +6,7 @@ var martinez = window.martinez = require('../../');
 var xhr = require('superagent');
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.json' : 'shape_border.json';
+var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
 
 var div = document.createElement('div');
 div.id = 'image-map';

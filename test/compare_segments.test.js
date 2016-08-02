@@ -87,10 +87,18 @@ tap.test('compare segments', function(t) {
     var se1 = new SweepEvent(pt, true, new SweepEvent([5, 1], false), false);
     var se2 = new SweepEvent(pt, true, new SweepEvent([3, 1], false), false);
 
+    se1.contourId = 1;
+    se2.contourId = 2;
+
     t.equal(se1.isSubject, se2.isSubject);
     t.equal(se1.point, se2.point);
 
-    t.equal(compareSegments(se1, se2), 0);
+    t.equal(compareSegments(se1, se2), -1);
+
+    se1.contourId = 2;
+    se2.contourId = 1;
+
+    t.equal(compareSegments(se1, se2), +1);
 
     t.end();
   });
