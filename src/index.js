@@ -333,7 +333,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      var ins = sweepLine.insert(event);
+      sweepLine.insert(event);
       // _renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.findIter(event);
@@ -453,7 +453,7 @@ function addHole(contour, idx) {
  * @return {Array.<SweepEvent>}
  */
 function orderEvents(sortedEvents) {
-  var i, len;
+  var event, i, len;
   var resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
@@ -497,7 +497,7 @@ function orderEvents(sortedEvents) {
  * @return {Array.<*>} polygons
  */
 function connectEdges(sortedEvents) {
-  var event, i, len;
+  var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
 
@@ -515,7 +515,7 @@ function connectEdges(sortedEvents) {
     var contour = [];
     result.push(contour);
 
-    var contourId = result.length - 1;
+    var ringContourId = result.length - 1;
     depth.push(0);
     holeOf.push(-1);
 
@@ -523,15 +523,15 @@ function connectEdges(sortedEvents) {
     if (resultEvents[i].prevInResult) {
       var lowerContourId = resultEvents[i].prevInResult.contourId;
       if (!resultEvents[i].prevInResult.resultInOut) {
-        addHole(result[lowerContourId], contourId);
-        holeOf[contourId] = lowerContourId;
-        depth[contourId]  = depth[lowerContourId] + 1;
-        isHole[contourId] = true;
+        addHole(result[lowerContourId], ringContourId);
+        holeOf[ringContourId] = lowerContourId;
+        depth[ringContourId]  = depth[lowerContourId] + 1;
+        isHole[ringContourId] = true;
       } else if (isHole[lowerContourId]) {
-        addHole(result[holeOf[lowerContourId]], contourId);
-        holeOf[contourId] = holeOf[lowerContourId];
-        depth[contourId]  = depth[lowerContourId];
-        isHole[contourId] = true;
+        addHole(result[holeOf[lowerContourId]], ringContourId);
+        holeOf[ringContourId] = holeOf[lowerContourId];
+        depth[ringContourId]  = depth[lowerContourId];
+        isHole[ringContourId] = true;
       }
     }
 

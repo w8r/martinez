@@ -1,5 +1,5 @@
 var signedArea = require('./signed_area');
-var equals = require('./equals');
+// var equals = require('./equals');
 
 /**
  * @param  {SweepEvent} e1
