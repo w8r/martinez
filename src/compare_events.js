@@ -36,8 +36,6 @@ function specialCases(e1, e2, p1, p2) {
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
 
-  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
-
   // uncomment this if you want to play with multipolygons
   // if (e1.isSubject === e2.isSubject) {
   //   if(equals(e1.point, e2.point) && e1.contourId === e2.contourId) {
@@ -46,6 +44,6 @@ function specialCases(e1, e2, p1, p2) {
   //     return e1.contourId > e2.contourId ? 1 : -1;
   //   }
   // }
-  //
-  // return e1.isSubject ? -1 : 1;
+
+  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }

@@ -690,8 +690,6 @@ function specialCases(e1, e2, p1, p2) {
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
 
-  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
-
   // uncomment this if you want to play with multipolygons
   // if (e1.isSubject === e2.isSubject) {
   //   if(equals(e1.point, e2.point) && e1.contourId === e2.contourId) {
@@ -700,8 +698,8 @@ function specialCases(e1, e2, p1, p2) {
   //     return e1.contourId > e2.contourId ? 1 : -1;
   //   }
   // }
-  //
-  // return e1.isSubject ? -1 : 1;
+
+  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }
 
 },{"./signed_area":13}],8:[function(require,module,exports){
@@ -1109,6 +1107,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       // Cannot get out of the tree what we just put there
       if (!prev || !next) {
+        console.log('brute');
         var iterators = findIterBrute(sweepLine);
         prev = iterators[0];
         next = iterators[1];
@@ -1207,7 +1206,7 @@ function isArray (arr) {
 
 
 function addHole(contour, idx) {
-  if (!isArray(contour[0][0])) {
+  if (isArray(contour[0]) && !isArray(contour[0][0])) {
     contour = [contour];
   }
   contour[idx] = [];
@@ -1282,7 +1281,7 @@ function connectEdges(sortedEvents) {
     var contour = [];
     result.push(contour);
 
-    var ringContourId = result.length - 1;
+    var ringId = result.length - 1;
     depth.push(0);
     holeOf.push(-1);
 
@@ -1290,15 +1289,15 @@ function connectEdges(sortedEvents) {
     if (resultEvents[i].prevInResult) {
       var lowerContourId = resultEvents[i].prevInResult.contourId;
       if (!resultEvents[i].prevInResult.resultInOut) {
-        addHole(result[lowerContourId], ringContourId);
-        holeOf[ringContourId] = lowerContourId;
-        depth[ringContourId]  = depth[lowerContourId] + 1;
-        isHole[ringContourId] = true;
+        addHole(result[lowerContourId], ringId);
+        holeOf[ringId] = lowerContourId;
+        depth[ringId]  = depth[lowerContourId] + 1;
+        isHole[ringId] = true;
       } else if (isHole[lowerContourId]) {
-        addHole(result[holeOf[lowerContourId]], ringContourId);
-        holeOf[ringContourId] = holeOf[lowerContourId];
-        depth[ringContourId]  = depth[lowerContourId];
-        isHole[ringContourId] = true;
+        addHole(result[holeOf[lowerContourId]], ringId);
+        holeOf[ringId] = holeOf[lowerContourId];
+        depth[ringId]  = depth[lowerContourId];
+        isHole[ringId] = true;
       }
     }
 
@@ -1311,10 +1310,10 @@ function connectEdges(sortedEvents) {
 
       if (resultEvents[pos].left) {
         resultEvents[pos].resultInOut = false;
-        resultEvents[pos].contourId   = contourId;
+        resultEvents[pos].contourId   = ringId;
       } else {
         resultEvents[pos].otherEvent.resultInOut = true;
-        resultEvents[pos].otherEvent.contourId   = contourId;
+        resultEvents[pos].otherEvent.contourId   = ringId;
       }
 
       pos = resultEvents[pos].pos;
@@ -1328,12 +1327,12 @@ function connectEdges(sortedEvents) {
 
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
-    resultEvents[pos].otherEvent.contourId   = contourId;
+    resultEvents[pos].otherEvent.contourId   = ringId;
 
 
     // depth is even
     /* eslint-disable no-bitwise */
-    if (depth[contourId] & 1) {
+    if (depth[ringId] & 1) {
       changeOrientation(contour);
     }
     /* eslint-enable no-bitwise */
