@@ -10,6 +10,8 @@ polygons with holes, self-intersecting polygons and degenerate polygons with ove
 
 ### Example
 
+Play with it by [forking this Codepen](http://codepen.io/w8r/pen/rrBkER)
+
 ```js
 var martinez = require('martinez-polygon-clipping');
 var gj1 = { "type": "Feature", ..., "geometry": { "type": "Polygon", "coordinates": [ [ [x, y], ... ] ]};
