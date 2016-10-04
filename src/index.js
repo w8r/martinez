@@ -312,9 +312,6 @@ function _renderSweepLine(sweepLine, pos, event) {
 
 
 function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation) {
-  var sortedEvents = [];
-  var prev, next;
-
   var sweepLine = new Tree(compareSegments);
   var sortedEvents = [];
 
