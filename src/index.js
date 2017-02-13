@@ -165,10 +165,10 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject){
-    if(se1.contourId === se2.contourId){
-    console.warn('Edges of the same polygon overlap',
-      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-    }
+    // if(se1.contourId === se2.contourId){
+    // console.warn('Edges of the same polygon overlap',
+    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    // }
     //throw new Error('Edges of the same polygon overlap');
     return 0;
   }
@@ -293,7 +293,7 @@ function _renderSweepLine(sweepLine, pos, event) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.each(function(e) {
+  sweepLine.forEach(function(e) {
     var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
     window.sws.push(poly);
   });
@@ -336,17 +336,10 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       prev = sweepLine.find(event);
       event.iterator = sweepLine.find(event);
 
-      // Cannot get out of the tree what we just put there
-      if (!prev || !next) {
-        console.log('brute');
-        var iterators = findIterBrute(sweepLine);
-        prev = iterators[0];
-        next = iterators[1];
-      }
       if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator(); 
+        prev = sweepLine.begin; 
         prev.prev();
         prev.next();
       }
@@ -385,8 +378,8 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator();
-        prev.prev(); // sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.begin;
+        prev.prev(); 
         prev.next();
       }
       next.next();
@@ -403,20 +396,6 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
   }
   return sortedEvents;
-}
-
-function findIterBrute(sweepLine, q) {
-  var prev = sweepLine.iterator();
-  var next = sweepLine.iterator();
-  var it   = sweepLine.iterator(), data;
-  while((data = it.next()) !== null) {
-    prev.next();
-    next.next();
-    if (data === event) {
-      break;
-    }
-  }
-  return [prev, next];
 }
 
 
