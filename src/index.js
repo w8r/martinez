@@ -8,7 +8,7 @@ var EMPTY           = [];
 var edgeType        = require('./edge_type');
 
 var Queue           = require('tinyqueue');
-var Tree            = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var SweepEvent      = require('./sweep_event');
 
 var compareEvents   = require('./compare_events');
@@ -93,19 +93,19 @@ function computeFields(event, prev, sweepLine, operation) {
     event.otherInOut = true;
 
   // previous line segment in sweepline belongs to the same polygon
-  } else if (event.isSubject === prev.isSubject) {
-    event.inOut      = !prev.inOut;
-    event.otherInOut = prev.otherInOut;
+  } else if (event.isSubject === prev.key.isSubject) {
+    event.inOut      = !prev.key.inOut;
+    event.otherInOut = prev.key.otherInOut;
 
   // previous line segment in sweepline belongs to the clipping polygon
   } else {
-    event.inOut      = !prev.otherInOut;
-    event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
+    event.inOut      = !prev.key.otherInOut;
+    event.otherInOut = prev.key.isVertical() ? !prev.key.inOut : prev.key.inOut;
   }
 
   // compute prevInResult field
   if (prev) {
-    event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ?
+    event.prevInResult = (!inResult(prev, operation) || prev.key.isVertical()) ?
        prev.prevInResult : prev;
   }
   // check if the line segment belongs to the Boolean operation
@@ -149,7 +149,6 @@ function possibleIntersection(se1, se2, queue) {
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
-
   var inter = intersection(
     se1.point, se1.otherEvent.point,
     se2.point, se2.otherEvent.point
@@ -166,10 +165,10 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject){
-    if(se1.contourId === se2.contourId){
-    console.warn('Edges of the same polygon overlap',
-      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-    }
+    // if(se1.contourId === se2.contourId){
+    // console.warn('Edges of the same polygon overlap',
+    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    // }
     //throw new Error('Edges of the same polygon overlap');
     return 0;
   }
@@ -294,7 +293,7 @@ function _renderSweepLine(sweepLine, pos, event) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.each(function(e) {
+  sweepLine.forEach(function(e) {
     var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
     window.sws.push(poly);
   });
@@ -330,93 +329,73 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine.insert(event);
+      sweepLine = sweepLine.insert(event);
       // _renderSweepLine(sweepLine, event.point, event);
 
-      next = sweepLine.findIter(event);
-      prev = sweepLine.findIter(event);
-      event.iterator = sweepLine.findIter(event);
+      next = sweepLine.find(event);
+      prev = sweepLine.find(event);
+      event.iterator = sweepLine.find(event);
 
-      // Cannot get out of the tree what we just put there
-      if (!prev || !next) {
-        console.log('brute');
-        var iterators = findIterBrute(sweepLine);
-        prev = iterators[0];
-        next = iterators[1];
-      }
-
-      if (prev.data() !== sweepLine.min()) {
+      if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator(); //findIter(sweepLine.max());
+        prev = sweepLine.begin; 
         prev.prev();
         prev.next();
       }
       next.next();
 
-      computeFields(event, prev.data(), sweepLine, operation);
-
-      if (next.data()) {
-        if (possibleIntersection(event, next.data(), eventQueue) === 2) {
-          computeFields(event, prev.data(), sweepLine, operation);
-          computeFields(event, next.data(), sweepLine, operation);
+      computeFields(event, prev.node, sweepLine, operation);
+      if (next.node) {
+        if (possibleIntersection(event, next.key, eventQueue) === 2) {
+          computeFields(event, prev.node, sweepLine, operation);
+          computeFields(event, next.node, sweepLine, operation);
         }
       }
 
-      if (prev.data()) {
-        if (possibleIntersection(prev.data(), event, eventQueue) === 2) {
-          var prevprev = sweepLine.findIter(prev.data());
-          if (prevprev.data() !== sweepLine.min()) {
+      if (prev.node) {
+        if (possibleIntersection(prev.key, event, eventQueue) === 2) {
+          var prevprev = sweepLine.find(prev.key);
+          if (prevprev.node !== sweepLine.begin) {
             prevprev.prev();
           } else {
-            prevprev = sweepLine.findIter(sweepLine.max());
+            prevprev = sweepLine.find(sweepLine.end);
             prevprev.next();
           }
-          computeFields(prev.data(), prevprev.data(), sweepLine, operation);
-          computeFields(event, prev.data(), sweepLine, operation);
+          computeFields(prev.node, prevprev.node, sweepLine, operation);
+          computeFields(event, prev.node, sweepLine, operation);
         }
       }
     } else {
       event = event.otherEvent;
-      next = sweepLine.findIter(event);
-      prev = sweepLine.findIter(event);
+      next = sweepLine.find(event);
+      prev = sweepLine.find(event);
 
       // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (!(prev && next)) continue;
 
-      if (prev.data() !== sweepLine.min()) {
+      if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator();
-        prev.prev(); // sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.begin;
+        prev.prev(); 
         prev.next();
       }
       next.next();
-      sweepLine.remove(event);
+      sweepLine = sweepLine.remove(event);
 
-      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
+      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
-      if (next.data() && prev.data()) {
-        possibleIntersection(prev.data(), next.data(), eventQueue);
+      if (next.node && prev.node) {
+        if (typeof prev.node.value !== 'undefined' && typeof next.node.value !== 'undefined') {
+          possibleIntersection(prev.node, next.node, eventQueue);
+        }        
       }
+
     }
   }
   return sortedEvents;
-}
-
-function findIterBrute(sweepLine, q) {
-  var prev = sweepLine.iterator();
-  var next = sweepLine.iterator();
-  var it   = sweepLine.iterator(), data;
-  while((data = it.next()) !== null) {
-    prev.next();
-    next.next();
-    if (data === event) {
-      break;
-    }
-  }
-  return [prev, next];
 }
 
 
