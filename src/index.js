@@ -106,7 +106,7 @@ function computeFields(event, prev, sweepLine, operation) {
   // compute prevInResult field
   if (prev) {
     event.prevInResult = (!inResult(prev, operation) || prev.key.isVertical()) ?
-       prev.prevInResult : prev;
+       prev.key.prevInResult : prev.key;
   }
   // check if the line segment belongs to the Boolean operation
   event.inResult = inResult(event, operation);
@@ -339,7 +339,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.begin; 
+        prev = sweepLine.begin;
         prev.prev();
         prev.next();
       }
@@ -379,7 +379,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
         prev.prev();
       } else {
         prev = sweepLine.begin;
-        prev.prev(); 
+        prev.prev();
         prev.next();
       }
       next.next();
@@ -390,7 +390,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       if (next.node && prev.node) {
         if (typeof prev.node.value !== 'undefined' && typeof next.node.value !== 'undefined') {
           possibleIntersection(prev.node, next.node, eventQueue);
-        }        
+        }
       }
 
     }
