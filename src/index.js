@@ -86,28 +86,38 @@ function fillQueue(subject, clipping, sbbox, cbbox) {
 }
 
 
-function computeFields(event, prev, sweepLine, operation) {
+/**
+ * @param  {SweepEvent} event
+ * @param  {SweepEvent} prev
+ * @param  {Tree} sweepLine
+ * @param  {Operation} operation
+ * @return {[type]}
+ */
+function computeFields(event, prev, operation) {
   // compute inOut and otherInOut fields
   if (prev === null) {
     event.inOut      = false;
     event.otherInOut = true;
 
   // previous line segment in sweepline belongs to the same polygon
-  } else if (event.isSubject === prev.key.isSubject) {
-    event.inOut      = !prev.key.inOut;
-    event.otherInOut = prev.key.otherInOut;
-
-  // previous line segment in sweepline belongs to the clipping polygon
   } else {
-    event.inOut      = !prev.key.otherInOut;
-    event.otherInOut = prev.key.isVertical() ? !prev.key.inOut : prev.key.inOut;
+    if (event.isSubject === prev.isSubject) {
+      event.inOut      = !prev.inOut;
+      event.otherInOut = prev.otherInOut;
+
+    // previous line segment in sweepline belongs to the clipping polygon
+    } else {
+      event.inOut      = !prev.otherInOut;
+      event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
+    }
+
+    // compute prevInResult field
+    if (prev) {
+      event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ?
+         prev.prevInResult : prev;
+    }
   }
 
-  // compute prevInResult field
-  if (prev) {
-    event.prevInResult = (!inResult(prev, operation) || prev.key.isVertical()) ?
-       prev.key.prevInResult : prev.key;
-  }
   // check if the line segment belongs to the Boolean operation
   event.inResult = inResult(event, operation);
 }
@@ -345,11 +355,12 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       }
       next.next();
 
-      computeFields(event, prev.node, sweepLine, operation);
+      var prevEvent = (prev.key || null), prevprevEvent;
+      computeFields(event, prevEvent, operation);
       if (next.node) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
-          computeFields(event, prev.node, sweepLine, operation);
-          computeFields(event, next.node, sweepLine, operation);
+          computeFields(event, prevEvent, operation);
+          computeFields(event, next.key, operation);
         }
       }
 
@@ -362,8 +373,9 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
             prevprev = sweepLine.find(sweepLine.end);
             prevprev.next();
           }
-          computeFields(prev.node, prevprev.node, sweepLine, operation);
-          computeFields(event, prev.node, sweepLine, operation);
+          prevprevEvent = prevprev.key || null;
+          computeFields(prevEvent, prevprevEvent, operation);
+          computeFields(event, prevEvent, operation);
         }
       }
     } else {
@@ -389,10 +401,9 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       if (next.node && prev.node) {
         if (typeof prev.node.value !== 'undefined' && typeof next.node.value !== 'undefined') {
-          possibleIntersection(prev.node, next.node, eventQueue);
+          possibleIntersection(prev.key, next.key, eventQueue);
         }
       }
-
     }
   }
   return sortedEvents;

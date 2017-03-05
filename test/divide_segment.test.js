@@ -213,7 +213,6 @@ tap.test('divide segments', function(t) {
       data = intervals[interval];
       for(var i = 0; i < leftSegments.length; i++){
         seg = leftSegments[i];
-        console.log(seg instanceof SweepEvent, seg.prevInResult);
         if(equals(seg.point, data.l) &&
            equals(seg.otherEvent.point, data.r) &&
            seg.inOut      === data.inOut &&
