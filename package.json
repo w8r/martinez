@@ -45,7 +45,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "functional-red-black-tree": "^1.0.1",
-    "tinyqueue": "^1.1.0"
+    "functional-red-black-tree": "1.0.1",
+    "tinyqueue": "1.1.0"
   }
 }
