@@ -1,7 +1,7 @@
 var tap = require('tap');
 var martinez = require('../src/');
 var data = require('./fixtures/two_triangles.json');
-var Tree = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 var SweepEvent = require('../src/sweep_event');
 
@@ -19,41 +19,39 @@ tap.test('sweep line', function(t) {
   EG.name = 'EG';
 
   var tree = new Tree(compareSegments);
-  tree.insert(EF);
-  tree.insert(EG);
+  tree = tree.insert(EF);
+  tree = tree.insert(EG);
 
 
-  t.equals(tree.findIter(EF).data(), EF, 'able to retrieve node');
-  t.equals(tree.min(), EF, 'EF is at the begin');
-  t.equals(tree.max(), EG, 'EG is at the end');
+  t.equals(tree.find(EF).key, EF, 'able to retrieve node');
+  t.equals(tree.begin.key, EF, 'EF is at the begin');
+  t.equals(tree.end.key, EG, 'EG is at the end');
 
-  var it = tree.findIter(EF);
+  var it = tree.find(EF);
   it.next();
 
-  t.equals(it.data(), EG);
+  t.equals(it.key, EG);
 
-  it = tree.findIter(EG);
+  it = tree.find(EG);
   it.prev();
 
-  t.equals(it.data(), EF);
+  t.equals(it.key, EF);
 
   var DA = new SweepEvent(c[0][0], true, new SweepEvent(c[0][2], false), true);
   var DC = new SweepEvent(c[0][0], true, new SweepEvent(c[0][1], false), true);
 
-  tree.insert(DA);
-  tree.insert(DC);
+  tree = tree.insert(DA);
+  tree = tree.insert(DC);
 
-  var begin = tree.iterator();
-  begin.next();
-  var item;
+  var begin = tree.begin;
 
-  t.equals(begin.data(), DA, 'DA');
+  t.equals(begin.key, DA, 'DA');
   begin.next();
-  t.equals(begin.data(), DC, 'DC');
+  t.equals(begin.key, DC, 'DC');
   begin.next();
-  t.equals(begin.data(), EF, 'EF');
+  t.equals(begin.key, EF, 'EF');
   begin.next();
-  t.equals(begin.data(), EG, 'EG');
+  t.equals(begin.key, EG, 'EG');
 
   t.end();
 });

@@ -8,7 +8,7 @@ var intersection  = require('../src/segment_intersection');
 var shapes        = require('./fixtures/two_shapes.json');
 var equals        = require('../src/equals');
 
-var Tree = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
@@ -93,11 +93,11 @@ tap.test('divide segments', function(t) {
 
     var tr = new Tree(compareSegments);
 
-    t.ok(tr.insert(te), 'insert');
-    t.ok(tr.insert(te3), 'insert');
+    t.ok(tr = tr.insert(te), 'insert');
+    t.ok(tr = tr.insert(te3), 'insert');
 
-    t.equals(tr.find(te), te);
-    t.equals(tr.find(te3), te3);
+    t.equals(tr.find(te).key, te);
+    t.equals(tr.find(te3).key, te3);
 
     t.equals(compareSegments(te, te3), 1);
     t.equals(compareSegments(te3, te), -1);
