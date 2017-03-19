@@ -8,7 +8,7 @@ var intersection  = require('../src/segment_intersection');
 var shapes        = require('./fixtures/two_shapes.json');
 var equals        = require('../src/equals');
 
-var Tree = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
@@ -93,11 +93,11 @@ tap.test('divide segments', function(t) {
 
     var tr = new Tree(compareSegments);
 
-    t.ok(tr.insert(te), 'insert');
-    t.ok(tr.insert(te3), 'insert');
+    t.ok(tr = tr.insert(te), 'insert');
+    t.ok(tr = tr.insert(te3), 'insert');
 
-    t.equals(tr.find(te), te);
-    t.equals(tr.find(te3), te3);
+    t.equals(tr.find(te).key, te);
+    t.equals(tr.find(te3).key, te3);
 
     t.equals(compareSegments(te, te3), 1);
     t.equals(compareSegments(te3, te), -1);
@@ -112,8 +112,8 @@ tap.test('divide segments', function(t) {
 
     t.equals(leftSegments.length, 11);
 
-    var E = [16, 282];
-    var I = [100.79403384562252, 233.41363754101192 ];
+    var E = [ 16, 282];
+    var I = [ 100.79403384562252, 233.41363754101192 ];
     var G = [ 298, 359 ];
     var C = [ 153, 294.5 ];
     var J = [ 203.36313843035356, 257.5101243166895 ];
@@ -123,31 +123,102 @@ tap.test('divide segments', function(t) {
     var B = [ 241.5, 229.5 ];
 
     var intervals = {
-      'EI': {l: E, r: I, inOut: false, otherInOut: true, inResult: false, prevInResult : null},
-      'IF': {l: I, r: F, inOut: false, otherInOut: false, inResult: true, prevInResult : null},
-      'FJ': {l: F, r: J, inOut: false, otherInOut: false, inResult: true, prevInResult : null},
-      'JG': {l: J, r: G, inOut: false, otherInOut: true, inResult: false, prevInResult : null},
-      'EG': {l: E, r: G, inOut: true, otherInOut: true, inResult: false, prevInResult : null},
-      'DA': {l: D, r: A, inOut: false, otherInOut: true, inResult: false, prevInResult : null},
-      'AB': {l: A, r: B, inOut: false, otherInOut: true, inResult: false, prevInResult : null},
-      'JB': {l: J, r: B, inOut: true, otherInOut: true, inResult: false, prevInResult : null},
+      'EI': {
+        l: E, r: I,
+        inOut:        false,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
+      'IF': {
+        l: I, r: F,
+        inOut:        false,
+        otherInOut:   false,
+        inResult:     true,
+        prevInResult: null
+      },
+      'FJ': {
+        l:F, r: J,
+        inOut:        false,
+        otherInOut:   false,
+        inResult:     true,
+        prevInResult: null
+      },
+      'JG': {
+        l: J, r: G,
+        inOut:        false,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
+      'EG': {
+        l: E, r: G,
+        inOut:        true,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
+      'DA': {
+        l: D, r: A,
+        inOut:        false,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
+      'AB': {
+        l: A, r: B,
+        inOut:        false,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
+      'JB': {
+        l: J, r: B,
+        inOut:        true,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      },
 
-      'CJ': {l: C, r: J, inOut: true, otherInOut: false, inResult: true, prevInResult : {l: F, r: J}},
-      'IC': {l: I, r: C, inOut: true, otherInOut: false, inResult: true, prevInResult : {l: I, r: F}},
+      'CJ': {
+        l: C, r: J,
+        inOut:        true,
+        otherInOut:   false,
+        inResult:     true,
+        prevInResult: {
+          l: F, r: J,
+          prevInResult: null
+        }
+      },
+      'IC': {
+        l: I, r: C,
+        inOut:        true,
+        otherInOut:   false,
+        inResult:     true,
+        prevInResult: {
+          l: I, r: F,
+          prevInResult: null
+        }},
 
-      'DI': {l: D, r: I, inOut: true, otherInOut: true, inResult: false, prevInResult : null}
+      'DI': {
+        l: D, r: I,
+        inOut:        true,
+        otherInOut:   true,
+        inResult:     false,
+        prevInResult: null
+      }
     };
 
     function check_contain(interval) {
       data = intervals[interval];
-      for(var i =0; i < leftSegments.length; i++){
+      for(var i = 0; i < leftSegments.length; i++){
         seg = leftSegments[i];
         if(equals(seg.point, data.l) &&
-          equals(seg.otherEvent.point, data.r) &&
-          seg.inOut === data.inOut &&
-          seg.otherInOut === data.otherInOut &&
-          seg.inResult === data.inResult &&
-          ((seg.prevInResult === null && data.prevInResult === null)
+           equals(seg.otherEvent.point, data.r) &&
+           seg.inOut      === data.inOut &&
+           seg.otherInOut === data.otherInOut &&
+           seg.inResult   === data.inResult &&
+           ((seg.prevInResult === null && data.prevInResult === null)
             || (equals(seg.prevInResult.point, data.prevInResult.l)
             && equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))) {
           t.pass(interval);

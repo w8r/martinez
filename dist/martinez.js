@@ -1,576 +1,1004 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.martinez = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = require('./src/index');
 
-},{"./src/index":11}],2:[function(require,module,exports){
-module.exports = {
-    RBTree: require('./lib/rbtree'),
-    BinTree: require('./lib/bintree')
-};
+},{"./src/index":8}],2:[function(require,module,exports){
+"use strict"
 
-},{"./lib/bintree":3,"./lib/rbtree":4}],3:[function(require,module,exports){
+module.exports = createRBTree
 
-var TreeBase = require('./treebase');
+var RED   = 0
+var BLACK = 1
 
-function Node(data) {
-    this.data = data;
-    this.left = null;
-    this.right = null;
+function RBNode(color, key, value, left, right, count) {
+  this._color = color
+  this.key = key
+  this.value = value
+  this.left = left
+  this.right = right
+  this._count = count
 }
 
-Node.prototype.get_child = function(dir) {
-    return dir ? this.right : this.left;
-};
-
-Node.prototype.set_child = function(dir, val) {
-    if(dir) {
-        this.right = val;
-    }
-    else {
-        this.left = val;
-    }
-};
-
-function BinTree(comparator) {
-    this._root = null;
-    this._comparator = comparator;
-    this.size = 0;
+function cloneNode(node) {
+  return new RBNode(node._color, node.key, node.value, node.left, node.right, node._count)
 }
 
-BinTree.prototype = new TreeBase();
-
-// returns true if inserted, false if duplicate
-BinTree.prototype.insert = function(data) {
-    if(this._root === null) {
-        // empty tree
-        this._root = new Node(data);
-        this.size++;
-        return true;
-    }
-
-    var dir = 0;
-
-    // setup
-    var p = null; // parent
-    var node = this._root;
-
-    // search down
-    while(true) {
-        if(node === null) {
-            // insert new node at the bottom
-            node = new Node(data);
-            p.set_child(dir, node);
-            ret = true;
-            this.size++;
-            return true;
-        }
-
-        // stop if found
-        if(this._comparator(node.data, data) === 0) {
-            return false;
-        }
-
-        dir = this._comparator(node.data, data) < 0;
-
-        // update helpers
-        p = node;
-        node = node.get_child(dir);
-    }
-};
-
-// returns true if removed, false if not found
-BinTree.prototype.remove = function(data) {
-    if(this._root === null) {
-        return false;
-    }
-
-    var head = new Node(undefined); // fake tree root
-    var node = head;
-    node.right = this._root;
-    var p = null; // parent
-    var found = null; // found item
-    var dir = 1;
-
-    while(node.get_child(dir) !== null) {
-        p = node;
-        node = node.get_child(dir);
-        var cmp = this._comparator(data, node.data);
-        dir = cmp > 0;
-
-        if(cmp === 0) {
-            found = node;
-        }
-    }
-
-    if(found !== null) {
-        found.data = node.data;
-        p.set_child(p.right === node, node.get_child(node.left === null));
-
-        this._root = head.right;
-        this.size--;
-        return true;
-    }
-    else {
-        return false;
-    }
-};
-
-module.exports = BinTree;
-
-
-},{"./treebase":5}],4:[function(require,module,exports){
-
-var TreeBase = require('./treebase');
-
-function Node(data) {
-    this.data = data;
-    this.left = null;
-    this.right = null;
-    this.red = true;
+function repaint(color, node) {
+  return new RBNode(color, node.key, node.value, node.left, node.right, node._count)
 }
 
-Node.prototype.get_child = function(dir) {
-    return dir ? this.right : this.left;
-};
-
-Node.prototype.set_child = function(dir, val) {
-    if(dir) {
-        this.right = val;
-    }
-    else {
-        this.left = val;
-    }
-};
-
-function RBTree(comparator) {
-    this._root = null;
-    this._comparator = comparator;
-    this.size = 0;
+function recount(node) {
+  node._count = 1 + (node.left ? node.left._count : 0) + (node.right ? node.right._count : 0)
 }
 
-RBTree.prototype = new TreeBase();
+function RedBlackTree(compare, root) {
+  this._compare = compare
+  this.root = root
+}
 
-// returns true if inserted, false if duplicate
-RBTree.prototype.insert = function(data) {
-    var ret = false;
+var proto = RedBlackTree.prototype
 
-    if(this._root === null) {
-        // empty tree
-        this._root = new Node(data);
-        ret = true;
-        this.size++;
+Object.defineProperty(proto, "keys", {
+  get: function() {
+    var result = []
+    this.forEach(function(k,v) {
+      result.push(k)
+    })
+    return result
+  }
+})
+
+Object.defineProperty(proto, "values", {
+  get: function() {
+    var result = []
+    this.forEach(function(k,v) {
+      result.push(v)
+    })
+    return result
+  }
+})
+
+//Returns the number of nodes in the tree
+Object.defineProperty(proto, "length", {
+  get: function() {
+    if(this.root) {
+      return this.root._count
     }
-    else {
-        var head = new Node(undefined); // fake tree root
+    return 0
+  }
+})
 
-        var dir = 0;
-        var last = 0;
-
-        // setup
-        var gp = null; // grandparent
-        var ggp = head; // grand-grand-parent
-        var p = null; // parent
-        var node = this._root;
-        ggp.right = this._root;
-
-        // search down
-        while(true) {
-            if(node === null) {
-                // insert new node at the bottom
-                node = new Node(data);
-                p.set_child(dir, node);
-                ret = true;
-                this.size++;
+//Insert a new item into the tree
+proto.insert = function(key, value) {
+  var cmp = this._compare
+  //Find point to insert new node at
+  var n = this.root
+  var n_stack = []
+  var d_stack = []
+  while(n) {
+    var d = cmp(key, n.key)
+    n_stack.push(n)
+    d_stack.push(d)
+    if(d <= 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  //Rebuild path to leaf node
+  n_stack.push(new RBNode(RED, key, value, null, null, 1))
+  for(var s=n_stack.length-2; s>=0; --s) {
+    var n = n_stack[s]
+    if(d_stack[s] <= 0) {
+      n_stack[s] = new RBNode(n._color, n.key, n.value, n_stack[s+1], n.right, n._count+1)
+    } else {
+      n_stack[s] = new RBNode(n._color, n.key, n.value, n.left, n_stack[s+1], n._count+1)
+    }
+  }
+  //Rebalance tree using rotations
+  //console.log("start insert", key, d_stack)
+  for(var s=n_stack.length-1; s>1; --s) {
+    var p = n_stack[s-1]
+    var n = n_stack[s]
+    if(p._color === BLACK || n._color === BLACK) {
+      break
+    }
+    var pp = n_stack[s-2]
+    if(pp.left === p) {
+      if(p.left === n) {
+        var y = pp.right
+        if(y && y._color === RED) {
+          //console.log("LLr")
+          p._color = BLACK
+          pp.right = repaint(BLACK, y)
+          pp._color = RED
+          s -= 1
+        } else {
+          //console.log("LLb")
+          pp._color = RED
+          pp.left = p.right
+          p._color = BLACK
+          p.right = pp
+          n_stack[s-2] = p
+          n_stack[s-1] = n
+          recount(pp)
+          recount(p)
+          if(s >= 3) {
+            var ppp = n_stack[s-3]
+            if(ppp.left === pp) {
+              ppp.left = p
+            } else {
+              ppp.right = p
             }
-            else if(is_red(node.left) && is_red(node.right)) {
-                // color flip
-                node.red = true;
-                node.left.red = false;
-                node.right.red = false;
-            }
-
-            // fix red violation
-            if(is_red(node) && is_red(p)) {
-                var dir2 = ggp.right === gp;
-
-                if(node === p.get_child(last)) {
-                    ggp.set_child(dir2, single_rotate(gp, !last));
-                }
-                else {
-                    ggp.set_child(dir2, double_rotate(gp, !last));
-                }
-            }
-
-            var cmp = this._comparator(node.data, data);
-
-            // stop if found
-            if(cmp === 0) {
-                break;
-            }
-
-            last = dir;
-            dir = cmp < 0;
-
-            // update helpers
-            if(gp !== null) {
-                ggp = gp;
-            }
-            gp = p;
-            p = node;
-            node = node.get_child(dir);
+          }
+          break
         }
-
-        // update root
-        this._root = head.right;
-    }
-
-    // make root black
-    this._root.red = false;
-
-    return ret;
-};
-
-// returns true if removed, false if not found
-RBTree.prototype.remove = function(data) {
-    if(this._root === null) {
-        return false;
-    }
-
-    var head = new Node(undefined); // fake tree root
-    var node = head;
-    node.right = this._root;
-    var p = null; // parent
-    var gp = null; // grand parent
-    var found = null; // found item
-    var dir = 1;
-
-    while(node.get_child(dir) !== null) {
-        var last = dir;
-
-        // update helpers
-        gp = p;
-        p = node;
-        node = node.get_child(dir);
-
-        var cmp = this._comparator(data, node.data);
-
-        dir = cmp > 0;
-
-        // save found node
-        if(cmp === 0) {
-            found = node;
-        }
-
-        // push the red node down
-        if(!is_red(node) && !is_red(node.get_child(dir))) {
-            if(is_red(node.get_child(!dir))) {
-                var sr = single_rotate(node, dir);
-                p.set_child(last, sr);
-                p = sr;
+      } else {
+        var y = pp.right
+        if(y && y._color === RED) {
+          //console.log("LRr")
+          p._color = BLACK
+          pp.right = repaint(BLACK, y)
+          pp._color = RED
+          s -= 1
+        } else {
+          //console.log("LRb")
+          p.right = n.left
+          pp._color = RED
+          pp.left = n.right
+          n._color = BLACK
+          n.left = p
+          n.right = pp
+          n_stack[s-2] = n
+          n_stack[s-1] = p
+          recount(pp)
+          recount(p)
+          recount(n)
+          if(s >= 3) {
+            var ppp = n_stack[s-3]
+            if(ppp.left === pp) {
+              ppp.left = n
+            } else {
+              ppp.right = n
             }
-            else if(!is_red(node.get_child(!dir))) {
-                var sibling = p.get_child(!last);
-                if(sibling !== null) {
-                    if(!is_red(sibling.get_child(!last)) && !is_red(sibling.get_child(last))) {
-                        // color flip
-                        p.red = false;
-                        sibling.red = true;
-                        node.red = true;
-                    }
-                    else {
-                        var dir2 = gp.right === p;
-
-                        if(is_red(sibling.get_child(last))) {
-                            gp.set_child(dir2, double_rotate(p, last));
-                        }
-                        else if(is_red(sibling.get_child(!last))) {
-                            gp.set_child(dir2, single_rotate(p, last));
-                        }
-
-                        // ensure correct coloring
-                        var gpc = gp.get_child(dir2);
-                        gpc.red = true;
-                        node.red = true;
-                        gpc.left.red = false;
-                        gpc.right.red = false;
-                    }
-                }
-            }
+          }
+          break
         }
+      }
+    } else {
+      if(p.right === n) {
+        var y = pp.left
+        if(y && y._color === RED) {
+          //console.log("RRr", y.key)
+          p._color = BLACK
+          pp.left = repaint(BLACK, y)
+          pp._color = RED
+          s -= 1
+        } else {
+          //console.log("RRb")
+          pp._color = RED
+          pp.right = p.left
+          p._color = BLACK
+          p.left = pp
+          n_stack[s-2] = p
+          n_stack[s-1] = n
+          recount(pp)
+          recount(p)
+          if(s >= 3) {
+            var ppp = n_stack[s-3]
+            if(ppp.right === pp) {
+              ppp.right = p
+            } else {
+              ppp.left = p
+            }
+          }
+          break
+        }
+      } else {
+        var y = pp.left
+        if(y && y._color === RED) {
+          //console.log("RLr")
+          p._color = BLACK
+          pp.left = repaint(BLACK, y)
+          pp._color = RED
+          s -= 1
+        } else {
+          //console.log("RLb")
+          p.left = n.right
+          pp._color = RED
+          pp.right = n.left
+          n._color = BLACK
+          n.right = p
+          n.left = pp
+          n_stack[s-2] = n
+          n_stack[s-1] = p
+          recount(pp)
+          recount(p)
+          recount(n)
+          if(s >= 3) {
+            var ppp = n_stack[s-3]
+            if(ppp.right === pp) {
+              ppp.right = n
+            } else {
+              ppp.left = n
+            }
+          }
+          break
+        }
+      }
     }
-
-    // replace and remove if found
-    if(found !== null) {
-        found.data = node.data;
-        p.set_child(p.right === node, node.get_child(node.left === null));
-        this.size--;
-    }
-
-    // update root and make it black
-    this._root = head.right;
-    if(this._root !== null) {
-        this._root.red = false;
-    }
-
-    return found !== null;
-};
-
-function is_red(node) {
-    return node !== null && node.red;
+  }
+  //Return new tree
+  n_stack[0]._color = BLACK
+  return new RedBlackTree(cmp, n_stack[0])
 }
 
-function single_rotate(root, dir) {
-    var save = root.get_child(!dir);
 
-    root.set_child(!dir, save.get_child(dir));
-    save.set_child(dir, root);
-
-    root.red = true;
-    save.red = false;
-
-    return save;
+//Visit all nodes inorder
+function doVisitFull(visit, node) {
+  if(node.left) {
+    var v = doVisitFull(visit, node.left)
+    if(v) { return v }
+  }
+  var v = visit(node.key, node.value)
+  if(v) { return v }
+  if(node.right) {
+    return doVisitFull(visit, node.right)
+  }
 }
 
-function double_rotate(root, dir) {
-    root.set_child(!dir, single_rotate(root.get_child(!dir), !dir));
-    return single_rotate(root, dir);
+//Visit half nodes in order
+function doVisitHalf(lo, compare, visit, node) {
+  var l = compare(lo, node.key)
+  if(l <= 0) {
+    if(node.left) {
+      var v = doVisitHalf(lo, compare, visit, node.left)
+      if(v) { return v }
+    }
+    var v = visit(node.key, node.value)
+    if(v) { return v }
+  }
+  if(node.right) {
+    return doVisitHalf(lo, compare, visit, node.right)
+  }
 }
 
-module.exports = RBTree;
-
-},{"./treebase":5}],5:[function(require,module,exports){
-
-function TreeBase() {}
-
-// removes all nodes from the tree
-TreeBase.prototype.clear = function() {
-    this._root = null;
-    this.size = 0;
-};
-
-// returns node data if found, null otherwise
-TreeBase.prototype.find = function(data) {
-    var res = this._root;
-
-    while(res !== null) {
-        var c = this._comparator(data, res.data);
-        if(c === 0) {
-            return res.data;
-        }
-        else {
-            res = res.get_child(c > 0);
-        }
+//Visit all nodes within a range
+function doVisit(lo, hi, compare, visit, node) {
+  var l = compare(lo, node.key)
+  var h = compare(hi, node.key)
+  var v
+  if(l <= 0) {
+    if(node.left) {
+      v = doVisit(lo, hi, compare, visit, node.left)
+      if(v) { return v }
     }
-
-    return null;
-};
-
-// returns iterator to node if found, null otherwise
-TreeBase.prototype.findIter = function(data) {
-    var res = this._root;
-    var iter = this.iterator();
-
-    while(res !== null) {
-        var c = this._comparator(data, res.data);
-        if(c === 0) {
-            iter._cursor = res;
-            return iter;
-        }
-        else {
-            iter._ancestors.push(res);
-            res = res.get_child(c > 0);
-        }
+    if(h > 0) {
+      v = visit(node.key, node.value)
+      if(v) { return v }
     }
-
-    return null;
-};
-
-// Returns an iterator to the tree node at or immediately after the item
-TreeBase.prototype.lowerBound = function(item) {
-    var cur = this._root;
-    var iter = this.iterator();
-    var cmp = this._comparator;
-
-    while(cur !== null) {
-        var c = cmp(item, cur.data);
-        if(c === 0) {
-            iter._cursor = cur;
-            return iter;
-        }
-        iter._ancestors.push(cur);
-        cur = cur.get_child(c > 0);
-    }
-
-    for(var i=iter._ancestors.length - 1; i >= 0; --i) {
-        cur = iter._ancestors[i];
-        if(cmp(item, cur.data) < 0) {
-            iter._cursor = cur;
-            iter._ancestors.length = i;
-            return iter;
-        }
-    }
-
-    iter._ancestors.length = 0;
-    return iter;
-};
-
-// Returns an iterator to the tree node immediately after the item
-TreeBase.prototype.upperBound = function(item) {
-    var iter = this.lowerBound(item);
-    var cmp = this._comparator;
-
-    while(iter.data() !== null && cmp(iter.data(), item) === 0) {
-        iter.next();
-    }
-
-    return iter;
-};
-
-// returns null if tree is empty
-TreeBase.prototype.min = function() {
-    var res = this._root;
-    if(res === null) {
-        return null;
-    }
-
-    while(res.left !== null) {
-        res = res.left;
-    }
-
-    return res.data;
-};
-
-// returns null if tree is empty
-TreeBase.prototype.max = function() {
-    var res = this._root;
-    if(res === null) {
-        return null;
-    }
-
-    while(res.right !== null) {
-        res = res.right;
-    }
-
-    return res.data;
-};
-
-// returns a null iterator
-// call next() or prev() to point to an element
-TreeBase.prototype.iterator = function() {
-    return new Iterator(this);
-};
-
-// calls cb on each node's data, in order
-TreeBase.prototype.each = function(cb) {
-    var it=this.iterator(), data;
-    while((data = it.next()) !== null) {
-        cb(data);
-    }
-};
-
-// calls cb on each node's data, in reverse order
-TreeBase.prototype.reach = function(cb) {
-    var it=this.iterator(), data;
-    while((data = it.prev()) !== null) {
-        cb(data);
-    }
-};
-
-
-function Iterator(tree) {
-    this._tree = tree;
-    this._ancestors = [];
-    this._cursor = null;
+  }
+  if(h > 0 && node.right) {
+    return doVisit(lo, hi, compare, visit, node.right)
+  }
 }
 
-Iterator.prototype.data = function() {
-    return this._cursor !== null ? this._cursor.data : null;
-};
 
-// if null-iterator, returns first node
-// otherwise, returns next node
-Iterator.prototype.next = function() {
-    if(this._cursor === null) {
-        var root = this._tree._root;
-        if(root !== null) {
-            this._minNode(root);
-        }
+proto.forEach = function rbTreeForEach(visit, lo, hi) {
+  if(!this.root) {
+    return
+  }
+  switch(arguments.length) {
+    case 1:
+      return doVisitFull(visit, this.root)
+    break
+
+    case 2:
+      return doVisitHalf(lo, this._compare, visit, this.root)
+    break
+
+    case 3:
+      if(this._compare(lo, hi) >= 0) {
+        return
+      }
+      return doVisit(lo, hi, this._compare, visit, this.root)
+    break
+  }
+}
+
+//First item in list
+Object.defineProperty(proto, "begin", {
+  get: function() {
+    var stack = []
+    var n = this.root
+    while(n) {
+      stack.push(n)
+      n = n.left
     }
-    else {
-        if(this._cursor.right === null) {
-            // no greater node in subtree, go up to parent
-            // if coming from a right child, continue up the stack
-            var save;
-            do {
-                save = this._cursor;
-                if(this._ancestors.length) {
-                    this._cursor = this._ancestors.pop();
-                }
-                else {
-                    this._cursor = null;
-                    break;
-                }
-            } while(this._cursor.right === save);
-        }
-        else {
-            // get the next node from the subtree
-            this._ancestors.push(this._cursor);
-            this._minNode(this._cursor.right);
-        }
+    return new RedBlackTreeIterator(this, stack)
+  }
+})
+
+//Last item in list
+Object.defineProperty(proto, "end", {
+  get: function() {
+    var stack = []
+    var n = this.root
+    while(n) {
+      stack.push(n)
+      n = n.right
     }
-    return this._cursor !== null ? this._cursor.data : null;
-};
+    return new RedBlackTreeIterator(this, stack)
+  }
+})
 
-// if null-iterator, returns last node
-// otherwise, returns previous node
-Iterator.prototype.prev = function() {
-    if(this._cursor === null) {
-        var root = this._tree._root;
-        if(root !== null) {
-            this._maxNode(root);
+//Find the ith item in the tree
+proto.at = function(idx) {
+  if(idx < 0) {
+    return new RedBlackTreeIterator(this, [])
+  }
+  var n = this.root
+  var stack = []
+  while(true) {
+    stack.push(n)
+    if(n.left) {
+      if(idx < n.left._count) {
+        n = n.left
+        continue
+      }
+      idx -= n.left._count
+    }
+    if(!idx) {
+      return new RedBlackTreeIterator(this, stack)
+    }
+    idx -= 1
+    if(n.right) {
+      if(idx >= n.right._count) {
+        break
+      }
+      n = n.right
+    } else {
+      break
+    }
+  }
+  return new RedBlackTreeIterator(this, [])
+}
+
+proto.ge = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  var stack = []
+  var last_ptr = 0
+  while(n) {
+    var d = cmp(key, n.key)
+    stack.push(n)
+    if(d <= 0) {
+      last_ptr = stack.length
+    }
+    if(d <= 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  stack.length = last_ptr
+  return new RedBlackTreeIterator(this, stack)
+}
+
+proto.gt = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  var stack = []
+  var last_ptr = 0
+  while(n) {
+    var d = cmp(key, n.key)
+    stack.push(n)
+    if(d < 0) {
+      last_ptr = stack.length
+    }
+    if(d < 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  stack.length = last_ptr
+  return new RedBlackTreeIterator(this, stack)
+}
+
+proto.lt = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  var stack = []
+  var last_ptr = 0
+  while(n) {
+    var d = cmp(key, n.key)
+    stack.push(n)
+    if(d > 0) {
+      last_ptr = stack.length
+    }
+    if(d <= 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  stack.length = last_ptr
+  return new RedBlackTreeIterator(this, stack)
+}
+
+proto.le = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  var stack = []
+  var last_ptr = 0
+  while(n) {
+    var d = cmp(key, n.key)
+    stack.push(n)
+    if(d >= 0) {
+      last_ptr = stack.length
+    }
+    if(d < 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  stack.length = last_ptr
+  return new RedBlackTreeIterator(this, stack)
+}
+
+//Finds the item with key if it exists
+proto.find = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  var stack = []
+  while(n) {
+    var d = cmp(key, n.key)
+    stack.push(n)
+    if(d === 0) {
+      return new RedBlackTreeIterator(this, stack)
+    }
+    if(d <= 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  return new RedBlackTreeIterator(this, [])
+}
+
+//Removes item with key from tree
+proto.remove = function(key) {
+  var iter = this.find(key)
+  if(iter) {
+    return iter.remove()
+  }
+  return this
+}
+
+//Returns the item at `key`
+proto.get = function(key) {
+  var cmp = this._compare
+  var n = this.root
+  while(n) {
+    var d = cmp(key, n.key)
+    if(d === 0) {
+      return n.value
+    }
+    if(d <= 0) {
+      n = n.left
+    } else {
+      n = n.right
+    }
+  }
+  return
+}
+
+//Iterator for red black tree
+function RedBlackTreeIterator(tree, stack) {
+  this.tree = tree
+  this._stack = stack
+}
+
+var iproto = RedBlackTreeIterator.prototype
+
+//Test if iterator is valid
+Object.defineProperty(iproto, "valid", {
+  get: function() {
+    return this._stack.length > 0
+  }
+})
+
+//Node of the iterator
+Object.defineProperty(iproto, "node", {
+  get: function() {
+    if(this._stack.length > 0) {
+      return this._stack[this._stack.length-1]
+    }
+    return null
+  },
+  enumerable: true
+})
+
+//Makes a copy of an iterator
+iproto.clone = function() {
+  return new RedBlackTreeIterator(this.tree, this._stack.slice())
+}
+
+//Swaps two nodes
+function swapNode(n, v) {
+  n.key = v.key
+  n.value = v.value
+  n.left = v.left
+  n.right = v.right
+  n._color = v._color
+  n._count = v._count
+}
+
+//Fix up a double black node in a tree
+function fixDoubleBlack(stack) {
+  var n, p, s, z
+  for(var i=stack.length-1; i>=0; --i) {
+    n = stack[i]
+    if(i === 0) {
+      n._color = BLACK
+      return
+    }
+    //console.log("visit node:", n.key, i, stack[i].key, stack[i-1].key)
+    p = stack[i-1]
+    if(p.left === n) {
+      //console.log("left child")
+      s = p.right
+      if(s.right && s.right._color === RED) {
+        //console.log("case 1: right sibling child red")
+        s = p.right = cloneNode(s)
+        z = s.right = cloneNode(s.right)
+        p.right = s.left
+        s.left = p
+        s.right = z
+        s._color = p._color
+        n._color = BLACK
+        p._color = BLACK
+        z._color = BLACK
+        recount(p)
+        recount(s)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.left === p) {
+            pp.left = s
+          } else {
+            pp.right = s
+          }
         }
-    }
-    else {
-        if(this._cursor.left === null) {
-            var save;
-            do {
-                save = this._cursor;
-                if(this._ancestors.length) {
-                    this._cursor = this._ancestors.pop();
-                }
-                else {
-                    this._cursor = null;
-                    break;
-                }
-            } while(this._cursor.left === save);
+        stack[i-1] = s
+        return
+      } else if(s.left && s.left._color === RED) {
+        //console.log("case 1: left sibling child red")
+        s = p.right = cloneNode(s)
+        z = s.left = cloneNode(s.left)
+        p.right = z.left
+        s.left = z.right
+        z.left = p
+        z.right = s
+        z._color = p._color
+        p._color = BLACK
+        s._color = BLACK
+        n._color = BLACK
+        recount(p)
+        recount(s)
+        recount(z)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.left === p) {
+            pp.left = z
+          } else {
+            pp.right = z
+          }
         }
-        else {
-            this._ancestors.push(this._cursor);
-            this._maxNode(this._cursor.left);
+        stack[i-1] = z
+        return
+      }
+      if(s._color === BLACK) {
+        if(p._color === RED) {
+          //console.log("case 2: black sibling, red parent", p.right.value)
+          p._color = BLACK
+          p.right = repaint(RED, s)
+          return
+        } else {
+          //console.log("case 2: black sibling, black parent", p.right.value)
+          p.right = repaint(RED, s)
+          continue  
         }
+      } else {
+        //console.log("case 3: red sibling")
+        s = cloneNode(s)
+        p.right = s.left
+        s.left = p
+        s._color = p._color
+        p._color = RED
+        recount(p)
+        recount(s)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.left === p) {
+            pp.left = s
+          } else {
+            pp.right = s
+          }
+        }
+        stack[i-1] = s
+        stack[i] = p
+        if(i+1 < stack.length) {
+          stack[i+1] = n
+        } else {
+          stack.push(n)
+        }
+        i = i+2
+      }
+    } else {
+      //console.log("right child")
+      s = p.left
+      if(s.left && s.left._color === RED) {
+        //console.log("case 1: left sibling child red", p.value, p._color)
+        s = p.left = cloneNode(s)
+        z = s.left = cloneNode(s.left)
+        p.left = s.right
+        s.right = p
+        s.left = z
+        s._color = p._color
+        n._color = BLACK
+        p._color = BLACK
+        z._color = BLACK
+        recount(p)
+        recount(s)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.right === p) {
+            pp.right = s
+          } else {
+            pp.left = s
+          }
+        }
+        stack[i-1] = s
+        return
+      } else if(s.right && s.right._color === RED) {
+        //console.log("case 1: right sibling child red")
+        s = p.left = cloneNode(s)
+        z = s.right = cloneNode(s.right)
+        p.left = z.right
+        s.right = z.left
+        z.right = p
+        z.left = s
+        z._color = p._color
+        p._color = BLACK
+        s._color = BLACK
+        n._color = BLACK
+        recount(p)
+        recount(s)
+        recount(z)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.right === p) {
+            pp.right = z
+          } else {
+            pp.left = z
+          }
+        }
+        stack[i-1] = z
+        return
+      }
+      if(s._color === BLACK) {
+        if(p._color === RED) {
+          //console.log("case 2: black sibling, red parent")
+          p._color = BLACK
+          p.left = repaint(RED, s)
+          return
+        } else {
+          //console.log("case 2: black sibling, black parent")
+          p.left = repaint(RED, s)
+          continue  
+        }
+      } else {
+        //console.log("case 3: red sibling")
+        s = cloneNode(s)
+        p.left = s.right
+        s.right = p
+        s._color = p._color
+        p._color = RED
+        recount(p)
+        recount(s)
+        if(i > 1) {
+          var pp = stack[i-2]
+          if(pp.right === p) {
+            pp.right = s
+          } else {
+            pp.left = s
+          }
+        }
+        stack[i-1] = s
+        stack[i] = p
+        if(i+1 < stack.length) {
+          stack[i+1] = n
+        } else {
+          stack.push(n)
+        }
+        i = i+2
+      }
     }
-    return this._cursor !== null ? this._cursor.data : null;
-};
+  }
+}
 
-Iterator.prototype._minNode = function(start) {
-    while(start.left !== null) {
-        this._ancestors.push(start);
-        start = start.left;
+//Removes item at iterator from tree
+iproto.remove = function() {
+  var stack = this._stack
+  if(stack.length === 0) {
+    return this.tree
+  }
+  //First copy path to node
+  var cstack = new Array(stack.length)
+  var n = stack[stack.length-1]
+  cstack[cstack.length-1] = new RBNode(n._color, n.key, n.value, n.left, n.right, n._count)
+  for(var i=stack.length-2; i>=0; --i) {
+    var n = stack[i]
+    if(n.left === stack[i+1]) {
+      cstack[i] = new RBNode(n._color, n.key, n.value, cstack[i+1], n.right, n._count)
+    } else {
+      cstack[i] = new RBNode(n._color, n.key, n.value, n.left, cstack[i+1], n._count)
     }
-    this._cursor = start;
-};
+  }
 
-Iterator.prototype._maxNode = function(start) {
-    while(start.right !== null) {
-        this._ancestors.push(start);
-        start = start.right;
+  //Get node
+  n = cstack[cstack.length-1]
+  //console.log("start remove: ", n.value)
+
+  //If not leaf, then swap with previous node
+  if(n.left && n.right) {
+    //console.log("moving to leaf")
+
+    //First walk to previous leaf
+    var split = cstack.length
+    n = n.left
+    while(n.right) {
+      cstack.push(n)
+      n = n.right
     }
-    this._cursor = start;
-};
+    //Copy path to leaf
+    var v = cstack[split-1]
+    cstack.push(new RBNode(n._color, v.key, v.value, n.left, n.right, n._count))
+    cstack[split-1].key = n.key
+    cstack[split-1].value = n.value
 
-module.exports = TreeBase;
+    //Fix up stack
+    for(var i=cstack.length-2; i>=split; --i) {
+      n = cstack[i]
+      cstack[i] = new RBNode(n._color, n.key, n.value, n.left, cstack[i+1], n._count)
+    }
+    cstack[split-1].left = cstack[split]
+  }
+  //console.log("stack=", cstack.map(function(v) { return v.value }))
+
+  //Remove leaf node
+  n = cstack[cstack.length-1]
+  if(n._color === RED) {
+    //Easy case: removing red leaf
+    //console.log("RED leaf")
+    var p = cstack[cstack.length-2]
+    if(p.left === n) {
+      p.left = null
+    } else if(p.right === n) {
+      p.right = null
+    }
+    cstack.pop()
+    for(var i=0; i<cstack.length; ++i) {
+      cstack[i]._count--
+    }
+    return new RedBlackTree(this.tree._compare, cstack[0])
+  } else {
+    if(n.left || n.right) {
+      //Second easy case:  Single child black parent
+      //console.log("BLACK single child")
+      if(n.left) {
+        swapNode(n, n.left)
+      } else if(n.right) {
+        swapNode(n, n.right)
+      }
+      //Child must be red, so repaint it black to balance color
+      n._color = BLACK
+      for(var i=0; i<cstack.length-1; ++i) {
+        cstack[i]._count--
+      }
+      return new RedBlackTree(this.tree._compare, cstack[0])
+    } else if(cstack.length === 1) {
+      //Third easy case: root
+      //console.log("ROOT")
+      return new RedBlackTree(this.tree._compare, null)
+    } else {
+      //Hard case: Repaint n, and then do some nasty stuff
+      //console.log("BLACK leaf no children")
+      for(var i=0; i<cstack.length; ++i) {
+        cstack[i]._count--
+      }
+      var parent = cstack[cstack.length-2]
+      fixDoubleBlack(cstack)
+      //Fix up links
+      if(parent.left === n) {
+        parent.left = null
+      } else {
+        parent.right = null
+      }
+    }
+  }
+  return new RedBlackTree(this.tree._compare, cstack[0])
+}
+
+//Returns key
+Object.defineProperty(iproto, "key", {
+  get: function() {
+    if(this._stack.length > 0) {
+      return this._stack[this._stack.length-1].key
+    }
+    return
+  },
+  enumerable: true
+})
+
+//Returns value
+Object.defineProperty(iproto, "value", {
+  get: function() {
+    if(this._stack.length > 0) {
+      return this._stack[this._stack.length-1].value
+    }
+    return
+  },
+  enumerable: true
+})
 
 
-},{}],6:[function(require,module,exports){
+//Returns the position of this iterator in the sorted list
+Object.defineProperty(iproto, "index", {
+  get: function() {
+    var idx = 0
+    var stack = this._stack
+    if(stack.length === 0) {
+      var r = this.tree.root
+      if(r) {
+        return r._count
+      }
+      return 0
+    } else if(stack[stack.length-1].left) {
+      idx = stack[stack.length-1].left._count
+    }
+    for(var s=stack.length-2; s>=0; --s) {
+      if(stack[s+1] === stack[s].right) {
+        ++idx
+        if(stack[s].left) {
+          idx += stack[s].left._count
+        }
+      }
+    }
+    return idx
+  },
+  enumerable: true
+})
+
+//Advances iterator to next element in list
+iproto.next = function() {
+  var stack = this._stack
+  if(stack.length === 0) {
+    return
+  }
+  var n = stack[stack.length-1]
+  if(n.right) {
+    n = n.right
+    while(n) {
+      stack.push(n)
+      n = n.left
+    }
+  } else {
+    stack.pop()
+    while(stack.length > 0 && stack[stack.length-1].right === n) {
+      n = stack[stack.length-1]
+      stack.pop()
+    }
+  }
+}
+
+//Checks if iterator is at end of tree
+Object.defineProperty(iproto, "hasNext", {
+  get: function() {
+    var stack = this._stack
+    if(stack.length === 0) {
+      return false
+    }
+    if(stack[stack.length-1].right) {
+      return true
+    }
+    for(var s=stack.length-1; s>0; --s) {
+      if(stack[s-1].left === stack[s]) {
+        return true
+      }
+    }
+    return false
+  }
+})
+
+//Update value
+iproto.update = function(value) {
+  var stack = this._stack
+  if(stack.length === 0) {
+    throw new Error("Can't update empty node!")
+  }
+  var cstack = new Array(stack.length)
+  var n = stack[stack.length-1]
+  cstack[cstack.length-1] = new RBNode(n._color, n.key, value, n.left, n.right, n._count)
+  for(var i=stack.length-2; i>=0; --i) {
+    n = stack[i]
+    if(n.left === stack[i+1]) {
+      cstack[i] = new RBNode(n._color, n.key, n.value, cstack[i+1], n.right, n._count)
+    } else {
+      cstack[i] = new RBNode(n._color, n.key, n.value, n.left, cstack[i+1], n._count)
+    }
+  }
+  return new RedBlackTree(this.tree._compare, cstack[0])
+}
+
+//Moves iterator backward one element
+iproto.prev = function() {
+  var stack = this._stack
+  if(stack.length === 0) {
+    return
+  }
+  var n = stack[stack.length-1]
+  if(n.left) {
+    n = n.left
+    while(n) {
+      stack.push(n)
+      n = n.right
+    }
+  } else {
+    stack.pop()
+    while(stack.length > 0 && stack[stack.length-1].left === n) {
+      n = stack[stack.length-1]
+      stack.pop()
+    }
+  }
+}
+
+//Checks if iterator is at start of tree
+Object.defineProperty(iproto, "hasPrev", {
+  get: function() {
+    var stack = this._stack
+    if(stack.length === 0) {
+      return false
+    }
+    if(stack[stack.length-1].left) {
+      return true
+    }
+    for(var s=stack.length-1; s>0; --s) {
+      if(stack[s-1].right === stack[s]) {
+        return true
+      }
+    }
+    return false
+  }
+})
+
+//Default comparison function
+function defaultCompare(a, b) {
+  if(a < b) {
+    return -1
+  }
+  if(a > b) {
+    return 1
+  }
+  return 0
+}
+
+//Build a tree
+function createRBTree(compare) {
+  return new RedBlackTree(compare || defaultCompare, null)
+}
+},{}],3:[function(require,module,exports){
 'use strict';
 
 module.exports = TinyQueue;
@@ -651,7 +1079,7 @@ function swap(data, i, j) {
     data[j] = tmp;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var signedArea = require('./signed_area');
 // var equals = require('./equals');
 
@@ -702,7 +1130,7 @@ function specialCases(e1, e2, p1, p2) {
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }
 
-},{"./signed_area":13}],8:[function(require,module,exports){
+},{"./signed_area":10}],5:[function(require,module,exports){
 var signedArea    = require('./signed_area');
 var compareEvents = require('./compare_events');
 var equals        = require('./equals');
@@ -750,7 +1178,7 @@ module.exports = function compareSegments(le1, le2) {
   return compareEvents(le1, le2) === 1 ? 1 : -1;
 };
 
-},{"./compare_events":7,"./equals":10,"./signed_area":13}],9:[function(require,module,exports){
+},{"./compare_events":4,"./equals":7,"./signed_area":10}],6:[function(require,module,exports){
 module.exports = { 
   NORMAL:               0, 
   NON_CONTRIBUTING:     1, 
@@ -758,11 +1186,11 @@ module.exports = {
   DIFFERENT_TRANSITION: 3
 };
 
-},{}],10:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = function equals(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
-},{}],11:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var INTERSECTION    = 0;
 var UNION           = 1;
 var DIFFERENCE      = 2;
@@ -773,7 +1201,7 @@ var EMPTY           = [];
 var edgeType        = require('./edge_type');
 
 var Queue           = require('tinyqueue');
-var Tree            = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var SweepEvent      = require('./sweep_event');
 
 var compareEvents   = require('./compare_events');
@@ -851,28 +1279,38 @@ function fillQueue(subject, clipping, sbbox, cbbox) {
 }
 
 
-function computeFields(event, prev, sweepLine, operation) {
+/**
+ * @param  {SweepEvent} event
+ * @param  {SweepEvent} prev
+ * @param  {Tree} sweepLine
+ * @param  {Operation} operation
+ * @return {[type]}
+ */
+function computeFields(event, prev, operation) {
   // compute inOut and otherInOut fields
   if (prev === null) {
     event.inOut      = false;
     event.otherInOut = true;
 
   // previous line segment in sweepline belongs to the same polygon
-  } else if (event.isSubject === prev.isSubject) {
-    event.inOut      = !prev.inOut;
-    event.otherInOut = prev.otherInOut;
-
-  // previous line segment in sweepline belongs to the clipping polygon
   } else {
-    event.inOut      = !prev.otherInOut;
-    event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
+    if (event.isSubject === prev.isSubject) {
+      event.inOut      = !prev.inOut;
+      event.otherInOut = prev.otherInOut;
+
+    // previous line segment in sweepline belongs to the clipping polygon
+    } else {
+      event.inOut      = !prev.otherInOut;
+      event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
+    }
+
+    // compute prevInResult field
+    if (prev) {
+      event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ?
+         prev.prevInResult : prev;
+    }
   }
 
-  // compute prevInResult field
-  if (prev) {
-    event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ?
-       prev.prevInResult : prev;
-  }
   // check if the line segment belongs to the Boolean operation
   event.inResult = inResult(event, operation);
 }
@@ -914,7 +1352,6 @@ function possibleIntersection(se1, se2, queue) {
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
-
   var inter = intersection(
     se1.point, se1.otherEvent.point,
     se2.point, se2.otherEvent.point
@@ -931,10 +1368,10 @@ function possibleIntersection(se1, se2, queue) {
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject){
-    if(se1.contourId === se2.contourId){
-    console.warn('Edges of the same polygon overlap',
-      se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-    }
+    // if(se1.contourId === se2.contourId){
+    // console.warn('Edges of the same polygon overlap',
+    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
+    // }
     //throw new Error('Edges of the same polygon overlap');
     return 0;
   }
@@ -1059,7 +1496,7 @@ function _renderSweepLine(sweepLine, pos, event) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.each(function(e) {
+  sweepLine.forEach(function(e) {
     var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
     window.sws.push(poly);
   });
@@ -1077,9 +1514,6 @@ function _renderSweepLine(sweepLine, pos, event) {
 
 
 function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation) {
-  var sortedEvents = [];
-  var prev, next;
-
   var sweepLine = new Tree(compareSegments);
   var sortedEvents = [];
 
@@ -1098,93 +1532,74 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine.insert(event);
+      sweepLine = sweepLine.insert(event);
       // _renderSweepLine(sweepLine, event.point, event);
 
-      next = sweepLine.findIter(event);
-      prev = sweepLine.findIter(event);
-      event.iterator = sweepLine.findIter(event);
+      next = sweepLine.find(event);
+      prev = sweepLine.find(event);
+      event.iterator = sweepLine.find(event);
 
-      // Cannot get out of the tree what we just put there
-      if (!prev || !next) {
-        console.log('brute');
-        var iterators = findIterBrute(sweepLine);
-        prev = iterators[0];
-        next = iterators[1];
-      }
-
-      if (prev.data() !== sweepLine.min()) {
+      if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator(); //findIter(sweepLine.max());
+        prev = sweepLine.begin;
         prev.prev();
         prev.next();
       }
       next.next();
 
-      computeFields(event, prev.data(), sweepLine, operation);
-
-      if (next.data()) {
-        if (possibleIntersection(event, next.data(), eventQueue) === 2) {
-          computeFields(event, prev.data(), sweepLine, operation);
-          computeFields(event, next.data(), sweepLine, operation);
+      var prevEvent = (prev.key || null), prevprevEvent;
+      computeFields(event, prevEvent, operation);
+      if (next.node) {
+        if (possibleIntersection(event, next.key, eventQueue) === 2) {
+          computeFields(event, prevEvent, operation);
+          computeFields(event, next.key, operation);
         }
       }
 
-      if (prev.data()) {
-        if (possibleIntersection(prev.data(), event, eventQueue) === 2) {
-          var prevprev = sweepLine.findIter(prev.data());
-          if (prevprev.data() !== sweepLine.min()) {
+      if (prev.node) {
+        if (possibleIntersection(prev.key, event, eventQueue) === 2) {
+          var prevprev = sweepLine.find(prev.key);
+          if (prevprev.node !== sweepLine.begin) {
             prevprev.prev();
           } else {
-            prevprev = sweepLine.findIter(sweepLine.max());
+            prevprev = sweepLine.find(sweepLine.end);
             prevprev.next();
           }
-          computeFields(prev.data(), prevprev.data(), sweepLine, operation);
-          computeFields(event, prev.data(), sweepLine, operation);
+          prevprevEvent = prevprev.key || null;
+          computeFields(prevEvent, prevprevEvent, operation);
+          computeFields(event, prevEvent, operation);
         }
       }
     } else {
       event = event.otherEvent;
-      next = sweepLine.findIter(event);
-      prev = sweepLine.findIter(event);
+      next = sweepLine.find(event);
+      prev = sweepLine.find(event);
 
       // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (!(prev && next)) continue;
 
-      if (prev.data() !== sweepLine.min()) {
+      if (prev.node !== sweepLine.begin) {
         prev.prev();
       } else {
-        prev = sweepLine.iterator();
-        prev.prev(); // sweepLine.findIter(sweepLine.max());
+        prev = sweepLine.begin;
+        prev.prev();
         prev.next();
       }
       next.next();
-      sweepLine.remove(event);
+      sweepLine = sweepLine.remove(event);
 
-      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
+      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
-      if (next.data() && prev.data()) {
-        possibleIntersection(prev.data(), next.data(), eventQueue);
+      if (next.node && prev.node) {
+        if (typeof prev.node.value !== 'undefined' && typeof next.node.value !== 'undefined') {
+          possibleIntersection(prev.key, next.key, eventQueue);
+        }
       }
     }
   }
   return sortedEvents;
-}
-
-function findIterBrute(sweepLine, q) {
-  var prev = sweepLine.iterator();
-  var next = sweepLine.iterator();
-  var it   = sweepLine.iterator(), data;
-  while((data = it.next()) !== null) {
-    prev.next();
-    next.next();
-    if (data === event) {
-      break;
-    }
-  }
-  return [prev, next];
 }
 
 
@@ -1462,7 +1877,7 @@ module.exports.subdivideSegments    = subdivideSegments;
 module.exports.divideSegment        = divideSegment;
 module.exports.possibleIntersection = possibleIntersection;
 
-},{"./compare_events":7,"./compare_segments":8,"./edge_type":9,"./equals":10,"./segment_intersection":12,"./sweep_event":14,"bintrees":2,"tinyqueue":6}],12:[function(require,module,exports){
+},{"./compare_events":4,"./compare_segments":5,"./edge_type":6,"./equals":7,"./segment_intersection":9,"./sweep_event":11,"functional-red-black-tree":2,"tinyqueue":3}],9:[function(require,module,exports){
 var EPSILON = 1e-9;
 
 /**
@@ -1605,7 +2020,7 @@ module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
   return null;
 };
 
-},{}],13:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * Signed area of the triangle (p0, p1, p2)
  * @param  {Array.<Number>} p0
@@ -1617,7 +2032,7 @@ module.exports = function signedArea(p0, p1, p2) {
   return (p0[0] - p2[0]) * (p1[1] - p2[1]) - (p1[0] - p2[0]) * (p0[1] - p2[1]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var signedArea = require('./signed_area');
 var EdgeType   = require('./edge_type');
 
@@ -1729,5 +2144,5 @@ SweepEvent.prototype = {
 
 module.exports = SweepEvent;
 
-},{"./edge_type":9,"./signed_area":13}]},{},[1])(1)
+},{"./edge_type":6,"./signed_area":10}]},{},[1])(1)
 });

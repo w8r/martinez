@@ -1,7 +1,7 @@
 var tap             = require('tap');
 var compareSegments = require('../src/compare_segments');
 var compareEvents   = require('../src/compare_events');
-var Tree            = require('bintrees').RBTree;
+var Tree            = require('functional-red-black-tree');
 var SweepEvent      = require('../src/sweep_event');
 
 tap.test('compare segments', function(t) {
@@ -14,11 +14,11 @@ tap.test('compare segments', function(t) {
       var se1 = new SweepEvent(pt, true, new SweepEvent([1, 1], false));
       var se2 = new SweepEvent(pt, true, new SweepEvent([2, 3], false));
 
-      tree.insert(se1);
-      tree.insert(se2);
+      tree = tree.insert(se1);
+      tree = tree.insert(se2);
 
-      t.strictSame(tree.max().otherEvent.point, [2, 3]);
-      t.strictSame(tree.min().otherEvent.point, [1, 1]);
+      t.strictSame(tree.end.key.otherEvent.point, [2, 3]);
+      t.strictSame(tree.begin.key.otherEvent.point, [1, 1]);
 
       t.end();
     });
@@ -28,17 +28,16 @@ tap.test('compare segments', function(t) {
       var se1 = new SweepEvent([0, 1], true, new SweepEvent([1, 1], false));
       var se2 = new SweepEvent([0, 2], true, new SweepEvent([2, 3], false));
 
-      tree.insert(se1);
-      tree.insert(se2);
+      tree = tree.insert(se1);
+      tree = tree.insert(se2);
 
-      t.strictSame(tree.min().otherEvent.point, [1, 1]);
-      t.strictSame(tree.max().otherEvent.point, [2, 3]);
+      t.strictSame(tree.begin.key.otherEvent.point, [1, 1]);
+      t.strictSame(tree.end.key.otherEvent.point, [2, 3]);
 
       t.end();
     });
 
     t.test('events order in sweep line', function(t) {
-      var tree = new Tree(compareSegments);
       var se1 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
       var se2 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
 
