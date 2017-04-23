@@ -1,7 +1,7 @@
 var tap = require('tap');
+var Queue = require('tinyqueue');
 var sweepEventsComp = require('../src/compare_events');
 var SweepEvent = require('../src/sweep_event');
-var Queue = require('tinyqueue');
 
 tap.test('queue', function(main) {
 

@@ -1,6 +1,10 @@
+var path = require('path');
 var tap = require('tap');
 var martinez = require('../src/');
-var data = require('./fixtures/two_triangles.json');
+var load = require('load-json-file');
+
+// GeoJSON Data
+var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
 
 var subject  = data.features[0];
 var clipping = data.features[1];

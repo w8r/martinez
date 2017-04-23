@@ -1,8 +1,8 @@
-var tap             = require('tap');
+var tap = require('tap');
+var Tree = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
-var compareEvents   = require('../src/compare_events');
-var Tree            = require('functional-red-black-tree');
-var SweepEvent      = require('../src/sweep_event');
+var compareEvents = require('../src/compare_events');
+var SweepEvent = require('../src/sweep_event');
 
 tap.test('compare segments', function(main) {
 

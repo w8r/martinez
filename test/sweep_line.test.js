@@ -1,8 +1,12 @@
+var path = require('path');
 var tap = require('tap');
-var data = require('./fixtures/two_triangles.json');
 var Tree = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 var SweepEvent = require('../src/sweep_event');
+var load = require('load-json-file');
+
+// GeoJSON Data
+var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
 
 var subject  = data.features[0];
 var clipping = data.features[1];

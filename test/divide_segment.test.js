@@ -1,12 +1,16 @@
 var tap = require('tap');
+var path = require('path');
 var martinez = require('../src/');
 var divideSegment = martinez.divideSegment;
 var SweepEvent = require('../src/sweep_event');
 var Queue = require('tinyqueue');
 var compareEvents = require('../src/compare_events').compare;
 var intersection = require('../src/segment_intersection');
-var shapes = require('./fixtures/two_shapes.json');
+var load = require('load-json-file');
 var equals = require('../src/equals');
+
+// GeoJSON Data
+var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
 
 var Tree = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
