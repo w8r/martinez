@@ -1,7 +1,6 @@
 var tap = require('tap');
-var martinez = require('../src/');
 var data = require('./fixtures/two_triangles.json');
-var Tree            = require('functional-red-black-tree');
+var Tree = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 var SweepEvent = require('../src/sweep_event');
 
