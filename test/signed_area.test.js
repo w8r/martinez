@@ -1,6 +1,6 @@
 'use strict';
 
-var tap = require('tap');
+var tap        = require('tap');
 var signedArea = require('../src/signed_area');
 
 tap.test('analytical signed area', function (t) {

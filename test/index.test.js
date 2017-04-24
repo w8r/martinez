@@ -1,9 +1,9 @@
 'use strict';
 
-var path = require('path');
-var tap = require('tap');
+var tap      = require('tap');
+var path     = require('path');
+var load     = require('load-json-file');
 var martinez = require('../src/');
-var load = require('load-json-file');
 
 // GeoJSON Data
 var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));

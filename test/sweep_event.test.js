@@ -1,6 +1,6 @@
 'use strict';
 
-var tap = require('tap');
+var tap        = require('tap');
 var SweepEvent = require('../src/sweep_event');
 
 tap.test('sweep event', function (main) {

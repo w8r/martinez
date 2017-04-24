@@ -1,13 +1,13 @@
 'use strict';
 
-var Queue = require('tinyqueue');
-var Tree = require('functional-red-black-tree');
-var edgeType = require('./edge_type');
-var SweepEvent = require('./sweep_event');
-var compareEvents = require('./compare_events');
+var Queue           = require('tinyqueue');
+var Tree            = require('functional-red-black-tree');
+var edgeType        = require('./edge_type');
+var SweepEvent      = require('./sweep_event');
+var compareEvents   = require('./compare_events');
 var compareSegments = require('./compare_segments');
-var intersection = require('./segment_intersection');
-var equals = require('./equals');
+var intersection    = require('./segment_intersection');
+var equals          = require('./equals');
 
 var INTERSECTION = 0;
 var UNION = 1;

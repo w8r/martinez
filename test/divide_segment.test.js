@@ -1,15 +1,14 @@
 'use strict';
 
-var tap = require('tap');
-var path = require('path');
-var martinez = require('../src/');
-var divideSegment = martinez.divideSegment;
-var SweepEvent = require('../src/sweep_event');
-var Queue = require('tinyqueue');
+var tap           = require('tap');
+var path          = require('path');
+var Queue         = require('tinyqueue');
+var load          = require('load-json-file');
+var martinez      = require('../src/');
+var SweepEvent    = require('../src/sweep_event');
 var compareEvents = require('../src/compare_events').compare;
-var intersection = require('../src/segment_intersection');
-var load = require('load-json-file');
-var equals = require('../src/equals');
+var intersection  = require('../src/segment_intersection');
+var equals        = require('../src/equals');
 
 // GeoJSON Data
 var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
@@ -36,8 +35,8 @@ tap.test('divide segments', function (main) {
     );
 
 
-    divideSegment(se1, iter[0], q);
-    divideSegment(se2, iter[0], q);
+    martinez.divideSegment(se1, iter[0], q);
+    martinez.divideSegment(se2, iter[0], q);
 
     t.equals(q.length, 6, 'subdivided in 4 segments by intersection point');
 

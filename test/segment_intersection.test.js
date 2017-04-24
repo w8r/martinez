@@ -1,6 +1,6 @@
 'use strict';
 
-var tap = require('tap');
+var tap          = require('tap');
 var intersection = require('../src/segment_intersection');
 
 tap.test('intersection', function (t) {
