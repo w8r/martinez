@@ -31,7 +31,7 @@ var min = Math.min;
  * @param  {Queue}           eventQueue
  * @param  {Array.<Number>}  bbox
  */
-function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
+function processSegment(s1, s2, isSubject, depth, eventQueue, bbox, isExteriorRing) {
   // Possible degenerate condition.
   // if (equals(s1, s2)) return;
 
@@ -63,7 +63,7 @@ function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
 
 var contourId = 0;
 
-function processPolygon(polygon, isSubject, depth, queue, bbox) {
+function processPolygon(contourOrHole, isSubject, depth, queue, bbox, isExteriorRing) {
   var i, len;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
     processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, queue, bbox, isExteriorRing);
@@ -426,7 +426,7 @@ function swap (arr, i, n) {
 }
 
 
-function changeOrientation(contour) {
+function changeOrientation(contour) {  // eslint-disable-line no-unused-vars
   return contour.reverse();
 }
 
@@ -436,7 +436,7 @@ function isArray (arr) {
 }
 
 
-function addHole(contour, idx) {
+function addHole(contour, idx) { // eslint-disable-line no-unused-vars
   if (isArray(contour[0]) && !isArray(contour[0][0])) {
     contour = [contour];
   }
