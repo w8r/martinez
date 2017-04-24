@@ -6,7 +6,14 @@ var martinez = window.martinez = require('../../');
 var xhr = require('superagent');
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.json' : 'horseshoe.json';
+var file = mode === 'geo' ? 'asia.geojson' : 'horseshoe.geojson';
+
+var OPERATIONS = {
+  INTERSECTION: 0,
+  UNION:        1,
+  DIFFERENCE:   2,
+  XOR:          3
+};
 
 var div = document.createElement('div');
 div.id = 'image-map';
@@ -36,18 +43,18 @@ var drawnItems = window.drawnItems = L.geoJson().addTo(map);
 
 function loadData(path) {
   console.log(path);
-  // var two_triangles = require('../../test/fixtures/two_shapes.json');
-  // var oneInside = require('../../test/fixtures/one_inside.json');
-  // var twoPointedTriangles = require('../../test/fixtures/two_pointed_triangles.json');
-  // var selfIntersecting = require('../../test/fixtures/self_intersecting.json');
-  // var holes = require('../../test/fixtures/hole_hole.json');
-  //var data =  require('../../test/fixtures/indonesia.json');
+  // var two_triangles = require('../../test/fixtures/two_shapes.geojson');
+  // var oneInside = require('../../test/fixtures/one_inside.geojson');
+  // var twoPointedTriangles = require('../../test/fixtures/two_pointed_triangles.geojson');
+  // var selfIntersecting = require('../../test/fixtures/self_intersecting.geojson');
+  // var holes = require('../../test/fixtures/hole_hole.geojson');
+  //var data =  require('../../test/fixtures/indonesia.geojson');
   xhr
     .get(path)
-    .set('Accept', 'application/json')
+    .accept('json')
     .end(function(e, r) {
       if (!e) {
-        drawnItems.addData(r.body);
+        drawnItems.addData(JSON.parse(r.text));
         map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
       }
     });
@@ -73,9 +80,19 @@ function run (op) {
   subject  = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
 
+  var operation;
+  if (op === OPERATIONS.INTERSECTION) {
+    operation = martinez.intersection;
+  } else if (op === OPERATIONS.UNION) {
+    operation = martinez.union;
+  } else if (op === OPERATIONS.DIFFERENCE) {
+    operation = martinez.diff;
+  } else {
+    operation = martinez.xor;
+  }
 
   console.time('martinez');
-  var result = martinez(subject.geometry.coordinates, clipping.geometry.coordinates, op);
+  var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd('martinez');
 
   //console.log('result', result, res);
@@ -94,11 +111,11 @@ function run (op) {
     var s = reader.read(subject);
     var c = reader.read(clipping);
     var res;
-    if (op === martinez.operations.INTERSECTION) {
+    if (op === OPERATIONS.INTERSECTION) {
       res = s.geometry.intersection(c.geometry);
-    } else if (op === martinez.operations.UNION) {
+    } else if (op === OPERATIONS.UNION) {
       res = s.geometry.union(c.geometry);
-    } else if (op === martinez.operations.DIFFERENCE) {
+    } else if (op === OPERATIONS.DIFFERENCE) {
       res = s.geometry.difference(c.geometry);
     } else {
       res = s.geometry.symDifference(c.geometry);

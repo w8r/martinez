@@ -14,7 +14,7 @@
     "test": "tap test/*.test.js -R spec",
     "lint": "eslint ./src/",
     "test:watch": "nodemon --exec 'npm run test && npm run lint'",
-    "start": "watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv & serve",
+    "start": "watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv & http-server -p 3000",
     "start:win": "start watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv && start serve",
     "build": "browserify -s martinez ./index.js -o ./dist/martinez.js"
   },
@@ -43,8 +43,8 @@
     "browserify": "^13.0.1",
     "eslint": "^3.1.0",
     "geojson-project": "^1.0.0",
+    "http-server": "^0.9.0",
     "nodemon": "^1.9.2",
-    "serve": "^1.4.0",
     "smokestack": "^3.4.1",
     "superagent": "^2.1.0",
     "tap": "^6.2.0",
