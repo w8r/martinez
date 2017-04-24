@@ -1,7 +1,9 @@
 var tap = require('tap');
 var path = require('path');
-var martinez = require('../src/');
-var divideSegment = martinez.divideSegment;
+var divideSegment = require('../src/').divideSegment;
+var fillQueue = require('../src/').fillQueue;
+var subdivideSegments = require('../src/').subdivideSegments;
+var possibleIntersection = require('../src/').possibleIntersection;
 var SweepEvent = require('../src/sweep_event');
 var Queue = require('tinyqueue');
 var compareEvents = require('../src/compare_events').compare;
@@ -55,7 +57,7 @@ tap.test('divide segments', function(main) {
     // console.log(se1.point, se1.left, se1.otherEvent.point, se1.otherEvent.left);
     // console.log(se2.point, se2.left, se2.otherEvent.point, se2.otherEvent.left);
 
-    t.equals(martinez.possibleIntersection(se1, se2, q), 1);
+    t.equals(possibleIntersection(se1, se2, q), 1);
     t.equals(q.length, 4);
 
     var e = q.pop();
@@ -82,7 +84,7 @@ tap.test('divide segments', function(main) {
     var c = clipping.geometry.coordinates;
 
     var bbox = [Infinity, Infinity, -Infinity, -Infinity];
-    var q = martinez.fillQueue(s, c, bbox, bbox);
+    var q = fillQueue(s, c, bbox, bbox);
     var p0 = [ 16, 282 ];
     var p1 = [ 298, 359 ];
     var p2 = [ 156, 203.5 ];
@@ -106,7 +108,7 @@ tap.test('divide segments', function(main) {
     t.equals(compareSegments(te, te3), 1);
     t.equals(compareSegments(te3, te), -1);
 
-    var segments = martinez.subdivideSegments(q, s, c, bbox, bbox, 0);
+    var segments = subdivideSegments(q, s, c, bbox, bbox, 0);
     var leftSegments = [];
     for (var i = 0; i < segments.length; i++) {
       if (segments[i].left) {
