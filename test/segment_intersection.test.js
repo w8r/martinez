@@ -1,7 +1,9 @@
+'use strict';
+
 var tap = require('tap');
 var intersection = require('../src/segment_intersection');
 
-tap.test('intersection', function(t) {
+tap.test('intersection', function (t) {
 
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [2, 2]), null, 'null if no intersections');
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [10, 2]), null, 'null if no intersections');
@@ -15,8 +17,8 @@ tap.test('intersection', function(t) {
   t.strictSame(intersection([0, 0], [10, 10], [1, 1], [5, 5]), [[1, 1], [5, 5]], 'full overlap');
   t.strictSame(intersection([1, 1], [10, 10], [1, 1], [5, 5]), [[1, 1], [5, 5]], 'shared point + overlap');
   t.strictSame(intersection([3, 3], [10, 10], [0, 0], [5, 5]), [[3, 3], [5, 5]], 'mutual overlap');
-  t.strictSame(intersection([0, 0], [1, 1], [0, 0], [1, 1]), [[0,0], [1,1]], 'full overlap');
-  t.strictSame(intersection([1, 1], [0, 0], [0, 0], [1, 1]), [[1,1], [0,0]], 'full overlap, orientation');
+  t.strictSame(intersection([0, 0], [1, 1], [0, 0], [1, 1]), [[0, 0], [1, 1]], 'full overlap');
+  t.strictSame(intersection([1, 1], [0, 0], [0, 0], [1, 1]), [[1, 1], [0, 0]], 'full overlap, orientation');
 
   t.strictSame(intersection([0, 0], [1, 1], [1, 1], [2, 2]), [[1, 1]], 'collinear, shared point');
   t.strictSame(intersection([1, 1], [0, 0], [1, 1], [2, 2]), [[1, 1]], 'collinear, shared other point');

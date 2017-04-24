@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @param {Number} a
  * @param {Number} b
@@ -17,7 +19,7 @@ function DEFAULT_COMPARATOR(a, b) {
  * var list = new Set([{data: 50}, {data: 120}, {data: 10}]);
  * list.head; // {data:10, next: {data: 50, ...}, prev: {data: 120, ...}}
  * list.tail; // {data:120, next: {data: 10, ...}, prev: {data: 50, ...}}
- * 
+ *
  * @param {Array.<*>=} data
  * @param {Function=}  comparator
  */
@@ -52,14 +54,12 @@ function Set(data, comparator) {
 
 
 Set.prototype = {
-
-
   /**
    * @param  {*} a
    * @param  {*} b
    * @return {*} Inserted node
    */
-  insertBefore: function(a, b) {
+  insertBefore: function (a, b) {
     if (b === this.head) {
       a.prev = this.tail;
       this.head = a;
@@ -69,7 +69,8 @@ Set.prototype = {
       b.prev.next = a;
     }
     a.next = b;
-    return b.prev = a;
+    b.prev = a;
+    return a;
   },
 
 
@@ -78,7 +79,7 @@ Set.prototype = {
    * @param  {*} b
    * @return {*} inserted node
    */
-  insertAfter: function(a, b) {
+  insertAfter: function (a, b) {
     if (b === this.tail) {
       a.next = this.head;
       this.tail = a;
@@ -88,7 +89,8 @@ Set.prototype = {
       b.next.prev = a;
     }
     a.prev = b;
-    return b.next = a;
+    b.next = a;
+    return a;
   },
 
 
@@ -96,12 +98,12 @@ Set.prototype = {
    * @param  {*} node
    * @return {*}
    */
-  insert: function(node) {
+  insert: function (node) {
     var current, next;
 
     this.length++;
-    
-    if (this.head == null) {
+
+    if (this.head === null) {
       this.head = node;
       this.head.next = this.head.prev = this.tail = this.head;
       return node;
@@ -130,11 +132,11 @@ Set.prototype = {
    * @param  {*} node
    * @return {*}
    */
-  remove: function(node) {
+  remove: function (node) {
     var current = this.head;
     while (current !== node) {
       current = current.next;
-      if (current === this.head) return;
+      if (current === this.head) return undefined;
     }
 
     if (current === this.head) {
@@ -161,7 +163,7 @@ Set.prototype = {
    * @param  {*} node
    * @return {*|Null}
    */
-  find: function(node) {
+  find: function (node) {
     var current;
     if (!this.head) { // empty list
       return null;
@@ -179,10 +181,10 @@ Set.prototype = {
   /**
    * @return {Array.<*>}
    */
-  toArray: function() {
+  toArray: function () {
     var arr = [];
     var current = this.head;
-    while(current !== this.tail) {
+    while (current !== this.tail) {
       arr.push(current);
       current = current.next;
     }
@@ -190,6 +192,5 @@ Set.prototype = {
   }
 
 };
-
 
 module.exports = Set;

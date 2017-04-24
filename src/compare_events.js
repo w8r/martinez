@@ -1,3 +1,5 @@
+'use strict';
+
 var signedArea = require('./signed_area');
 // var equals = require('./equals');
 
@@ -31,7 +33,7 @@ function specialCases(e1, e2, p1, p2) {
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
-  if (signedArea (p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
+  if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }

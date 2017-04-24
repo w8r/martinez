@@ -1,3 +1,5 @@
+'use strict';
+
 var INTERSECTION    = 0;
 var UNION           = 1;
 var DIFFERENCE      = 2;
@@ -125,24 +127,25 @@ function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-    case edgeType.NORMAL:
-      switch (operation) {
-        case INTERSECTION:
-          return !event.otherInOut;
-        case UNION:
-          return event.otherInOut;
-        case DIFFERENCE:
-          return (event.isSubject && event.otherInOut) ||
-                 (!event.isSubject && !event.otherInOut);
-        case XOR:
-          return true;
-      }
-    case edgeType.SAME_TRANSITION:
-      return operation === INTERSECTION || operation === UNION;
-    case edgeType.DIFFERENT_TRANSITION:
-      return operation === DIFFERENCE;
-    case edgeType.NON_CONTRIBUTING:
-      return false;
+  case edgeType.NORMAL:
+    switch (operation) {
+    case INTERSECTION:
+      return !event.otherInOut;
+    case UNION:
+      return event.otherInOut;
+    case DIFFERENCE:
+      return (event.isSubject && event.otherInOut) ||
+              (!event.isSubject && !event.otherInOut);
+    case XOR:
+      return true;
+    }
+    break;
+  case edgeType.SAME_TRANSITION:
+    return operation === INTERSECTION || operation === UNION;
+  case edgeType.DIFFERENT_TRANSITION:
+    return operation === DIFFERENCE;
+  case edgeType.NON_CONTRIBUTING:
+    return false;
   }
   return false;
 }
@@ -174,7 +177,7 @@ function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject){
+  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
     // if(se1.contourId === se2.contourId){
     // console.warn('Edges of the same polygon overlap',
     //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
@@ -299,11 +302,11 @@ function iteratorEquals(it1, it2) {
 function _renderSweepLine(sweepLine, pos, event) {
   var map = window.map;
   if (!map) return;
-  if (window.sws) window.sws.forEach(function(p) {
+  if (window.sws) window.sws.forEach(function (p) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.forEach(function(e) {
+  sweepLine.forEach(function (e) {
     var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
     window.sws.push(poly);
   });
@@ -410,7 +413,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap (arr, i, n) {
+function swap(arr, i, n) {
   var temp = arr[i];
   arr[i] = arr[n];
   arr[n] = temp;
@@ -422,7 +425,7 @@ function changeOrientation(contour) {
 }
 
 
-function isArray (arr) {
+function isArray(arr) {
   return Object.prototype.toString.call(arr) === '[object Array]';
 }
 
@@ -643,25 +646,25 @@ function boolean(subject, clipping, operation) {
 }
 
 
-module.exports.boolean = boolean;
+module.exports = boolean;
 
 
-module.exports.union = function(subject, clipping) {
+module.exports.union = function (subject, clipping) {
   return boolean(subject, clipping, UNION);
 };
 
 
-module.exports.diff = function(subject, clipping) {
+module.exports.diff = function (subject, clipping) {
   return boolean(subject, clipping, DIFFERENCE);
 };
 
 
-module.exports.xor = function(subject, clipping) {
+module.exports.xor = function (subject, clipping) {
   return boolean(subject, clipping, XOR);
 };
 
 
-module.exports.intersection = function(subject, clipping) {
+module.exports.intersection = function (subject, clipping) {
   return boolean(subject, clipping, INTERSECTION);
 };
 
@@ -671,9 +674,9 @@ module.exports.intersection = function(subject, clipping) {
  */
 module.exports.operations = {
   INTERSECTION: INTERSECTION,
-  DIFFERENCE:   DIFFERENCE,
-  UNION:        UNION,
-  XOR:          XOR
+  DIFFERENCE: DIFFERENCE,
+  UNION: UNION,
+  XOR: XOR
 };
 
 

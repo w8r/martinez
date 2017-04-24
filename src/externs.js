@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Externs file for google closure compiler
  */
@@ -8,13 +9,13 @@
  * @param {*=}o
  * @param {*=}u
  */
-window.require = function(o, u) {};
+window.require = function (o, u) {};
 
 /**
  * @type {Object}
  */
 window.module = {
-    exports: {}
+  exports: {}
 };
 
 /**
@@ -24,7 +25,7 @@ window.module = {
  * @param  {Array.<Array.<Array.<Number>>>} polygonB
  * @return {Array.<Array.<Array.<Number>>>|Null}
  */
-window.martinez = function(polygonA, polygonB, operation) {};
+window.martinez = function (polygonA, polygonB, operation) {};
 
 
 /**
@@ -32,9 +33,9 @@ window.martinez = function(polygonA, polygonB, operation) {};
  */
 window.martinez.operations = {
   INTERSECTION: 0,
-  DIFFERENCE:   1,
-  UNION:        2,
-  XOR:          3
+  DIFFERENCE: 1,
+  UNION: 2,
+  XOR: 3
 };
 
 /**
@@ -44,7 +45,7 @@ window.martinez.operations = {
  * @param  {Array.<Array.<Array.<Number>>>} polygonB
  * @return {Array.<Array.<Array.<Number>>>|Null}
  */
-window.martinez.intersection = function(polygonA, polygonB) {};
+window.martinez.intersection = function (polygonA, polygonB) {};
 
 /**
  * @api
@@ -53,7 +54,7 @@ window.martinez.intersection = function(polygonA, polygonB) {};
  * @param  {Array.<Array.<Array.<Number>>>} polygonB
  * @return {Array.<Array.<Array.<Number>>>|Null}
  */
-window.martinez.diff = function(polygonA, polygonB) {};
+window.martinez.diff = function (polygonA, polygonB) {};
 
 /**
  * @api
@@ -62,7 +63,7 @@ window.martinez.diff = function(polygonA, polygonB) {};
  * @param  {Array.<Array.<Array.<Number>>>} polygonB
  * @return {Array.<Array.<Array.<Number>>>|Null}
  */
-window.martinez.union = function(polygonA, polygonB) {};
+window.martinez.union = function (polygonA, polygonB) {};
 
 /**
  * @api
@@ -71,4 +72,4 @@ window.martinez.union = function(polygonA, polygonB) {};
  * @param  {Array.<Array.<Array.<Number>>>} polygonB
  * @return {Array.<Array.<Array.<Number>>>|Null}
  */
-window.martinez.intersection = function(polygonA, polygonB) {};
+window.martinez.intersection = function (polygonA, polygonB) {};
