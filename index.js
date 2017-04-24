@@ -1,3 +1,5 @@
+'use strict';
+
 var martinez = require('./src/index');
 
 module.exports = {

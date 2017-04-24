@@ -2,8 +2,9 @@
 /**
  * Externs file for google closure compiler
  */
-
 // this makes GCC play with browserify
+
+/* eslint-disable no-unused-vars */
 
 /**
  * @param {*=}o
@@ -21,9 +22,9 @@ window.module = {
 /**
  * @api
  * @static
- * @param  {Array.<Array.<Array.<Number>>>} polygonA
- * @param  {Array.<Array.<Array.<Number>>>} polygonB
- * @return {Array.<Array.<Array.<Number>>>|Null}
+ * @param  {Array<Array<Array<Number>>>} polygonA
+ * @param  {Array<Array<Array<Number>>>} polygonB
+ * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez = function (polygonA, polygonB, operation) {};
 
@@ -41,35 +42,35 @@ window.martinez.operations = {
 /**
  * @api
  * @static
- * @param  {Array.<Array.<Array.<Number>>>} polygonA
- * @param  {Array.<Array.<Array.<Number>>>} polygonB
- * @return {Array.<Array.<Array.<Number>>>|Null}
+ * @param  {Array<Array<Array<Number>>>} polygonA
+ * @param  {Array<Array<Array<Number>>>} polygonB
+ * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez.intersection = function (polygonA, polygonB) {};
 
 /**
  * @api
  * @static
- * @param  {Array.<Array.<Array.<Number>>>} polygonA
- * @param  {Array.<Array.<Array.<Number>>>} polygonB
- * @return {Array.<Array.<Array.<Number>>>|Null}
+ * @param  {Array<Array<Array<Number>>>} polygonA
+ * @param  {Array<Array<Array<Number>>>} polygonB
+ * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez.diff = function (polygonA, polygonB) {};
 
 /**
  * @api
  * @static
- * @param  {Array.<Array.<Array.<Number>>>} polygonA
- * @param  {Array.<Array.<Array.<Number>>>} polygonB
- * @return {Array.<Array.<Array.<Number>>>|Null}
+ * @param  {Array<Array<Array<Number>>>} polygonA
+ * @param  {Array<Array<Array<Number>>>} polygonB
+ * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez.union = function (polygonA, polygonB) {};
 
 /**
  * @api
  * @static
- * @param  {Array.<Array.<Array.<Number>>>} polygonA
- * @param  {Array.<Array.<Array.<Number>>>} polygonB
- * @return {Array.<Array.<Array.<Number>>>|Null}
+ * @param  {Array<Array<Array<Number>>>} polygonA
+ * @param  {Array<Array<Array<Number>>>} polygonB
+ * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez.intersection = function (polygonA, polygonB) {};
