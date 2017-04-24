@@ -1,4 +1,5 @@
 var tap = require('tap');
+var path = require('path');
 var divideSegment = require('../src/').divideSegment;
 var fillQueue = require('../src/').fillQueue;
 var subdivideSegments = require('../src/').subdivideSegments;
