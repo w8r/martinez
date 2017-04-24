@@ -3,6 +3,11 @@
   "version": "0.1.5",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "src/",
+    "dist/"
+  ],
   "scripts": {
     "test": "tap test/*.test.js -R spec",
     "lint": "eslint ./src/",
