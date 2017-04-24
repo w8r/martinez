@@ -1,20 +1,19 @@
-var INTERSECTION    = 0;
-var UNION           = 1;
-var DIFFERENCE      = 2;
-var XOR             = 3;
-
-var EMPTY           = [];
-
-var edgeType        = require('./edge_type');
+'use strict';
 
 var Queue           = require('tinyqueue');
 var Tree            = require('functional-red-black-tree');
+var edgeType        = require('./edge_type');
 var SweepEvent      = require('./sweep_event');
-
 var compareEvents   = require('./compare_events');
 var compareSegments = require('./compare_segments');
 var intersection    = require('./segment_intersection');
 var equals          = require('./equals');
+
+var INTERSECTION = 0;
+var UNION = 1;
+var DIFFERENCE = 2;
+var XOR = 3;
+var EMPTY = [];
 
 var max = Math.max;
 var min = Math.min;
@@ -25,11 +24,11 @@ var min = Math.min;
 // global.signedArea = require('./signed_area');
 
 /**
- * @param  {<Array.<Number>} s1
- * @param  {<Array.<Number>} s2
+ * @param  {Array<Number>} s1
+ * @param  {Array<Number>} s2
  * @param  {Boolean}         isSubject
  * @param  {Queue}           eventQueue
- * @param  {Array.<Number>}  bbox
+ * @param  {Array<Number>}  bbox
  */
 function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
   // Possible degenerate condition.
@@ -125,24 +124,25 @@ function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-    case edgeType.NORMAL:
-      switch (operation) {
-        case INTERSECTION:
-          return !event.otherInOut;
-        case UNION:
-          return event.otherInOut;
-        case DIFFERENCE:
-          return (event.isSubject && event.otherInOut) ||
-                 (!event.isSubject && !event.otherInOut);
-        case XOR:
-          return true;
-      }
-    case edgeType.SAME_TRANSITION:
-      return operation === INTERSECTION || operation === UNION;
-    case edgeType.DIFFERENT_TRANSITION:
-      return operation === DIFFERENCE;
-    case edgeType.NON_CONTRIBUTING:
-      return false;
+  case edgeType.NORMAL:
+    switch (operation) {
+    case INTERSECTION:
+      return !event.otherInOut;
+    case UNION:
+      return event.otherInOut;
+    case DIFFERENCE:
+      return (event.isSubject && event.otherInOut) ||
+              (!event.isSubject && !event.otherInOut);
+    case XOR:
+      return true;
+    }
+    break;
+  case edgeType.SAME_TRANSITION:
+    return operation === INTERSECTION || operation === UNION;
+  case edgeType.DIFFERENT_TRANSITION:
+    return operation === DIFFERENCE;
+  case edgeType.NON_CONTRIBUTING:
+    return false;
   }
   return false;
 }
@@ -174,7 +174,7 @@ function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject){
+  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
     // if(se1.contourId === se2.contourId){
     // console.warn('Edges of the same polygon overlap',
     //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
@@ -290,7 +290,7 @@ function divideSegment(se, p, queue)  {
 }
 
 
-/* eslint-disable no-unused-vars, no-debugger */
+/* eslint-disable no-unused-vars, no-debugger, no-undef */
 function iteratorEquals(it1, it2) {
   return it1._cursor === it2._cursor;
 }
@@ -299,12 +299,12 @@ function iteratorEquals(it1, it2) {
 function _renderSweepLine(sweepLine, pos, event) {
   var map = window.map;
   if (!map) return;
-  if (window.sws) window.sws.forEach(function(p) {
+  if (window.sws) window.sws.forEach(function (p) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.forEach(function(e) {
-    var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
+  sweepLine.forEach(function (e) {
+    var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], {color: 'green'}).addTo(map);
     window.sws.push(poly);
   });
 
@@ -317,7 +317,7 @@ function _renderSweepLine(sweepLine, pos, event) {
   window.ps = L.polyline([event.point.slice().reverse(), event.otherEvent.point.slice().reverse()], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
   debugger;
 }
-/* eslint-enable no-unused-vars, no-debugger */
+/* eslint-enable no-unused-vars, no-debugger, no-undef */
 
 
 function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation) {
@@ -410,7 +410,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap (arr, i, n) {
+function swap(arr, i, n) {
   var temp = arr[i];
   arr[i] = arr[n];
   arr[n] = temp;
@@ -422,7 +422,7 @@ function changeOrientation(contour) {
 }
 
 
-function isArray (arr) {
+function isArray(arr) {
   return Object.prototype.toString.call(arr) === '[object Array]';
 }
 
@@ -643,25 +643,25 @@ function boolean(subject, clipping, operation) {
 }
 
 
-module.exports.boolean = boolean;
+module.exports = boolean;
 
 
-module.exports.union = function(subject, clipping) {
+module.exports.union = function (subject, clipping) {
   return boolean(subject, clipping, UNION);
 };
 
 
-module.exports.diff = function(subject, clipping) {
+module.exports.diff = function (subject, clipping) {
   return boolean(subject, clipping, DIFFERENCE);
 };
 
 
-module.exports.xor = function(subject, clipping) {
+module.exports.xor = function (subject, clipping) {
   return boolean(subject, clipping, XOR);
 };
 
 
-module.exports.intersection = function(subject, clipping) {
+module.exports.intersection = function (subject, clipping) {
   return boolean(subject, clipping, INTERSECTION);
 };
 
@@ -671,9 +671,9 @@ module.exports.intersection = function(subject, clipping) {
  */
 module.exports.operations = {
   INTERSECTION: INTERSECTION,
-  DIFFERENCE:   DIFFERENCE,
-  UNION:        UNION,
-  XOR:          XOR
+  DIFFERENCE: DIFFERENCE,
+  UNION: UNION,
+  XOR: XOR
 };
 
 

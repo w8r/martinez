@@ -1,15 +1,14 @@
-var tap = require('tap');
-var path = require('path');
-var divideSegment = require('../src/').divideSegment;
-var fillQueue = require('../src/').fillQueue;
-var subdivideSegments = require('../src/').subdivideSegments;
-var possibleIntersection = require('../src/').possibleIntersection;
-var SweepEvent = require('../src/sweep_event');
-var Queue = require('tinyqueue');
+'use strict';
+
+var tap           = require('tap');
+var path          = require('path');
+var Queue         = require('tinyqueue');
+var load          = require('load-json-file');
+var martinez      = require('../src/');
+var SweepEvent    = require('../src/sweep_event');
 var compareEvents = require('../src/compare_events').compare;
-var intersection = require('../src/segment_intersection');
-var load = require('load-json-file');
-var equals = require('../src/equals');
+var intersection  = require('../src/segment_intersection');
+var equals        = require('../src/equals');
 
 // GeoJSON Data
 var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
@@ -20,11 +19,11 @@ var compareSegments = require('../src/compare_segments');
 var subject = shapes.features[0];
 var clipping = shapes.features[1];
 
-tap.test('divide segments', function(main) {
+tap.test('divide segments', function (main) {
 
-  main.test('divide 2 segments', function(t) {
-    var se1 = new SweepEvent([0, 0], true, new SweepEvent([5,5], false), true);
-    var se2 = new SweepEvent([0, 5], true, new SweepEvent([5,0], false), false);
+  main.test('divide 2 segments', function (t) {
+    var se1 = new SweepEvent([0, 0], true, new SweepEvent([5, 5], false), true);
+    var se2 = new SweepEvent([0, 5], true, new SweepEvent([5, 0], false), false);
     var q = new Queue(null, compareEvents);
 
     q.push(se1);
@@ -36,15 +35,15 @@ tap.test('divide segments', function(main) {
     );
 
 
-    divideSegment(se1, iter[0], q);
-    divideSegment(se2, iter[0], q);
+    martinez.divideSegment(se1, iter[0], q);
+    martinez.divideSegment(se2, iter[0], q);
 
     t.equals(q.length, 6, 'subdivided in 4 segments by intersection point');
 
     t.end();
   });
 
-  main.test('possible intersections', function(t) {
+  main.test('possible intersections', function (t) {
 
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
@@ -57,37 +56,37 @@ tap.test('divide segments', function(main) {
     // console.log(se1.point, se1.left, se1.otherEvent.point, se1.otherEvent.left);
     // console.log(se2.point, se2.left, se2.otherEvent.point, se2.otherEvent.left);
 
-    t.equals(possibleIntersection(se1, se2, q), 1);
+    t.equals(martinez.possibleIntersection(se1, se2, q), 1);
     t.equals(q.length, 4);
 
     var e = q.pop();
-    t.strictSame(e.point, [ 100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [ 153, 203.5 ]);
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [153, 203.5]);
 
     e = q.pop();
-    t.strictSame(e.point, [ 100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [ 56, 181 ]);
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [56, 181]);
 
     e = q.pop();
-    t.strictSame(e.point, [ 100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [ 153, 294.5 ]);
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [153, 294.5]);
 
     e = q.pop();
-    t.strictSame(e.point, [ 100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [16, 282 ]);
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [16, 282]);
 
     t.end();
   });
 
-  main.test('possible intersections on 2 polygons', function(t) {
+  main.test('possible intersections on 2 polygons', function (t) {
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
 
     var bbox = [Infinity, Infinity, -Infinity, -Infinity];
-    var q = fillQueue(s, c, bbox, bbox);
-    var p0 = [ 16, 282 ];
-    var p1 = [ 298, 359 ];
-    var p2 = [ 156, 203.5 ];
+    var q = martinez.fillQueue(s, c, bbox, bbox);
+    var p0 = [16, 282];
+    var p1 = [298, 359];
+    var p2 = [156, 203.5];
 
     var te  = new SweepEvent(p0, true, null, true);
     var te2 = new SweepEvent(p1, false, te, false);
@@ -108,7 +107,7 @@ tap.test('divide segments', function(main) {
     t.equals(compareSegments(te, te3), 1);
     t.equals(compareSegments(te3, te), -1);
 
-    var segments = subdivideSegments(q, s, c, bbox, bbox, 0);
+    var segments = martinez.subdivideSegments(q, s, c, bbox, bbox, 0);
     var leftSegments = [];
     for (var i = 0; i < segments.length; i++) {
       if (segments[i].left) {
@@ -118,79 +117,79 @@ tap.test('divide segments', function(main) {
 
     t.equals(leftSegments.length, 11);
 
-    var E = [ 16, 282];
-    var I = [ 100.79403384562252, 233.41363754101192 ];
-    var G = [ 298, 359 ];
-    var C = [ 153, 294.5 ];
-    var J = [ 203.36313843035356, 257.5101243166895 ];
-    var F = [ 153, 203.5 ];
-    var D = [ 56, 181 ];
-    var A = [ 108.5, 120 ];
-    var B = [ 241.5, 229.5 ];
+    var E = [16, 282];
+    var I = [100.79403384562252, 233.41363754101192];
+    var G = [298, 359];
+    var C = [153, 294.5];
+    var J = [203.36313843035356, 257.5101243166895];
+    var F = [153, 203.5];
+    var D = [56, 181];
+    var A = [108.5, 120];
+    var B = [241.5, 229.5];
 
     var intervals = {
       'EI': {
         l: E, r: I,
-        inOut:        false,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: false,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
       'IF': {
         l: I, r: F,
-        inOut:        false,
-        otherInOut:   false,
-        inResult:     true,
+        inOut: false,
+        otherInOut: false,
+        inResult: true,
         prevInResult: null
       },
       'FJ': {
-        l:F, r: J,
-        inOut:        false,
-        otherInOut:   false,
-        inResult:     true,
+        l: F, r: J,
+        inOut: false,
+        otherInOut: false,
+        inResult: true,
         prevInResult: null
       },
       'JG': {
         l: J, r: G,
-        inOut:        false,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: false,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
       'EG': {
         l: E, r: G,
-        inOut:        true,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: true,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
       'DA': {
         l: D, r: A,
-        inOut:        false,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: false,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
       'AB': {
         l: A, r: B,
-        inOut:        false,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: false,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
       'JB': {
         l: J, r: B,
-        inOut:        true,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: true,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       },
 
       'CJ': {
         l: C, r: J,
-        inOut:        true,
-        otherInOut:   false,
-        inResult:     true,
+        inOut: true,
+        otherInOut: false,
+        inResult: true,
         prevInResult: {
           l: F, r: J,
           prevInResult: null
@@ -198,9 +197,9 @@ tap.test('divide segments', function(main) {
       },
       'IC': {
         l: I, r: C,
-        inOut:        true,
-        otherInOut:   false,
-        inResult:     true,
+        inOut: true,
+        otherInOut: false,
+        inResult: true,
         prevInResult: {
           l: I, r: F,
           prevInResult: null
@@ -208,25 +207,25 @@ tap.test('divide segments', function(main) {
 
       'DI': {
         l: D, r: I,
-        inOut:        true,
-        otherInOut:   true,
-        inResult:     false,
+        inOut: true,
+        otherInOut: true,
+        inResult: false,
         prevInResult: null
       }
     };
 
     function checkContain(interval) {
       var data = intervals[interval];
-      for(var x = 0; x < leftSegments.length; x++){
+      for (var x = 0; x < leftSegments.length; x++) {
         var seg = leftSegments[x];
-        if(equals(seg.point, data.l) &&
+        if (equals(seg.point, data.l) &&
            equals(seg.otherEvent.point, data.r) &&
            seg.inOut      === data.inOut &&
            seg.otherInOut === data.otherInOut &&
            seg.inResult   === data.inResult &&
-           ((seg.prevInResult === null && data.prevInResult === null)
-            || (equals(seg.prevInResult.point, data.prevInResult.l)
-            && equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))) {
+           ((seg.prevInResult === null && data.prevInResult === null) ||
+            (equals(seg.prevInResult.point, data.prevInResult.l) &&
+            equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))) {
           t.pass(interval);
           return;
         }

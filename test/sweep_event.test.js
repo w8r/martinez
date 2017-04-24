@@ -1,9 +1,11 @@
-var tap = require('tap');
+'use strict';
+
+var tap        = require('tap');
 var SweepEvent = require('../src/sweep_event');
 
-tap.test('sweep event', function(main) {
+tap.test('sweep event', function (main) {
 
-  main.test('isBelow', function(t) {
+  main.test('isBelow', function (t) {
     var s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
     var s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
 
@@ -21,7 +23,7 @@ tap.test('sweep event', function(main) {
   });
 
 
-  main.test('isAbove', function(t) {
+  main.test('isAbove', function (t) {
 
     var s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
     var s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
@@ -40,7 +42,7 @@ tap.test('sweep event', function(main) {
   });
 
 
-  main.test('isVertical', function(t) {
+  main.test('isVertical', function (t) {
     t.ok(new SweepEvent([0, 0], true, new SweepEvent([0, 1], false)).isVertical());
     t.notOk(new SweepEvent([0, 0], true, new SweepEvent([0.0001, 1], false)).isVertical());
 

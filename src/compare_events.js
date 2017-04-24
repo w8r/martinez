@@ -1,3 +1,5 @@
+'use strict';
+
 var signedArea = require('./signed_area');
 // var equals = require('./equals');
 
@@ -21,7 +23,7 @@ module.exports = function sweepEventsComp(e1, e2) {
   return specialCases(e1, e2, p1, p2);
 };
 
-
+/* eslint-disable no-unused-vars */
 function specialCases(e1, e2, p1, p2) {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
@@ -31,7 +33,7 @@ function specialCases(e1, e2, p1, p2) {
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
-  if (signedArea (p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
+  if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
@@ -47,3 +49,4 @@ function specialCases(e1, e2, p1, p2) {
 
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }
+/* eslint-enable no-unused-vars */

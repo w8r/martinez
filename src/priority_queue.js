@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @param {Number} a
  * @param {Number} b
@@ -30,7 +32,7 @@ Queue.prototype = {
    * First element
    * @return {*}
    */
-  peek: function() {
+  peek: function () {
     return this.data[0];
   },
 
@@ -38,7 +40,7 @@ Queue.prototype = {
   /**
    * @return {*}
    */
-  pop: function() {
+  pop: function () {
     var data = this.data;
     var first = data[0];
     var last = data.pop();
@@ -79,7 +81,7 @@ Queue.prototype = {
    * @param {*} element
    * @return {Number} new size
    */
-  push: function(element) {
+  push: function (element) {
     var size = this.length = this.data.push(element);
     var current = size - 1;
     var compare = this._comparator;
@@ -99,7 +101,7 @@ Queue.prototype = {
   /**
    * @return {Number}
    */
-  size: function() {
+  size: function () {
     return this.length;
   },
 
@@ -108,7 +110,7 @@ Queue.prototype = {
    * @param {Function} fn
    * @param {*}        context
    */
-  forEach: function(fn, context) {
+  forEach: function (fn, context) {
     this.data.forEach(fn, context);
   },
 
@@ -117,7 +119,7 @@ Queue.prototype = {
    * @param {Number} a
    * @param {Number} b
    */
-  _swap: function(a, b) {
+  _swap: function (a, b) {
     var temp = this.data[a];
     this.data[a] = this.data[b];
     this.data[b] = temp;
