@@ -1,24 +1,27 @@
-var tap           = require('tap');
+var tap = require('tap');
 var divideSegment = require('../src/').divideSegment;
-var fillQueue     = require('../src/').fillQueue;
+var fillQueue = require('../src/').fillQueue;
 var subdivideSegments = require('../src/').subdivideSegments;
 var possibleIntersection = require('../src/').possibleIntersection;
-var SweepEvent    = require('../src/sweep_event');
-var Queue         = require('tinyqueue');
+var SweepEvent = require('../src/sweep_event');
+var Queue = require('tinyqueue');
 var compareEvents = require('../src/compare_events').compare;
-var intersection  = require('../src/segment_intersection');
-var shapes        = require('./fixtures/two_shapes.json');
-var equals        = require('../src/equals');
+var intersection = require('../src/segment_intersection');
+var load = require('load-json-file');
+var equals = require('../src/equals');
 
-var Tree            = require('functional-red-black-tree');
+// GeoJSON Data
+var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
+
+var Tree = require('functional-red-black-tree');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
 var clipping = shapes.features[1];
 
-tap.test('divide segments', function(t) {
+tap.test('divide segments', function(main) {
 
-  t.test('divide 2 segments', function(t) {
+  main.test('divide 2 segments', function(t) {
     var se1 = new SweepEvent([0, 0], true, new SweepEvent([5,5], false), true);
     var se2 = new SweepEvent([0, 5], true, new SweepEvent([5,0], false), false);
     var q = new Queue(null, compareEvents);
@@ -40,7 +43,7 @@ tap.test('divide segments', function(t) {
     t.end();
   });
 
-  t.test('possible intersections', function(t) {
+  main.test('possible intersections', function(t) {
 
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
@@ -75,7 +78,7 @@ tap.test('divide segments', function(t) {
     t.end();
   });
 
-  t.test('possible intersections on 2 polygons', function(t) {
+  main.test('possible intersections on 2 polygons', function(t) {
     var s = subject.geometry.coordinates;
     var c = clipping.geometry.coordinates;
 
@@ -106,7 +109,7 @@ tap.test('divide segments', function(t) {
 
     var segments = subdivideSegments(q, s, c, bbox, bbox, 0);
     var leftSegments = [];
-    for (var i =0; i < segments.length; i++) {
+    for (var i = 0; i < segments.length; i++) {
       if (segments[i].left) {
         leftSegments.push(segments[i]);
       }
@@ -211,10 +214,10 @@ tap.test('divide segments', function(t) {
       }
     };
 
-    function check_contain(interval) {
-      data = intervals[interval];
-      for(var i = 0; i < leftSegments.length; i++){
-        seg = leftSegments[i];
+    function checkContain(interval) {
+      var data = intervals[interval];
+      for(var x = 0; x < leftSegments.length; x++){
+        var seg = leftSegments[x];
         if(equals(seg.point, data.l) &&
            equals(seg.otherEvent.point, data.r) &&
            seg.inOut      === data.inOut &&
@@ -230,12 +233,10 @@ tap.test('divide segments', function(t) {
       t.fail(interval);
     }
 
-    for (var key in intervals) {
-      check_contain(key);
-    }
+    Object.keys(intervals).forEach(function (key) { checkContain(key); });
 
     t.end();
   });
 
-  t.end();
+  main.end();
 });
