@@ -643,7 +643,7 @@ function boolean(subject, clipping, operation) {
 }
 
 
-module.exports = boolean;
+module.exports.boolean = boolean;
 
 
 module.exports.union = function(subject, clipping) {
