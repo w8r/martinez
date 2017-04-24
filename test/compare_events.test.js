@@ -1,12 +1,12 @@
 var tap = require('tap');
+var Queue = require('tinyqueue');
 var sweepEventsComp = require('../src/compare_events');
 var SweepEvent = require('../src/sweep_event');
-var Queue = require('tinyqueue');
 
-tap.test('queue', function(t) {
+tap.test('queue', function(main) {
 
-  t.test('queue should process lest(by x) sweep event first', function(t) {
-    var queue = eventQueue = new Queue(null, sweepEventsComp);
+  main.test('queue should process lest(by x) sweep event first', function(t) {
+    var queue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0] };
     var e2 = { point: [0.5, 0.5] };
 
@@ -19,8 +19,8 @@ tap.test('queue', function(t) {
     t.end();
   });
 
-  t.test('queue should process lest(by y) sweep event first', function(t) {
-    var queue = eventQueue = new Queue(null, sweepEventsComp);
+  main.test('queue should process lest(by y) sweep event first', function(t) {
+    var queue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0] };
     var e2 = { point: [0.0, 0.5] };
 
@@ -34,8 +34,8 @@ tap.test('queue', function(t) {
   });
 
 
-  t.test('queue should pop least(by left prop) sweep event first', function(t) {
-    var queue = eventQueue = new Queue(null, sweepEventsComp);
+  main.test('queue should pop least(by left prop) sweep event first', function(t) {
+    var queue = new Queue(null, sweepEventsComp);
     var e1 = { point: [0.0, 0.0], left: true };
     var e2 = { point: [0.0, 0.0], left: false };
 
@@ -48,7 +48,7 @@ tap.test('queue', function(t) {
     t.end();
   });
 
-  t.end();
+  main.end();
 });
 
 tap.test('sweep event comparison x coordinates', function(t) {
