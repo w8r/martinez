@@ -3,8 +3,10 @@
   "version": "0.1.5",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "index.js",
+    "index.d.ts",
     "src/",
     "dist/"
   ],
@@ -34,6 +36,7 @@
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
   "devDependencies": {
+    "@types/geojson": "^1.0.2",
     "babel-cli": "^6.10.1",
     "babel-preset-es2015": "^6.9.0",
     "babelify": "^7.3.0",
@@ -46,6 +49,7 @@
     "superagent": "^2.1.0",
     "tap": "^6.2.0",
     "tap-status": "^1.0.1",
+    "typescript": "^2.2.2",
     "uglifyjs": "^2.4.10",
     "watchify": "^3.7.0"
   },
