@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "functional-red-black-tree": "1.0.1",
+    "load-json-file": "^2.0.0",
     "tinyqueue": "1.1.0"
   }
 }
