@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Signed area of the triangle (p0, p1, p2)
  * @param  {Array.<Number>} p0

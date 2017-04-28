@@ -1,14 +1,19 @@
-var tap = require('tap');
-var martinez = require('../src/');
-var data = require('./fixtures/two_triangles.json');
+'use strict';
+
+var tap             = require('tap');
+var path            = require('path');
 var Tree            = require('functional-red-black-tree');
+var load            = require('load-json-file');
 var compareSegments = require('../src/compare_segments');
-var SweepEvent = require('../src/sweep_event');
+var SweepEvent      = require('../src/sweep_event');
+
+// GeoJSON Data
+var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
 
 var subject  = data.features[0];
 var clipping = data.features[1];
 
-tap.test('sweep line', function(t) {
+tap.test('sweep line', function (t) {
 
   var s = subject.geometry.coordinates;
   var c = clipping.geometry.coordinates;

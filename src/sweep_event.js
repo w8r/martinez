@@ -1,6 +1,7 @@
+'use strict';
+
 var signedArea = require('./signed_area');
 var EdgeType   = require('./edge_type');
-
 
 /**
  * Sweepline event
@@ -85,10 +86,10 @@ SweepEvent.prototype = {
    * @param  {Array.<Number>}  p
    * @return {Boolean}
    */
-  isBelow: function(p) {
+  isBelow: function (p) {
     return this.left ?
-      signedArea (this.point, this.otherEvent.point, p) > 0 :
-      signedArea (this.otherEvent.point, this.point, p) > 0;
+      signedArea(this.point, this.otherEvent.point, p) > 0 :
+      signedArea(this.otherEvent.point, this.point, p) > 0;
   },
 
 
@@ -96,7 +97,7 @@ SweepEvent.prototype = {
    * @param  {Array.<Number>}  p
    * @return {Boolean}
    */
-  isAbove: function(p) {
+  isAbove: function (p) {
     return !this.isBelow(p);
   },
 
@@ -104,7 +105,7 @@ SweepEvent.prototype = {
   /**
    * @return {Boolean}
    */
-  isVertical: function() {
+  isVertical: function () {
     return this.point[0] === this.otherEvent.point[0];
   }
 };
