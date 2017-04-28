@@ -6,7 +6,7 @@ var martinez = window.martinez = require('../../');
 var xhr = require('superagent');
 var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.geojson' : 'horseshoe.geojson';
+var file = mode === 'geo' ? 'asia.geojson' : 'hole_hole.geojson';
 
 var OPERATIONS = {
   INTERSECTION: 0,
@@ -95,13 +95,13 @@ function run (op) {
   var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd('martinez');
 
-  //console.log('result', result, res);
+  //console.log('result', result);
 
   results.clearLayers();
   results.addData({
     'type': 'Feature',
     'geometry': {
-      'type': 'Polygon',
+      'type': 'MultiPolygon',
       'coordinates': result
     }
   });

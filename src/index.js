@@ -18,11 +18,6 @@ var EMPTY = [];
 var max = Math.max;
 var min = Math.min;
 
-// global.Tree = Tree;
-// global.compareSegments = compareSegments;
-// global.SweepEvent = SweepEvent;
-// global.signedArea = require('./signed_area');
-
 /**
  * @param  {Array<Number>} s1
  * @param  {Array<Number>} s2
@@ -71,24 +66,25 @@ function processPolygon(contourOrHole, isSubject, depth, queue, bbox, isExterior
 
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  subject.forEach(function (contour, counterIndex) {
-    contour.forEach(function (contourOrHole, index) {
-      var isExteriorRing = index === 0 ? true : false;
-      if (!isExteriorRing) {
-        contourId++;  
-      }
-      processPolygon(contourOrHole,  true,  contourId, eventQueue, sbbox, isExteriorRing);
-    });
-  });
-  clipping.forEach(function (contour) {
-    contour.forEach(function (contourOrHole, index) {
-      var isExteriorRing = index === 0 ? true : false;
-      if (!isExteriorRing) {
-        contourId++;  
-      }
-      processPolygon(contourOrHole,  false,  contourId, eventQueue, cbbox, isExteriorRing);
-    });
-  });
+  var polygonSet, contourOrHole, isExteriorRing, i, ii, j, jj;
+
+  for (i = 0, ii = subject.length; i < ii; i++) {
+    polygonSet = subject[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], true, contourId, eventQueue, sbbox, isExteriorRing);
+    }
+  }
+
+  for (i = 0, ii = clipping.length; i < ii; i++) {
+    polygonSet = clipping[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
+    }
+  }
 
   return eventQueue;
 }
@@ -497,73 +493,74 @@ function connectEdges(sortedEvents) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
-    // "false"-filled array
-    var processed = Array(resultEvents.length);
-    var result = [];
+  // "false"-filled array
+  var processed = new Array(resultEvents.length);
+  var result = [];
 
-    for (i = 0, len = resultEvents.length; i < len; i++) {
-      if (processed[i]) continue;
-      var contour = [[]];
+  for (i = 0, len = resultEvents.length; i < len; i++) {
+    if (processed[i]) continue;
+    var contour = [[]];
 
-      if (!resultEvents[i].isExteriorRing) {
-        result[result.length-1].push([contour]);
-      } else {
-        result.push(contour);
-      }
-
-      var ringId = result.length - 1;
-
-      var pos = i;
-
-      var initial = resultEvents[i].point;
-      initial.push(resultEvents[i].isExteriorRing);
-      contour[0].push(initial);
-
-      while (pos >= i) {
-        processed[pos] = true;
-
-        if (resultEvents[pos].left) {
-          resultEvents[pos].resultInOut = false;
-          resultEvents[pos].contourId   = ringId;
-        } else {
-          resultEvents[pos].otherEvent.resultInOut = true;
-          resultEvents[pos].otherEvent.contourId   = ringId;
-        }
-
-        pos = resultEvents[pos].pos;
-        processed[pos] = true;
-        resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
-
-        contour[0].push(resultEvents[pos].point);
-        pos = nextPos(pos, resultEvents, processed);
-      }
-
-      pos = pos === -1 ? i : pos;
-
-      processed[pos] = processed[resultEvents[pos].pos] = true;
-      resultEvents[pos].otherEvent.resultInOut = true;
-      resultEvents[pos].otherEvent.contourId   = ringId;
-
+    if (!resultEvents[i].isExteriorRing) {
+      result[result.length - 1].push([contour]);
+    } else {
+      result.push(contour);
     }
 
-    result.forEach(function (contourOrHole, index, resultArray){
-      contourOrHole.forEach(function (outContour, nextIndex, outContourArray) {
-        outContour.forEach(function (coordSet, coordindex, theArray){
-          if (typeof coordSet[0] === 'number'){
-            theArray[coordindex] = coordSet.slice(0,2);
-          } else {
-            var newArray = coordSet[0].map(function(coords){
-              return [coords[0], coords[1]];
-            });
-            resultArray[index].push(newArray);
-            outContourArray.splice(nextIndex, 1);
-          }
-        });
-      });
-    });
+    var ringId = result.length - 1;
+    var pos = i;
 
-    return result;
+    var initial = resultEvents[i].point;
+    // initial.push(resultEvents[i].isExteriorRing);
+    contour[0].push(initial);
+
+    while (pos >= i) {
+      processed[pos] = true;
+
+      if (resultEvents[pos].left) {
+        resultEvents[pos].resultInOut = false;
+        resultEvents[pos].contourId   = ringId;
+      } else {
+        resultEvents[pos].otherEvent.resultInOut = true;
+        resultEvents[pos].otherEvent.contourId   = ringId;
+      }
+
+      pos = resultEvents[pos].pos;
+      processed[pos] = true;
+      // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
+
+      contour[0].push(resultEvents[pos].point);
+      pos = nextPos(pos, resultEvents, processed);
+    }
+
+    pos = pos === -1 ? i : pos;
+
+    processed[pos] = processed[resultEvents[pos].pos] = true;
+    resultEvents[pos].otherEvent.resultInOut = true;
+    resultEvents[pos].otherEvent.contourId   = ringId;
   }
+
+  for (i = 0, len = result.length; i < len; i++) {
+    var polygon = result[i];
+    for (var j = 0, jj = polygon.length; j < jj; j++) {
+      var contour = polygon[j];
+      for (var k = 0, kk = contour.length; k < kk; k++) {
+        var coords = contour[k];
+        if (typeof coords[0] !== 'number') {
+          var ring    = coords[0];
+          var outRing = new Array(ring.length);
+          for (var l = 0, ll = ring.length; l < ll; l++) {
+            outRing[l] = ring[l];
+          }
+          polygon.push(outRing);
+          polygon.splice(j, 1);
+        }
+      }
+    }
+  }
+
+  return result;
+}
 
 
 /**
