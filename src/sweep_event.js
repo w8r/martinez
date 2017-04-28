@@ -75,6 +75,8 @@ function SweepEvent(point, left, otherEvent, isSubject, edgeType) {
    * @type {Boolean}
    */
   this.resultInOut = false;
+
+  this.isExteriorRing = true;
 }
 
 

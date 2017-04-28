@@ -78,9 +78,9 @@ tap.test('divide segments', function (main) {
     t.end();
   });
 
-  main.test('possible intersections on 2 polygons', function (t) {
-    var s = subject.geometry.coordinates;
-    var c = clipping.geometry.coordinates;
+  main.test('possible intersections on 2 polygons', function(t) {
+    var s = [subject.geometry.coordinates];
+    var c = [clipping.geometry.coordinates];
 
     var bbox = [Infinity, Infinity, -Infinity, -Infinity];
     var q = martinez.fillQueue(s, c, bbox, bbox);
