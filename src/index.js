@@ -547,12 +547,7 @@ function connectEdges(sortedEvents) {
       for (var k = 0, kk = contour.length; k < kk; k++) {
         var coords = contour[k];
         if (typeof coords[0] !== 'number') {
-          var ring    = coords[0];
-          var outRing = new Array(ring.length);
-          for (var l = 0, ll = ring.length; l < ll; l++) {
-            outRing[l] = ring[l];
-          }
-          polygon.push(outRing);
+          polygon.push(coords[0]);
           polygon.splice(j, 1);
         }
       }
