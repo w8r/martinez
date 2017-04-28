@@ -6,8 +6,8 @@ var subject  = data.features[0];
 var clipping = data.features[1];
 
 tap.test('fill event queue', function(t) {
-  var s = subject.geometry.coordinates;
-  var c = clipping.geometry.coordinates;
+  var s = [subject.geometry.coordinates];
+  var c = [clipping.geometry.coordinates];
   var sbbox = [Infinity, Infinity, -Infinity, -Infinity];
   var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
   var q = martinez.fillQueue(s, c, sbbox, cbbox);
