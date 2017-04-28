@@ -11,7 +11,7 @@ var EPSILON = 1e-9;
  * @private
  * @returns {Number} The magnitude of the cross product
  */
-function krossProduct(a, b) {
+function crossProduct(a, b) {
   return a[0] * b[1] - a[1] * b[0];
 }
 
@@ -70,10 +70,10 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
 
   // The rest is pretty much a straight port of the algorithm.
   var e = [b1[0] - a1[0], b1[1] - a1[1]];
-  var kross = krossProduct(va, vb);
+  var kross    = crossProduct(va, vb);
   var sqrKross = kross * kross;
-  var sqrLenA = dotProduct(va, va);
-  var sqrLenB = dotProduct(vb, vb);
+  var sqrLenA  = dotProduct(va, va);
+  var sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
@@ -84,12 +84,12 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
-    var s = krossProduct(e, vb) / kross;
+    var s = crossProduct(e, vb) / kross;
     if (s < 0 || s > 1) {
       // not on line segment a
       return null;
     }
-    var t = krossProduct(e, va) / kross;
+    var t = crossProduct(e, va) / kross;
     if (t < 0 || t > 1) {
       // not on line segment b
       return null;
@@ -104,7 +104,7 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
   var sqrLenE = dotProduct(e, e);
-  kross = krossProduct(e, va);
+  kross = crossProduct(e, va);
   sqrKross = kross * kross;
 
   if (sqrKross > EPSILON * sqrLenA * sqrLenE) {

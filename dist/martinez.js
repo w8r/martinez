@@ -1,5 +1,14 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.martinez = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = require('./src/index');
+'use strict';
+
+var martinez = require('./src/index');
+
+module.exports = {
+  union: martinez.union,
+  diff: martinez.diff,
+  xor: martinez.xor,
+  intersection: martinez.intersection
+};
 
 },{"./src/index":8}],2:[function(require,module,exports){
 "use strict"
@@ -1080,6 +1089,8 @@ function swap(data, i, j) {
 }
 
 },{}],4:[function(require,module,exports){
+'use strict';
+
 var signedArea = require('./signed_area');
 // var equals = require('./equals');
 
@@ -1103,7 +1114,7 @@ module.exports = function sweepEventsComp(e1, e2) {
   return specialCases(e1, e2, p1, p2);
 };
 
-
+/* eslint-disable no-unused-vars */
 function specialCases(e1, e2, p1, p2) {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
@@ -1113,7 +1124,7 @@ function specialCases(e1, e2, p1, p2) {
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
-  if (signedArea (p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
+  if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
@@ -1129,8 +1140,11 @@ function specialCases(e1, e2, p1, p2) {
 
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }
+/* eslint-enable no-unused-vars */
 
 },{"./signed_area":10}],5:[function(require,module,exports){
+'use strict';
+
 var signedArea    = require('./signed_area');
 var compareEvents = require('./compare_events');
 var equals        = require('./equals');
@@ -1179,52 +1193,51 @@ module.exports = function compareSegments(le1, le2) {
 };
 
 },{"./compare_events":4,"./equals":7,"./signed_area":10}],6:[function(require,module,exports){
-module.exports = { 
-  NORMAL:               0, 
-  NON_CONTRIBUTING:     1, 
-  SAME_TRANSITION:      2, 
+'use strict';
+
+module.exports = {
+  NORMAL:               0,
+  NON_CONTRIBUTING:     1,
+  SAME_TRANSITION:      2,
   DIFFERENT_TRANSITION: 3
 };
 
 },{}],7:[function(require,module,exports){
+'use strict';
+
 module.exports = function equals(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
+
 },{}],8:[function(require,module,exports){
-var INTERSECTION    = 0;
-var UNION           = 1;
-var DIFFERENCE      = 2;
-var XOR             = 3;
-
-var EMPTY           = [];
-
-var edgeType        = require('./edge_type');
+'use strict';
 
 var Queue           = require('tinyqueue');
 var Tree            = require('functional-red-black-tree');
+var edgeType        = require('./edge_type');
 var SweepEvent      = require('./sweep_event');
-
 var compareEvents   = require('./compare_events');
 var compareSegments = require('./compare_segments');
 var intersection    = require('./segment_intersection');
 var equals          = require('./equals');
 
+var INTERSECTION = 0;
+var UNION = 1;
+var DIFFERENCE = 2;
+var XOR = 3;
+var EMPTY = [];
+
 var max = Math.max;
 var min = Math.min;
 
-// global.Tree = Tree;
-// global.compareSegments = compareSegments;
-// global.SweepEvent = SweepEvent;
-// global.signedArea = require('./signed_area');
-
 /**
- * @param  {<Array.<Number>} s1
- * @param  {<Array.<Number>} s2
+ * @param  {Array<Number>} s1
+ * @param  {Array<Number>} s2
  * @param  {Boolean}         isSubject
  * @param  {Queue}           eventQueue
- * @param  {Array.<Number>}  bbox
+ * @param  {Array<Number>}  bbox
  */
-function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
+function processSegment(s1, s2, isSubject, depth, eventQueue, bbox, isExteriorRing) {
   // Possible degenerate condition.
   // if (equals(s1, s2)) return;
 
@@ -1233,7 +1246,10 @@ function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
   e1.otherEvent = e2;
 
   e1.contourId = e2.contourId = depth;
-
+  if (!isExteriorRing) {
+    e1.isExteriorRing = false;
+    e2.isExteriorRing = false;
+  }
   if (compareEvents(e1, e2) > 0) {
     e2.left = true;
   } else {
@@ -1253,27 +1269,34 @@ function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
 
 var contourId = 0;
 
-function processPolygon(polygon, isSubject, depth, queue, bbox) {
+function processPolygon(contourOrHole, isSubject, depth, queue, bbox, isExteriorRing) {
   var i, len;
-  if (typeof polygon[0][0] === 'number') {
-    for (i = 0, len = polygon.length - 1; i < len; i++) {
-      processSegment(polygon[i], polygon[i + 1], isSubject, depth + 1, queue, bbox);
-    }
-  } else {
-    for (i = 0, len = polygon.length; i < len; i++) {
-      contourId++;
-      processPolygon(polygon[i], isSubject, contourId, queue, bbox);
-    }
+  for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
+    processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, queue, bbox, isExteriorRing);
   }
 }
 
-
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  contourId = 0;
+  var polygonSet, contourOrHole, isExteriorRing, i, ii, j, jj;
 
-  processPolygon(subject,  true,  0, eventQueue, sbbox);
-  processPolygon(clipping, false, 0, eventQueue, cbbox);
+  for (i = 0, ii = subject.length; i < ii; i++) {
+    polygonSet = subject[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], true, contourId, eventQueue, sbbox, isExteriorRing);
+    }
+  }
+
+  for (i = 0, ii = clipping.length; i < ii; i++) {
+    polygonSet = clipping[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
+    }
+  }
 
   return eventQueue;
 }
@@ -1318,24 +1341,25 @@ function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-    case edgeType.NORMAL:
-      switch (operation) {
-        case INTERSECTION:
-          return !event.otherInOut;
-        case UNION:
-          return event.otherInOut;
-        case DIFFERENCE:
-          return (event.isSubject && event.otherInOut) ||
-                 (!event.isSubject && !event.otherInOut);
-        case XOR:
-          return true;
-      }
-    case edgeType.SAME_TRANSITION:
-      return operation === INTERSECTION || operation === UNION;
-    case edgeType.DIFFERENT_TRANSITION:
-      return operation === DIFFERENCE;
-    case edgeType.NON_CONTRIBUTING:
-      return false;
+  case edgeType.NORMAL:
+    switch (operation) {
+    case INTERSECTION:
+      return !event.otherInOut;
+    case UNION:
+      return event.otherInOut;
+    case DIFFERENCE:
+      return (event.isSubject && event.otherInOut) ||
+              (!event.isSubject && !event.otherInOut);
+    case XOR:
+      return true;
+    }
+    break;
+  case edgeType.SAME_TRANSITION:
+    return operation === INTERSECTION || operation === UNION;
+  case edgeType.DIFFERENT_TRANSITION:
+    return operation === DIFFERENCE;
+  case edgeType.NON_CONTRIBUTING:
+    return false;
   }
   return false;
 }
@@ -1367,7 +1391,7 @@ function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject){
+  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
     // if(se1.contourId === se2.contourId){
     // console.warn('Edges of the same polygon overlap',
     //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
@@ -1483,7 +1507,7 @@ function divideSegment(se, p, queue)  {
 }
 
 
-/* eslint-disable no-unused-vars, no-debugger */
+/* eslint-disable no-unused-vars, no-debugger, no-undef */
 function iteratorEquals(it1, it2) {
   return it1._cursor === it2._cursor;
 }
@@ -1492,12 +1516,12 @@ function iteratorEquals(it1, it2) {
 function _renderSweepLine(sweepLine, pos, event) {
   var map = window.map;
   if (!map) return;
-  if (window.sws) window.sws.forEach(function(p) {
+  if (window.sws) window.sws.forEach(function (p) {
     map.removeLayer(p);
   });
   window.sws = [];
-  sweepLine.forEach(function(e) {
-    var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], { color: 'green' }).addTo(map);
+  sweepLine.forEach(function (e) {
+    var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], {color: 'green'}).addTo(map);
     window.sws.push(poly);
   });
 
@@ -1510,7 +1534,7 @@ function _renderSweepLine(sweepLine, pos, event) {
   window.ps = L.polyline([event.point.slice().reverse(), event.otherEvent.point.slice().reverse()], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
   debugger;
 }
-/* eslint-enable no-unused-vars, no-debugger */
+/* eslint-enable no-unused-vars, no-debugger, no-undef */
 
 
 function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation) {
@@ -1603,29 +1627,15 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap (arr, i, n) {
+function swap(arr, i, n) {
   var temp = arr[i];
   arr[i] = arr[n];
   arr[n] = temp;
 }
 
 
-function changeOrientation(contour) {
-  return contour.reverse();
-}
-
-
-function isArray (arr) {
+function isArray(arr) {
   return Object.prototype.toString.call(arr) === '[object Array]';
-}
-
-
-function addHole(contour, idx) {
-  if (isArray(contour[0]) && !isArray(contour[0][0])) {
-    contour = [contour];
-  }
-  contour[idx] = [];
-  return contour;
 }
 
 
@@ -1681,44 +1691,26 @@ function connectEdges(sortedEvents) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
-
   // "false"-filled array
-  var processed = Array(resultEvents.length);
+  var processed = new Array(resultEvents.length);
   var result = [];
-
-  var depth  = [];
-  var holeOf = [];
-  var isHole = {};
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
+    var contour = [[]];
 
-    var contour = [];
-    result.push(contour);
-
-    var ringId = result.length - 1;
-    depth.push(0);
-    holeOf.push(-1);
-
-
-    if (resultEvents[i].prevInResult) {
-      var lowerContourId = resultEvents[i].prevInResult.contourId;
-      if (!resultEvents[i].prevInResult.resultInOut) {
-        addHole(result[lowerContourId], ringId);
-        holeOf[ringId] = lowerContourId;
-        depth[ringId]  = depth[lowerContourId] + 1;
-        isHole[ringId] = true;
-      } else if (isHole[lowerContourId]) {
-        addHole(result[holeOf[lowerContourId]], ringId);
-        holeOf[ringId] = holeOf[lowerContourId];
-        depth[ringId]  = depth[lowerContourId];
-        isHole[ringId] = true;
-      }
+    if (!resultEvents[i].isExteriorRing) {
+      result[result.length - 1].push([contour]);
+    } else {
+      result.push(contour);
     }
 
+    var ringId = result.length - 1;
     var pos = i;
+
     var initial = resultEvents[i].point;
-    contour.push(initial);
+    // initial.push(resultEvents[i].isExteriorRing);
+    contour[0].push(initial);
 
     while (pos >= i) {
       processed[pos] = true;
@@ -1733,8 +1725,9 @@ function connectEdges(sortedEvents) {
 
       pos = resultEvents[pos].pos;
       processed[pos] = true;
+      // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
 
-      contour.push(resultEvents[pos].point);
+      contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed);
     }
 
@@ -1743,14 +1736,20 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = ringId;
+  }
 
-
-    // depth is even
-    /* eslint-disable no-bitwise */
-    if (depth[ringId] & 1) {
-      changeOrientation(contour);
+  for (i = 0, len = result.length; i < len; i++) {
+    var polygon = result[i];
+    for (var j = 0, jj = polygon.length; j < jj; j++) {
+      var contour = polygon[j];
+      for (var k = 0, kk = contour.length; k < kk; k++) {
+        var coords = contour[k];
+        if (typeof coords[0] !== 'number') {
+          polygon.push(coords[0]);
+          polygon.splice(j, 1);
+        }
+      }
     }
-    /* eslint-enable no-bitwise */
   }
 
   return result;
@@ -1818,6 +1817,12 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 
 
 function boolean(subject, clipping, operation) {
+  if (typeof subject[0][0][0] === 'number') {
+    subject = [subject];
+  }
+  if (typeof clipping[0][0][0] === 'number') {
+    clipping = [clipping];
+  }
   var trivial = trivialOperation(subject, clipping, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
@@ -1839,22 +1844,22 @@ function boolean(subject, clipping, operation) {
 module.exports = boolean;
 
 
-module.exports.union = function(subject, clipping) {
+module.exports.union = function (subject, clipping) {
   return boolean(subject, clipping, UNION);
 };
 
 
-module.exports.diff = function(subject, clipping) {
+module.exports.diff = function (subject, clipping) {
   return boolean(subject, clipping, DIFFERENCE);
 };
 
 
-module.exports.xor = function(subject, clipping) {
+module.exports.xor = function (subject, clipping) {
   return boolean(subject, clipping, XOR);
 };
 
 
-module.exports.intersection = function(subject, clipping) {
+module.exports.intersection = function (subject, clipping) {
   return boolean(subject, clipping, INTERSECTION);
 };
 
@@ -1864,9 +1869,9 @@ module.exports.intersection = function(subject, clipping) {
  */
 module.exports.operations = {
   INTERSECTION: INTERSECTION,
-  DIFFERENCE:   DIFFERENCE,
-  UNION:        UNION,
-  XOR:          XOR
+  DIFFERENCE: DIFFERENCE,
+  UNION: UNION,
+  XOR: XOR
 };
 
 
@@ -1878,6 +1883,8 @@ module.exports.divideSegment        = divideSegment;
 module.exports.possibleIntersection = possibleIntersection;
 
 },{"./compare_events":4,"./compare_segments":5,"./edge_type":6,"./equals":7,"./segment_intersection":9,"./sweep_event":11,"functional-red-black-tree":2,"tinyqueue":3}],9:[function(require,module,exports){
+'use strict';
+
 var EPSILON = 1e-9;
 
 /**
@@ -1889,7 +1896,7 @@ var EPSILON = 1e-9;
  * @private
  * @returns {Number} The magnitude of the cross product
  */
-function krossProduct(a, b) {
+function crossProduct(a, b) {
   return a[0] * b[1] - a[1] * b[0];
 }
 
@@ -1924,7 +1931,7 @@ function dotProduct(a, b) {
  * intersection. If they overlap, the two end points of the overlapping segment.
  * Otherwise, null.
  */
-module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
+module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   // The algorithm expects our lines in the form P + sd, where P is a point,
   // s is on the interval [0, 1], and d is a vector.
   // We are passed two points. P can be the first point of each pair. The
@@ -1948,10 +1955,10 @@ module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
 
   // The rest is pretty much a straight port of the algorithm.
   var e = [b1[0] - a1[0], b1[1] - a1[1]];
-  var kross = krossProduct(va, vb);
+  var kross    = crossProduct(va, vb);
   var sqrKross = kross * kross;
-  var sqrLenA = dotProduct(va, va);
-  var sqrLenB = dotProduct(vb, vb);
+  var sqrLenA  = dotProduct(va, va);
+  var sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
@@ -1962,12 +1969,12 @@ module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
-    var s = krossProduct(e, vb) / kross;
+    var s = crossProduct(e, vb) / kross;
     if (s < 0 || s > 1) {
       // not on line segment a
       return null;
     }
-    var t = krossProduct(e, va) / kross;
+    var t = crossProduct(e, va) / kross;
     if (t < 0 || t > 1) {
       // not on line segment b
       return null;
@@ -1982,7 +1989,7 @@ module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
   var sqrLenE = dotProduct(e, e);
-  kross = krossProduct(e, va);
+  kross = crossProduct(e, va);
   sqrKross = kross * kross;
 
   if (sqrKross > EPSILON * sqrLenA * sqrLenE) {
@@ -2021,6 +2028,8 @@ module.exports = function(a1, a2, b1, b2, noEndpointTouch) {
 };
 
 },{}],10:[function(require,module,exports){
+'use strict';
+
 /**
  * Signed area of the triangle (p0, p1, p2)
  * @param  {Array.<Number>} p0
@@ -2033,9 +2042,10 @@ module.exports = function signedArea(p0, p1, p2) {
 };
 
 },{}],11:[function(require,module,exports){
+'use strict';
+
 var signedArea = require('./signed_area');
 var EdgeType   = require('./edge_type');
-
 
 /**
  * Sweepline event
@@ -2109,6 +2119,8 @@ function SweepEvent(point, left, otherEvent, isSubject, edgeType) {
    * @type {Boolean}
    */
   this.resultInOut = false;
+
+  this.isExteriorRing = true;
 }
 
 
@@ -2118,10 +2130,10 @@ SweepEvent.prototype = {
    * @param  {Array.<Number>}  p
    * @return {Boolean}
    */
-  isBelow: function(p) {
+  isBelow: function (p) {
     return this.left ?
-      signedArea (this.point, this.otherEvent.point, p) > 0 :
-      signedArea (this.otherEvent.point, this.point, p) > 0;
+      signedArea(this.point, this.otherEvent.point, p) > 0 :
+      signedArea(this.otherEvent.point, this.point, p) > 0;
   },
 
 
@@ -2129,7 +2141,7 @@ SweepEvent.prototype = {
    * @param  {Array.<Number>}  p
    * @return {Boolean}
    */
-  isAbove: function(p) {
+  isAbove: function (p) {
     return !this.isBelow(p);
   },
 
@@ -2137,7 +2149,7 @@ SweepEvent.prototype = {
   /**
    * @return {Boolean}
    */
-  isVertical: function() {
+  isVertical: function () {
     return this.point[0] === this.otherEvent.point[0];
   }
 };

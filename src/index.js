@@ -415,38 +415,12 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap(arr, i, n) {
-  var temp = arr[i];
-  arr[i] = arr[n];
-  arr[n] = temp;
-}
-
-
-function changeOrientation(contour) {  // eslint-disable-line no-unused-vars
-  return contour.reverse();
-}
-
-
-function isArray(arr) {
-  return Object.prototype.toString.call(arr) === '[object Array]';
-}
-
-
-function addHole(contour, idx) { // eslint-disable-line no-unused-vars
-  if (isArray(contour[0]) && !isArray(contour[0][0])) {
-    contour = [contour];
-  }
-  contour[idx] = [];
-  return contour;
-}
-
-
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<SweepEvent>}
  */
 function orderEvents(sortedEvents) {
-  var event, i, len;
+  var event, i, len, tmp;
   var resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
@@ -463,7 +437,9 @@ function orderEvents(sortedEvents) {
     for (i = 0, len = resultEvents.length; i < len; i++) {
       if ((i + 1) < len &&
         compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
-        swap(resultEvents, i, i + 1);
+        tmp = resultEvents[i];
+        resultEvents[i] = resultEvents[i + 1];
+        resultEvents[i + 1] = tmp;
         sorted = false;
       }
     }
