@@ -18,11 +18,6 @@ var EMPTY = [];
 var max = Math.max;
 var min = Math.min;
 
-// global.Tree = Tree;
-// global.compareSegments = compareSegments;
-// global.SweepEvent = SweepEvent;
-// global.signedArea = require('./signed_area');
-
 /**
  * @param  {Array<Number>} s1
  * @param  {Array<Number>} s2
@@ -30,7 +25,7 @@ var min = Math.min;
  * @param  {Queue}           eventQueue
  * @param  {Array<Number>}  bbox
  */
-function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
+function processSegment(s1, s2, isSubject, depth, eventQueue, bbox, isExteriorRing) {
   // Possible degenerate condition.
   // if (equals(s1, s2)) return;
 
@@ -39,7 +34,10 @@ function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
   e1.otherEvent = e2;
 
   e1.contourId = e2.contourId = depth;
-
+  if (!isExteriorRing) {
+    e1.isExteriorRing = false;
+    e2.isExteriorRing = false;
+  }
   if (compareEvents(e1, e2) > 0) {
     e2.left = true;
   } else {
@@ -59,27 +57,34 @@ function processSegment(s1, s2, isSubject, depth, eventQueue, bbox) {
 
 var contourId = 0;
 
-function processPolygon(polygon, isSubject, depth, queue, bbox) {
+function processPolygon(contourOrHole, isSubject, depth, queue, bbox, isExteriorRing) {
   var i, len;
-  if (typeof polygon[0][0] === 'number') {
-    for (i = 0, len = polygon.length - 1; i < len; i++) {
-      processSegment(polygon[i], polygon[i + 1], isSubject, depth + 1, queue, bbox);
-    }
-  } else {
-    for (i = 0, len = polygon.length; i < len; i++) {
-      contourId++;
-      processPolygon(polygon[i], isSubject, contourId, queue, bbox);
-    }
+  for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
+    processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, queue, bbox, isExteriorRing);
   }
 }
 
-
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  contourId = 0;
+  var polygonSet, contourOrHole, isExteriorRing, i, ii, j, jj;
 
-  processPolygon(subject,  true,  0, eventQueue, sbbox);
-  processPolygon(clipping, false, 0, eventQueue, cbbox);
+  for (i = 0, ii = subject.length; i < ii; i++) {
+    polygonSet = subject[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], true, contourId, eventQueue, sbbox, isExteriorRing);
+    }
+  }
+
+  for (i = 0, ii = clipping.length; i < ii; i++) {
+    polygonSet = clipping[i];
+    for (j = 0, jj = polygonSet.length; j < jj; j++) {
+      isExteriorRing = j === 0;
+      if (isExteriorRing) contourId++;
+      processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
+    }
+  }
 
   return eventQueue;
 }
@@ -410,38 +415,12 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap(arr, i, n) {
-  var temp = arr[i];
-  arr[i] = arr[n];
-  arr[n] = temp;
-}
-
-
-function changeOrientation(contour) {
-  return contour.reverse();
-}
-
-
-function isArray(arr) {
-  return Object.prototype.toString.call(arr) === '[object Array]';
-}
-
-
-function addHole(contour, idx) {
-  if (isArray(contour[0]) && !isArray(contour[0][0])) {
-    contour = [contour];
-  }
-  contour[idx] = [];
-  return contour;
-}
-
-
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<SweepEvent>}
  */
 function orderEvents(sortedEvents) {
-  var event, i, len;
+  var event, i, len, tmp;
   var resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
@@ -458,7 +437,9 @@ function orderEvents(sortedEvents) {
     for (i = 0, len = resultEvents.length; i < len; i++) {
       if ((i + 1) < len &&
         compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
-        swap(resultEvents, i, i + 1);
+        tmp = resultEvents[i];
+        resultEvents[i] = resultEvents[i + 1];
+        resultEvents[i + 1] = tmp;
         sorted = false;
       }
     }
@@ -488,44 +469,26 @@ function connectEdges(sortedEvents) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
-
   // "false"-filled array
-  var processed = Array(resultEvents.length);
+  var processed = new Array(resultEvents.length);
   var result = [];
-
-  var depth  = [];
-  var holeOf = [];
-  var isHole = {};
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
+    var contour = [[]];
 
-    var contour = [];
-    result.push(contour);
-
-    var ringId = result.length - 1;
-    depth.push(0);
-    holeOf.push(-1);
-
-
-    if (resultEvents[i].prevInResult) {
-      var lowerContourId = resultEvents[i].prevInResult.contourId;
-      if (!resultEvents[i].prevInResult.resultInOut) {
-        addHole(result[lowerContourId], ringId);
-        holeOf[ringId] = lowerContourId;
-        depth[ringId]  = depth[lowerContourId] + 1;
-        isHole[ringId] = true;
-      } else if (isHole[lowerContourId]) {
-        addHole(result[holeOf[lowerContourId]], ringId);
-        holeOf[ringId] = holeOf[lowerContourId];
-        depth[ringId]  = depth[lowerContourId];
-        isHole[ringId] = true;
-      }
+    if (!resultEvents[i].isExteriorRing) {
+      result[result.length - 1].push([contour]);
+    } else {
+      result.push(contour);
     }
 
+    var ringId = result.length - 1;
     var pos = i;
+
     var initial = resultEvents[i].point;
-    contour.push(initial);
+    // initial.push(resultEvents[i].isExteriorRing);
+    contour[0].push(initial);
 
     while (pos >= i) {
       processed[pos] = true;
@@ -540,8 +503,9 @@ function connectEdges(sortedEvents) {
 
       pos = resultEvents[pos].pos;
       processed[pos] = true;
+      // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
 
-      contour.push(resultEvents[pos].point);
+      contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed);
     }
 
@@ -550,14 +514,20 @@ function connectEdges(sortedEvents) {
     processed[pos] = processed[resultEvents[pos].pos] = true;
     resultEvents[pos].otherEvent.resultInOut = true;
     resultEvents[pos].otherEvent.contourId   = ringId;
+  }
 
-
-    // depth is even
-    /* eslint-disable no-bitwise */
-    if (depth[ringId] & 1) {
-      changeOrientation(contour);
+  for (i = 0, len = result.length; i < len; i++) {
+    var polygon = result[i];
+    for (var j = 0, jj = polygon.length; j < jj; j++) {
+      var contour = polygon[j];
+      for (var k = 0, kk = contour.length; k < kk; k++) {
+        var coords = contour[k];
+        if (typeof coords[0] !== 'number') {
+          polygon.push(coords[0]);
+          polygon.splice(j, 1);
+        }
+      }
     }
-    /* eslint-enable no-bitwise */
   }
 
   return result;
@@ -625,6 +595,12 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 
 
 function boolean(subject, clipping, operation) {
+  if (typeof subject[0][0][0] === 'number') {
+    subject = [subject];
+  }
+  if (typeof clipping[0][0][0] === 'number') {
+    clipping = [clipping];
+  }
   var trivial = trivialOperation(subject, clipping, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
