@@ -39,6 +39,10 @@ var intersection = {
 `<Operation>` is an enum of `{ INTERSECTION: 0, UNION: 1, DIFFERENCE: 2, XOR: 3 }` in case you have to decide programmatically
 which operation do you need
 
+### Features
+
+The algorithm of Matrinez et al. was extended to work with multipolygons without cascading.
+
 ### Authors
 
 * [Alexander Milevski](https://github.com/w8r/)
