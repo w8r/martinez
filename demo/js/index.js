@@ -27,6 +27,9 @@ switch (mode) {
   case 'edge_overlap':
     file = 'polygon_trapezoid_edge_overlap.geojson';
     break;
+  case 'touching':
+    file = 'touching_boxes.geojson';
+    break;
   case 'triangles':
     file = 'two_pointed_triangles.geojson';
     break;
