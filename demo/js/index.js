@@ -21,6 +21,12 @@ switch (mode) {
   case 'horseshoe':
     file = 'horseshoe.geojson';
     break;
+  case 'hourglasses':
+    file = 'hourglasses.geojson';
+    break;
+  case 'edge_overlap':
+    file = 'polygon_trapezoid_edge_overlap.geojson';
+    break;
   case 'triangles':
     file = 'two_pointed_triangles.geojson';
     break;

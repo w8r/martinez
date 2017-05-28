@@ -35,7 +35,8 @@
   "eslintConfig": {
     "extends": "mourner",
     "rules": {
-      "indent": [2, 2]
+      "indent": [2, 2],
+      "key-spacing": ["error", { "mode": "minimum" }]
     }
   },
   "homepage": "https://github.com/w8r/martinez",

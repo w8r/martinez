@@ -1341,25 +1341,25 @@ function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-  case edgeType.NORMAL:
-    switch (operation) {
-    case INTERSECTION:
-      return !event.otherInOut;
-    case UNION:
-      return event.otherInOut;
-    case DIFFERENCE:
-      return (event.isSubject && event.otherInOut) ||
-              (!event.isSubject && !event.otherInOut);
-    case XOR:
-      return true;
-    }
-    break;
-  case edgeType.SAME_TRANSITION:
-    return operation === INTERSECTION || operation === UNION;
-  case edgeType.DIFFERENT_TRANSITION:
-    return operation === DIFFERENCE;
-  case edgeType.NON_CONTRIBUTING:
-    return false;
+    case edgeType.NORMAL:
+      switch (operation) {
+        case INTERSECTION:
+          return !event.otherInOut;
+        case UNION:
+          return event.otherInOut;
+        case DIFFERENCE:
+          return (event.isSubject && event.otherInOut) ||
+                  (!event.isSubject && !event.otherInOut);
+        case XOR:
+          return true;
+      }
+      break;
+    case edgeType.SAME_TRANSITION:
+      return operation === INTERSECTION || operation === UNION;
+    case edgeType.DIFFERENT_TRANSITION:
+      return operation === DIFFERENCE;
+    case edgeType.NON_CONTRIBUTING:
+      return false;
   }
   return false;
 }
@@ -1446,7 +1446,7 @@ function possibleIntersection(se1, se2, queue) {
     if (leftCoincide && !rightCoincide) {
       // honestly no idea, but changing events selection from [2, 1]
       // to [0, 1] fixes the overlapping self-intersecting polygons issue
-      divideSegment(events[0].otherEvent, events[1].point, queue);
+      divideSegment(events[1].otherEvent, events[0].point, queue);
     }
     return 2;
   }
@@ -1521,17 +1521,26 @@ function _renderSweepLine(sweepLine, pos, event) {
   });
   window.sws = [];
   sweepLine.forEach(function (e) {
-    var poly = L.polyline([e.point.slice().reverse(), e.otherEvent.point.slice().reverse()], {color: 'green'}).addTo(map);
+    var poly = L.polyline([
+      e.point.slice().reverse(),
+      e.otherEvent.point.slice().reverse()
+    ], {color: 'green'}).addTo(map);
     window.sws.push(poly);
   });
 
   if (window.vt) map.removeLayer(window.vt);
   var v = pos.slice();
   var b = map.getBounds();
-  window.vt = L.polyline([[b.getNorth(), v[0]], [b.getSouth(), v[0]]], {color: 'green', weight: 1}).addTo(map);
+  window.vt = L.polyline([
+    [b.getNorth(), v[0]],
+    [b.getSouth(), v[0]]
+  ], {color: 'green', weight: 1}).addTo(map);
 
   if (window.ps) map.removeLayer(window.ps);
-  window.ps = L.polyline([event.point.slice().reverse(), event.otherEvent.point.slice().reverse()], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
+  window.ps = L.polyline([
+    event.point.slice().reverse(),
+    event.otherEvent.point.slice().reverse()
+  ], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
   debugger;
 }
 /* eslint-enable no-unused-vars, no-debugger, no-undef */
@@ -1557,7 +1566,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
     if (event.left) {
       sweepLine = sweepLine.insert(event);
-      // _renderSweepLine(sweepLine, event.point, event);
+      //_renderSweepLine(sweepLine, event.point, event);
 
       next = sweepLine.find(event);
       prev = sweepLine.find(event);
@@ -1627,24 +1636,12 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 }
 
 
-function swap(arr, i, n) {
-  var temp = arr[i];
-  arr[i] = arr[n];
-  arr[n] = temp;
-}
-
-
-function isArray(arr) {
-  return Object.prototype.toString.call(arr) === '[object Array]';
-}
-
-
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<SweepEvent>}
  */
 function orderEvents(sortedEvents) {
-  var event, i, len;
+  var event, i, len, tmp;
   var resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
@@ -1661,7 +1658,9 @@ function orderEvents(sortedEvents) {
     for (i = 0, len = resultEvents.length; i < len; i++) {
       if ((i + 1) < len &&
         compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
-        swap(resultEvents, i, i + 1);
+        tmp = resultEvents[i];
+        resultEvents[i] = resultEvents[i + 1];
+        resultEvents[i + 1] = tmp;
         sorted = false;
       }
     }
