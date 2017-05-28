@@ -4,9 +4,33 @@ require('./booleanopcontrol');
 var martinez = window.martinez = require('../../');
 //var martinez = require('../../dist/martinez.min');
 var xhr = require('superagent');
-var mode = /geo/.test(window.location.hash) ? 'geo' : 'orthogonal';
+var mode = window.location.hash.substring(1);
 var path = '../test/fixtures/';
-var file = mode === 'geo' ? 'asia.geojson' : 'hole_hole.geojson';
+var file;
+
+switch (mode) {
+  case 'geo':
+    file = 'asia.geojson';
+    break;
+  case 'trapezoid':
+    file = 'trapezoid-box.geojson';
+    break;
+  case 'canada':
+    file = 'canada.geojson';
+    break;
+  case 'horseshoe':
+    file = 'horseshoe.geojson';
+    break;
+  case 'triangles':
+    file = 'two_pointed_triangles.geojson';
+    break;
+  default:
+    file = 'hole_hole.geojson';
+    break;
+}
+
+console.log(mode);
+
 
 var OPERATIONS = {
   INTERSECTION: 0,
