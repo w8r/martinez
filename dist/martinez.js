@@ -1205,9 +1205,19 @@ module.exports = {
 },{}],7:[function(require,module,exports){
 'use strict';
 
+// var EPSILON = 1e-9;
+// var abs = Math.abs;
+
 module.exports = function equals(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
+
+// TODO https://github.com/w8r/martinez/issues/6#issuecomment-262847164
+// Precision problem.
+//
+// module.exports = function equals(p1, p2) {
+//   return abs(p1[0] - p2[0]) <= EPSILON && abs(p1[1] - p2[1]) <= EPSILON;
+// };
 
 },{}],8:[function(require,module,exports){
 'use strict';
@@ -1278,7 +1288,7 @@ function processPolygon(contourOrHole, isSubject, depth, queue, bbox, isExterior
 
 function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  var polygonSet, contourOrHole, isExteriorRing, i, ii, j, jj;
+  var polygonSet, isExteriorRing, i, ii, j, jj;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
@@ -1341,25 +1351,25 @@ function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-    case edgeType.NORMAL:
-      switch (operation) {
-        case INTERSECTION:
-          return !event.otherInOut;
-        case UNION:
-          return event.otherInOut;
-        case DIFFERENCE:
-          return (event.isSubject && event.otherInOut) ||
-                  (!event.isSubject && !event.otherInOut);
-        case XOR:
-          return true;
-      }
-      break;
-    case edgeType.SAME_TRANSITION:
-      return operation === INTERSECTION || operation === UNION;
-    case edgeType.DIFFERENT_TRANSITION:
-      return operation === DIFFERENCE;
-    case edgeType.NON_CONTRIBUTING:
-      return false;
+  case edgeType.NORMAL:
+    switch (operation) {
+    case INTERSECTION:
+      return !event.otherInOut;
+    case UNION:
+      return event.otherInOut;
+    case DIFFERENCE:
+      return (event.isSubject && event.otherInOut) ||
+              (!event.isSubject && !event.otherInOut);
+    case XOR:
+      return true;
+    }
+    break;
+  case edgeType.SAME_TRANSITION:
+    return operation === INTERSECTION || operation === UNION;
+  case edgeType.DIFFERENT_TRANSITION:
+    return operation === DIFFERENCE;
+  case edgeType.NON_CONTRIBUTING:
+    return false;
   }
   return false;
 }
@@ -1740,9 +1750,9 @@ function connectEdges(sortedEvents) {
   for (i = 0, len = result.length; i < len; i++) {
     var polygon = result[i];
     for (var j = 0, jj = polygon.length; j < jj; j++) {
-      var contour = polygon[j];
-      for (var k = 0, kk = contour.length; k < kk; k++) {
-        var coords = contour[k];
+      var polygonContour = polygon[j];
+      for (var k = 0, kk = polygonContour.length; k < kk; k++) {
+        var coords = polygonContour[k];
         if (typeof coords[0] !== 'number') {
           polygon.push(coords[0]);
           polygon.splice(j, 1);
