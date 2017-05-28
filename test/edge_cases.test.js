@@ -83,5 +83,81 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
+  main.test('overlapping edge + one inside', function(t) {
+    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_loop.geojson'));
+    var subject  = shapes.features[0];
+    var clipping = shapes.features[1];
+
+    t.test('intersection', function(t) {
+      var result = martinez.intersection(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, [[[[57.8,-49.1],[177.8,-49.1],[177.8,-37.1],[57.8,-37.1],[57.8,-49.1]]]]);
+
+      t.end();
+    });
+
+    t.test('union', function(t) {
+      var result = martinez.union(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, [[[[57.8,-97.1],[196.4,-97.1],[196.4,-11.5],[57.8,-11.5],[57.8,-37.1],[57.8,-49.1],[57.8,-97.1]]]]);
+
+      t.end();
+    });
+
+    t.test('difference', function(t) {
+      var result = martinez.diff(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, []);
+
+      t.end();
+    });
+
+    t.end();
+  });
+
+  main.test('overlapping Y shift', function(t) {
+    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_y.geojson'));
+    var subject  = shapes.features[0];
+    var clipping = shapes.features[1];
+
+    t.test('intersection', function(t) {
+      var result = martinez.intersection(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, [[[[-1883,-8.5],[-1783,-8.5],[-1783,-3],[-1783,-2.999999999999999],[-1883,-3],[-1883,-8.5]]]]);
+
+      t.end();
+    });
+
+    t.test('union', function(t) {
+      var result = martinez.union(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, [[[[-1883,-25],[-1783,-25],[-1783,-8.5],[-1783,-3],[-1783,-2.999999999999999],[-1783,75],[-1883,75],[-1883,-3],[-1883,-8.5],[-1883,-25]]]]);
+
+      t.end();
+    });
+
+    t.test('difference', function(t) {
+      var result = martinez.diff(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, []);
+
+      t.end();
+    });
+
+    t.end();
+  });
+
   main.end();
 });
