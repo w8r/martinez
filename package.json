@@ -60,6 +60,7 @@
     "eslint-config-mourner": "^2.0.1",
     "geojson-project": "^1.0.0",
     "http-server": "^0.9.0",
+    "load-json-file": "^2.0.0",
     "nodemon": "^1.9.2",
     "smokestack": "^3.4.1",
     "superagent": "^2.1.0",
@@ -71,7 +72,6 @@
   },
   "dependencies": {
     "functional-red-black-tree": "1.0.1",
-    "load-json-file": "^2.0.0",
     "tinyqueue": "1.1.0"
   }
 }
