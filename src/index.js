@@ -487,7 +487,11 @@ function connectEdges(sortedEvents) {
     var contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
-      result[result.length - 1].push([contour]);
+      if (result.length === 0) {
+        result.push([[contour]]);
+      } else {
+        result[result.length - 1].push([contour]);
+      }
     } else {
       result.push(contour);
     }
