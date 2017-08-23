@@ -13,7 +13,7 @@ var equals        = require('../src/equals');
 // GeoJSON Data
 var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
 
-var Tree = require('functional-red-black-tree');
+var Tree = require('avl');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
@@ -98,8 +98,8 @@ tap.test('divide segments', function (main) {
 
     var tr = new Tree(compareSegments);
 
-    t.ok(tr = tr.insert(te), 'insert');
-    t.ok(tr = tr.insert(te3), 'insert');
+    t.ok(tr.insert(te), 'insert');
+    t.ok(tr.insert(te3), 'insert');
 
     t.equals(tr.find(te).key, te);
     t.equals(tr.find(te3).key, te3);
