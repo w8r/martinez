@@ -368,27 +368,27 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       }
       next = sweepLine.next(next);
 
-      var prevprev = null;
-      computeFields(event, prev, operation);
+      var prevEvent = prev ? prev.key : null;
+      var prevprevEvent;
+      computeFields(event, prevEvent, operation);
       if (next) {
-        if (possibleIntersection(event, next, eventQueue) === 2) {
-          computeFields(event, prev, operation);
-          computeFields(event, next, operation);
+        if (possibleIntersection(event, next.key, eventQueue) === 2) {
+          computeFields(event, prevEvent, operation);
+          computeFields(event, next.key, operation);
         }
       }
-
       if (prev) {
-        if (possibleIntersection(prev, event, eventQueue) === 2) {
-          prevprev = sweepLine.find(prev);
+        if (possibleIntersection(prev.key, event, eventQueue) === 2) {
+          var prevprev = sweepLine.find(prev);
           if (prevprev !== sweepLine.minNode()) {
             prevprev = sweepLine.prev(prevprev);
           } else {
             prevprev = sweepLine.find(sweepLine.maxNode());
             prevprev = sweepLine.next(prevprev);
           }
-          prevprev = prevprev || null;
-          computeFields(prev, prevprev, operation);
-          computeFields(event, prev, operation);
+          prevprevEvent = prevprev.key || null;
+          computeFields(prevEvent, prevprevEvent, operation);
+          computeFields(event, prevEvent, operation);
         }
       }
     } else {
@@ -414,7 +414,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
       if (next && prev) {
         if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
-          possibleIntersection(prev, next, eventQueue);
+          possibleIntersection(prev.key, next.key, eventQueue);
         }
       }
     }
