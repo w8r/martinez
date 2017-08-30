@@ -93,9 +93,7 @@ function fillQueue(subject, clipping, sbbox, cbbox) {
 /**
  * @param  {SweepEvent} event
  * @param  {SweepEvent} prev
- * @param  {Tree} sweepLine
  * @param  {Operation} operation
- * @return {[type]}
  */
 function computeFields(event, prev, operation) {
   // compute inOut and otherInOut fields
@@ -340,7 +338,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
   var rightbound = min(sbbox[2], cbbox[2]);
 
-  var prev, next;
+  var prev, next, begin, end;
 
   while (eventQueue.length) {
     var event = eventQueue.pop();
@@ -353,19 +351,13 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine.insert(event);
+      next  = prev = sweepLine.insert(event);
       //_renderSweepLine(sweepLine, event.point, event);
-      next = sweepLine.find(event);
-      prev = sweepLine.find(event);
-      event.iterator = sweepLine.find(event);
+      begin = sweepLine.minNode();
 
-      if (prev !== sweepLine.minNode()) {
-        prev = sweepLine.prev(prev);
-      } else {
-        prev = sweepLine.minNode();
-        prev = sweepLine.prev(prev);
-        prev = sweepLine.next(prev);
-      }
+      if (prev !== begin) prev = sweepLine.prev(prev);
+      else                prev = null;
+
       next = sweepLine.next(next);
 
       var prevEvent = prev ? prev.key : null;
@@ -379,42 +371,35 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
       }
       if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
-          var prevprev = sweepLine.find(prev);
-          if (prevprev !== sweepLine.minNode()) {
-            prevprev = sweepLine.prev(prevprev);
-          } else {
-            prevprev = sweepLine.find(sweepLine.maxNode());
-            prevprev = sweepLine.next(prevprev);
-          }
-          prevprevEvent = prevprev.key || null;
+          var prevprev = prev;
+          if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
+          else                    prevprev = null;
+
+          prevprevEvent = prevprev ? prevprev.key : null;
           computeFields(prevEvent, prevprevEvent, operation);
           computeFields(event, prevEvent, operation);
         }
       }
     } else {
       event = event.otherEvent;
-      next = sweepLine.find(event);
-      prev = sweepLine.find(event);
+      next = prev = sweepLine.find(event);
 
       // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
-      if (!(prev && next)) continue;
+      if (prev && next) {
 
-      if (prev !== sweepLine.minNode()) {
-        prev = sweepLine.prev(prev);
-      } else {
-        prev = sweepLine.minNode();
-        prev = sweepLine.prev(prev);
-        prev = sweepLine.next(prev);
-      }
-      next = sweepLine.next(next);
-      sweepLine.remove(event);
+        if (prev !== begin) prev = sweepLine.prev(prev);
+        else                prev = null;
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+        next = sweepLine.next(next);
+        sweepLine.remove(event);
 
-      if (next && prev) {
-        if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
-          possibleIntersection(prev.key, next.key, eventQueue);
+        // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+
+        if (next && prev) {
+          //if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
+            possibleIntersection(prev.key, next.key, eventQueue);
+          //}
         }
       }
     }
