@@ -1,7 +1,7 @@
 'use strict';
 
 var Queue           = require('tinyqueue');
-var Tree            = require('functional-red-black-tree');
+var Tree            = require('avl');
 var edgeType        = require('./edge_type');
 var SweepEvent      = require('./sweep_event');
 var compareEvents   = require('./compare_events');
@@ -93,9 +93,7 @@ function fillQueue(subject, clipping, sbbox, cbbox) {
 /**
  * @param  {SweepEvent} event
  * @param  {SweepEvent} prev
- * @param  {Tree} sweepLine
  * @param  {Operation} operation
- * @return {[type]}
  */
 function computeFields(event, prev, operation) {
   // compute inOut and otherInOut fields
@@ -340,7 +338,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
   var rightbound = min(sbbox[2], cbbox[2]);
 
-  var prev, next;
+  var prev, next, begin, end;
 
   while (eventQueue.length) {
     var event = eventQueue.pop();
@@ -353,69 +351,55 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
     }
 
     if (event.left) {
-      sweepLine = sweepLine.insert(event);
+      next  = prev = sweepLine.insert(event);
       //_renderSweepLine(sweepLine, event.point, event);
+      begin = sweepLine.minNode();
 
-      next = sweepLine.find(event);
-      prev = sweepLine.find(event);
-      event.iterator = sweepLine.find(event);
+      if (prev !== begin) prev = sweepLine.prev(prev);
+      else                prev = null;
 
-      if (prev.node !== sweepLine.begin) {
-        prev.prev();
-      } else {
-        prev = sweepLine.begin;
-        prev.prev();
-        prev.next();
-      }
-      next.next();
+      next = sweepLine.next(next);
 
-      var prevEvent = (prev.key || null), prevprevEvent;
+      var prevEvent = prev ? prev.key : null;
+      var prevprevEvent;
       computeFields(event, prevEvent, operation);
-      if (next.node) {
+      if (next) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
           computeFields(event, prevEvent, operation);
           computeFields(event, next.key, operation);
         }
       }
-
-      if (prev.node) {
+      if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
-          var prevprev = sweepLine.find(prev.key);
-          if (prevprev.node !== sweepLine.begin) {
-            prevprev.prev();
-          } else {
-            prevprev = sweepLine.find(sweepLine.end);
-            prevprev.next();
-          }
-          prevprevEvent = prevprev.key || null;
+          var prevprev = prev;
+          if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
+          else                    prevprev = null;
+
+          prevprevEvent = prevprev ? prevprev.key : null;
           computeFields(prevEvent, prevprevEvent, operation);
           computeFields(event, prevEvent, operation);
         }
       }
     } else {
       event = event.otherEvent;
-      next = sweepLine.find(event);
-      prev = sweepLine.find(event);
+      next = prev = sweepLine.find(event);
 
       // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
-      if (!(prev && next)) continue;
+      if (prev && next) {
 
-      if (prev.node !== sweepLine.begin) {
-        prev.prev();
-      } else {
-        prev = sweepLine.begin;
-        prev.prev();
-        prev.next();
-      }
-      next.next();
-      sweepLine = sweepLine.remove(event);
+        if (prev !== begin) prev = sweepLine.prev(prev);
+        else                prev = null;
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+        next = sweepLine.next(next);
+        sweepLine.remove(event);
 
-      if (next.node && prev.node) {
-        if (typeof prev.node.value !== 'undefined' && typeof next.node.value !== 'undefined') {
+        // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+
+        if (next && prev) {
+          //if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
           possibleIntersection(prev.key, next.key, eventQueue);
+          //}
         }
       }
     }
@@ -474,7 +458,7 @@ function orderEvents(sortedEvents) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-function connectEdges(sortedEvents) {
+function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
@@ -490,7 +474,11 @@ function connectEdges(sortedEvents) {
       if (result.length === 0) {
         result.push([[contour]]);
       } else {
-        result[result.length - 1].push([contour]);
+        if (operation === 1) {
+          result.push(contour)
+        } else {
+          result[result.length - 1].push(contour);   
+        }
       }
     } else {
       result.push(contour);
@@ -628,7 +616,7 @@ function boolean(subject, clipping, operation) {
     return trivial === EMPTY ? null : trivial;
   }
   var sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
-  return connectEdges(sortedEvents);
+  return connectEdges(sortedEvents, operation);
 }
 
 

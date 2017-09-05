@@ -58,8 +58,10 @@ var map = window.map = L.map('image-map', {
   minZoom: 1,
   maxZoom: 20,
   center: [0, 0],
-  zoom: 1,
-  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.CRS.Simple,
+  zoom: 2,
+  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
+    transformation: new L.Transformation(0.5, 0, -0.5, 0)
+  }),
   editable: true
 });
 
@@ -128,6 +130,7 @@ function run (op) {
   var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd('martinez');
 
+  //if (op === OPERATIONS.UNION) result = result[0];
   //console.log('result', result);
 
   results.clearLayers();
