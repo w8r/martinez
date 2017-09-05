@@ -398,7 +398,7 @@ function subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operatio
 
         if (next && prev) {
           //if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
-            possibleIntersection(prev.key, next.key, eventQueue);
+          possibleIntersection(prev.key, next.key, eventQueue);
           //}
         }
       }
@@ -458,7 +458,7 @@ function orderEvents(sortedEvents) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-function connectEdges(sortedEvents) {
+function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
 
@@ -474,7 +474,11 @@ function connectEdges(sortedEvents) {
       if (result.length === 0) {
         result.push([[contour]]);
       } else {
-        result[result.length - 1].push([contour]);
+        if (operation === 1) {
+          result.push(contour)
+        } else {
+          result[result.length - 1].push(contour);   
+        }
       }
     } else {
       result.push(contour);
@@ -612,7 +616,7 @@ function boolean(subject, clipping, operation) {
     return trivial === EMPTY ? null : trivial;
   }
   var sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
-  return connectEdges(sortedEvents);
+  return connectEdges(sortedEvents, operation);
 }
 
 
