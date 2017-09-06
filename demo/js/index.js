@@ -142,23 +142,23 @@ function run (op) {
     }
   });
 
-  setTimeout(function() {
-    console.time('jsts');
-    var s = reader.read(subject);
-    var c = reader.read(clipping);
-    var res;
-    if (op === OPERATIONS.INTERSECTION) {
-      res = s.geometry.intersection(c.geometry);
-    } else if (op === OPERATIONS.UNION) {
-      res = s.geometry.union(c.geometry);
-    } else if (op === OPERATIONS.DIFFERENCE) {
-      res = s.geometry.difference(c.geometry);
-    } else {
-      res = s.geometry.symDifference(c.geometry);
-    }
-    res = writer.write(res);
-    console.timeEnd('jsts');
-  }, 500);
+  // setTimeout(function() {
+  //   console.time('jsts');
+  //   var s = reader.read(subject);
+  //   var c = reader.read(clipping);
+  //   var res;
+  //   if (op === OPERATIONS.INTERSECTION) {
+  //     res = s.geometry.intersection(c.geometry);
+  //   } else if (op === OPERATIONS.UNION) {
+  //     res = s.geometry.union(c.geometry);
+  //   } else if (op === OPERATIONS.DIFFERENCE) {
+  //     res = s.geometry.difference(c.geometry);
+  //   } else {
+  //     res = s.geometry.symDifference(c.geometry);
+  //   }
+  //   res = writer.write(res);
+  //   console.timeEnd('jsts');
+  // }, 500);
 }
 
 //drawnItems.addData(oneInside);

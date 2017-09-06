@@ -76,6 +76,8 @@
   "dependencies": {
     "avl": "^1.4.0",
     "functional-red-black-tree": "1.0.1",
+    "leaflet": "^1.2.0",
+    "leaflet-editable": "^1.1.0",
     "tinyqueue": "1.1.0"
   }
 }

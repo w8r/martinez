@@ -87,9 +87,12 @@ SweepEvent.prototype = {
    * @return {Boolean}
    */
   isBelow: function (p) {
+    var p0 = this.point, p1 = this.otherEvent.point;
     return this.left ?
-      signedArea(this.point, this.otherEvent.point, p) > 0 :
-      signedArea(this.otherEvent.point, this.point, p) > 0;
+      (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0 :
+      // signedArea(this.point, this.otherEvent.point, p) > 0 :
+      (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0
+      //signedArea(this.otherEvent.point, this.point, p) > 0;
   },
 
 
