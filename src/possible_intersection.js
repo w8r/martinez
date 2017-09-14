@@ -1,6 +1,8 @@
 var divideSegment = require('./divide_segment');
 var intersection  = require('./segment_intersection');
 var equals        = require('./equals');
+var compareEvents = require('./compare_events');
+var edgeType      = require('./edge_type');
 
 /**
  * @param  {SweepEvent} se1

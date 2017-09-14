@@ -1,9 +1,10 @@
 'use strict';
 
-var tap      = require('tap');
-var path     = require('path');
-var load     = require('load-json-file');
-var martinez = require('../src/');
+var tap       = require('tap');
+var path      = require('path');
+var load      = require('load-json-file');
+var martinez  = require('../src/');
+var fillQueue = require('../src/fill_queue');
 
 // GeoJSON Data
 var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
@@ -17,7 +18,7 @@ tap.test('fill event queue', function(main) {
 
   var sbbox = [Infinity, Infinity, -Infinity, -Infinity];
   var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
-  var q = martinez.fillQueue(s, c, sbbox, cbbox);
+  var q = fillQueue(s, c, sbbox, cbbox);
   var currentPoint;
 
   main.test('bboxes', function (t) {
