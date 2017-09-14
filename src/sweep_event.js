@@ -1,6 +1,6 @@
 'use strict';
 
-var signedArea = require('./signed_area');
+//var signedArea = require('./signed_area');
 var EdgeType   = require('./edge_type');
 
 /**
@@ -91,7 +91,7 @@ SweepEvent.prototype = {
     return this.left ?
       (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0 :
       // signedArea(this.point, this.otherEvent.point, p) > 0 :
-      (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0
+      (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
       //signedArea(this.otherEvent.point, this.point, p) > 0;
   },
 

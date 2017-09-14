@@ -1,3 +1,5 @@
+'use strict';
+
 var SweepEvent    = require('./sweep_event');
 var equals        = require('./equals');
 var compareEvents = require('./compare_events');

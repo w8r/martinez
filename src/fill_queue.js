@@ -1,3 +1,5 @@
+'use strict';
+
 var Queue           = require('tinyqueue');
 var SweepEvent      = require('./sweep_event');
 var compareEvents   = require('./compare_events');
@@ -10,9 +12,9 @@ var contourId = 0;
 
 function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
   var i, len, s1, s2, e1, e2;
-  var d = depth + 1;
+  // var d = depth + 1;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
-    s1 = contourOrHole[i],
+    s1 = contourOrHole[i];
     s2 = contourOrHole[i + 1];
     //processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, Q, bbox, isExteriorRing);
     e1 = new SweepEvent(s1, false, undefined, isSubject);
@@ -46,7 +48,7 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 
 module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  var polygonSet, isExteriorRing, i, ii, j, jj, k, kk;
+  var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
@@ -67,4 +69,4 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
   }
 
   return eventQueue;
-}
+};

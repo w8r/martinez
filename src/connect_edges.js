@@ -1,6 +1,8 @@
-var equals = require('./equals');
-var compareEvents = require('./compare_events');
+'use strict';
 
+// var equals = require('./equals');
+var compareEvents = require('./compare_events');
+var operationType = require('./operation');
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -37,7 +39,7 @@ function orderEvents(sortedEvents) {
   }
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
-    var event = resultEvents[i];
+    event = resultEvents[i];
     if (!event.left) {
       tmp = event.pos;
       event.pos = event.otherEvent.pos;
@@ -72,15 +74,14 @@ function nextPos(pos, resultEvents, processed) {
     if (!processed[newPos]) {
       console.log(pos, newPos, length);
       return newPos;
-    }
-    else                    newPos++;
-    p1 = resultEvents[newPos].point
+    } else                    newPos++;
+    p1 = resultEvents[newPos].point;
   }
 
   newPos = pos - 1;
 
   while (processed[newPos]) newPos--;
-  console.log('other', pos, newPos, length);
+  // console.log('other', pos, newPos, length);
   return newPos;
 }
 
@@ -105,12 +106,10 @@ module.exports = function (sortedEvents, operation) {
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
+      } else if (operation === operationType.UNION) {
+        result.push(contour);
       } else {
-        if (operation === 1) {
-          result.push(contour)
-        } else {
-          result[result.length - 1].push(contour);
-        }
+        result[result.length - 1].push(contour);
       }
     } else {
       result.push(contour);
@@ -124,7 +123,7 @@ module.exports = function (sortedEvents, operation) {
     contour[0].push(initial);
 
     while (pos >= i) {
-      var event = resultEvents[pos];
+      event = resultEvents[pos];
       processed[pos] = true;
 
       if (event.left) {

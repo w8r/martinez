@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   INTERSECTION: 0,
   UNION:        1,

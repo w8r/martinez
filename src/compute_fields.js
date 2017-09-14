@@ -1,3 +1,5 @@
+'use strict';
+
 var edgeType = require('./edge_type');
 
 var INTERSECTION = 0;

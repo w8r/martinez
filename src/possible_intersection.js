@@ -1,3 +1,5 @@
+'use strict';
+
 var divideSegment = require('./divide_segment');
 var intersection  = require('./segment_intersection');
 var equals        = require('./equals');

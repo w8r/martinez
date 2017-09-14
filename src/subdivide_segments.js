@@ -1,3 +1,5 @@
+'use strict';
+
 var Tree                 = require('avl');
 var computeFields        = require('./compute_fields');
 var possibleIntersection = require('./possible_intersection');
@@ -5,13 +7,13 @@ var compareSegments      = require('./compare_segments');
 var operations           = require('./operation');
 
 
-module.exports = function subdivide (eventQueue, subject, clipping, sbbox, cbbox, operation) {
+module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
   var sweepLine = new Tree(compareSegments);
   var sortedEvents = [];
 
   var rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  var prev, next, begin, end;
+  var prev, next, begin;
 
   var INTERSECTION = operations.INTERSECTION;
   var DIFFERENCE   = operations.DIFFERENCE;

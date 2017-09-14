@@ -1,9 +1,11 @@
 'use strict';
+
 var subdivideSegments = require('./subdivide_segments');
 var connectEdges      = require('./connect_edges');
-var equals            = require('./equals');
 var fillQueue         = require('./fill_queue');
-var operations        = require('./operation')
+var operations        = require('./operation');
+
+var EMPTY = [];
 
 
 function trivialOperation(subject, clipping, operation) {
