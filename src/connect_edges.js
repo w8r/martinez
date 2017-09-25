@@ -57,7 +57,7 @@ function orderEvents(sortedEvents) {
  * @param  {Object>}    processed
  * @return {Number}
  */
-function nextPos(pos, resultEvents, processed) {
+function nextPos(pos, resultEvents, processed, origIndex) {
   var newPos = pos + 1;
   var length = resultEvents.length;
   var p  = resultEvents[pos].point;
@@ -72,7 +72,7 @@ function nextPos(pos, resultEvents, processed) {
   // while in range and not the current one by value
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
     if (!processed[newPos]) {
-      console.log(pos, newPos, length);
+      // console.log(pos, newPos, length);
       return newPos;
     } else                    newPos++;
     p1 = resultEvents[newPos].point;
@@ -80,7 +80,9 @@ function nextPos(pos, resultEvents, processed) {
 
   newPos = pos - 1;
 
-  while (processed[newPos]) newPos--;
+  while (processed[newPos] && newPos >= origIndex) {
+    newPos--;
+  }
   // console.log('other', pos, newPos, length);
   return newPos;
 }
@@ -139,7 +141,7 @@ module.exports = function (sortedEvents, operation) {
       // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
 
       contour[0].push(resultEvents[pos].point);
-      pos = nextPos(pos, resultEvents, processed);
+      pos = nextPos(pos, resultEvents, processed, i);
     }
 
     pos = pos === -1 ? i : pos;
