@@ -108,7 +108,7 @@ module.exports = function (sortedEvents, operation) {
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
-      } else if (operation === operationType.UNION) {
+      } else if (operation === operationType.UNION || operation === operationType.XOR) {
         result[result.length - 1].push([contour]);
       } else {
         result[result.length - 1].push(contour);

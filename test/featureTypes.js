@@ -13,13 +13,17 @@ var testScenarios = [
     testName: 'polyToClipping',
     subjectPoly: 'poly',
   },
-  // {
-  //   testName: 'polyWithHoleToClipping',
-  //   subjectPoly: 'polyWithHole',
-  // }
+  {
+    testName: 'polyWithHoleToClipping',
+    subjectPoly: 'polyWithHole',
+  },
   {
     testName: 'multiPolyToClipping',
     subjectPoly: 'multiPoly',
+  },
+  {
+    testName: 'multiPolyWithHoleToClipping',
+    subjectPoly: 'multiPolyWithHole',
   }
 ];
 
