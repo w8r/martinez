@@ -109,7 +109,7 @@ module.exports = function (sortedEvents, operation) {
       if (result.length === 0) {
         result.push([[contour]]);
       } else if (operation === operationType.UNION) {
-        result.push(contour);
+        result[result.length - 1].push([contour]);
       } else {
         result[result.length - 1].push(contour);
       }
