@@ -167,6 +167,7 @@ module.exports = function (sortedEvents, operation) {
   }
 
   // Handle if the result is a polygon (eg not multipoly)
-  if (result.length === 1) result = result[0];
+  // Commented it again, let's see what do we mean by that
+  // if (result.length === 1) result = result[0];
   return result;
 };

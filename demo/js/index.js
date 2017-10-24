@@ -103,7 +103,6 @@ function clear() {
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
-
 function run (op) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
@@ -131,7 +130,7 @@ function run (op) {
   console.timeEnd('martinez');
 
   //if (op === OPERATIONS.UNION) result = result[0];
-  //console.log('result', result);
+  console.log('result', result);
 
   results.clearLayers();
   results.addData({
