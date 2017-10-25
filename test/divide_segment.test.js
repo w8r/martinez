@@ -6,7 +6,7 @@ var Queue             = require('tinyqueue');
 var load              = require('load-json-file');
 var martinez          = require('../src/');
 var SweepEvent        = require('../src/sweep_event');
-var compareEvents     = require('../src/compare_events').compare;
+var compareEvents     = require('../src/compare_events');
 var intersection      = require('../src/segment_intersection');
 var equals            = require('../src/equals');
 var fillQueue         = require('../src/fill_queue');
@@ -63,21 +63,22 @@ tap.test('divide segments', function (main) {
     t.equals(possibleIntersection(se1, se2, q), 1);
     t.equals(q.length, 4);
 
+
+    e = q.pop();
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [56, 181], '1');
+
+    e = q.pop();
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [16, 282], '2');
+
     var e = q.pop();
     t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [153, 203.5]);
+    t.strictSame(e.otherEvent.point, [153, 203.5], '3');
 
     e = q.pop();
     t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [56, 181]);
-
-    e = q.pop();
-    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [153, 294.5]);
-
-    e = q.pop();
-    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [16, 282]);
+    t.strictSame(e.otherEvent.point, [153, 294.5], '4');
 
     t.end();
   });

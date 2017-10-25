@@ -33,6 +33,9 @@ switch (mode) {
   case 'triangles':
     file = 'two_pointed_triangles.geojson';
     break;
+  case 'holecut':
+    file = 'hole_cut.geojson';
+    break;
   default:
     file = 'hole_hole.geojson';
     break;
