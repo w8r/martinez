@@ -96,8 +96,8 @@ function _renderSweepLine(sweepLine, pos, event) {
   window.sws = [];
   sweepLine.forEach(function (e) {
     var poly = L.polyline([
-      e.point.slice().reverse(),
-      e.otherEvent.point.slice().reverse()
+      e.key.point.slice().reverse(),
+      e.key.otherEvent.point.slice().reverse()
     ], {color: 'green'}).addTo(map);
     window.sws.push(poly);
   });
