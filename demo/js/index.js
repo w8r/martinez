@@ -36,6 +36,9 @@ switch (mode) {
   case 'holecut':
     file = 'hole_cut.geojson';
     break;
+  case 'overlapping_segments':
+    file = 'overlapping_segments.geojson';
+    break;
   default:
     file = 'hole_hole.geojson';
     break;
@@ -134,7 +137,7 @@ function run (op) {
 
   //if (op === OPERATIONS.UNION) result = result[0];
   console.log('result', result);
-
+  console.log(JSON.stringify(result))
   results.clearLayers();
   results.addData({
     'type': 'Feature',
