@@ -95,7 +95,7 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 module.exports = function (sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
-  _renderPoints(resultEvents, 'inResult')
+  _renderPoints(resultEvents, 'inResult');
   // "false"-filled array
   var processed = {};
   var result = [];
@@ -173,12 +173,12 @@ module.exports = function (sortedEvents, operation) {
 };
 
 
-/* eslint-disable no-unused-vars, no-debugger, no-undef */
+/* eslint-disable no-unused-vars, no-debugger, no-undef, no-use-before-define */
 function _renderPoints(possiblePoints, prop) {
   var map = window.map;
   if (!map) return;
   if (points !== undefined) points.clearLayers();
-  
+
   var points = L.layerGroup([]).addTo(map);
   possiblePoints.forEach(function (e) {
     var point = L.circleMarker([e.point[1], e.point[0]], {
@@ -190,5 +190,5 @@ function _renderPoints(possiblePoints, prop) {
 /* eslint-enable no-unused-vars, no-debugger, no-undef */
 
 function getColor(prop) {
-  return prop ? 'green' : 'red'
+  return prop ? 'green' : 'red';
 }
