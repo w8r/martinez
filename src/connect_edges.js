@@ -60,6 +60,7 @@ function orderEvents(sortedEvents) {
 function nextPos(pos, resultEvents, processed, origIndex) {
   var newPos = pos + 1;
   var length = resultEvents.length;
+  if (newPos > length - 1) return pos - 1;
   var p  = resultEvents[pos].point;
   var p1 = resultEvents[newPos].point;
 
@@ -151,6 +152,7 @@ module.exports = function (sortedEvents, operation) {
     event.otherEvent.resultInOut = true;
     event.otherEvent.contourId   = ringId;
   }
+  // _renderPoints(resultEvents, 'resultInOut');
 
   for (i = 0, len = result.length; i < len; i++) {
     var polygon = result[i];
@@ -182,7 +184,7 @@ function _renderPoints(possiblePoints, prop) {
   var points = L.layerGroup([]).addTo(map);
   possiblePoints.forEach(function (e) {
     var point = L.circleMarker([e.point[1], e.point[0]], {
-      radius: 20,
+      radius: getRandomSize(),
       color: getColor(e[prop])
     }).addTo(points);
   });
@@ -191,4 +193,8 @@ function _renderPoints(possiblePoints, prop) {
 
 function getColor(prop) {
   return prop ? 'green' : 'red';
+}
+
+function getRandomSize() {
+  return Math.floor(Math.random() * 30);
 }
