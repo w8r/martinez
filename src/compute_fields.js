@@ -51,8 +51,10 @@ function inResult(event, operation) {
     case UNION:
       return event.otherInOut;
     case DIFFERENCE:
-      return (event.isSubject && event.otherInOut) ||
-              (!event.isSubject && !event.otherInOut);
+      return (event.isSubject && !event.otherInOut) ||
+              (!event.isSubject && event.otherInOut);
+      // return (event.isSubject && event.otherInOut) ||
+      //         (!event.isSubject && !event.otherInOut);
     case XOR:
       return true;
     }
