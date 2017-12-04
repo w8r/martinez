@@ -1,11 +1,12 @@
 'use strict';
 
 var edgeType = require('./edge_type');
+var operationType = require('./operation');
 
-var INTERSECTION = 0;
-var UNION        = 1;
-var DIFFERENCE   = 2;
-var XOR          = 3;
+var INTERSECTION = operationType.INTERSECTION;
+var UNION        = operationType.UNION;
+var DIFFERENCE   = operationType.DIFFERENCE;
+var XOR          = operationType.XOR;
 
 /**
  * @param  {SweepEvent} event
@@ -44,27 +45,27 @@ module.exports = function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-  case edgeType.NORMAL:
-    switch (operation) {
-    case INTERSECTION:
-      return !event.otherInOut;
-    case UNION:
-      return event.otherInOut;
-    case DIFFERENCE:
-      // return (event.isSubject && !event.otherInOut) ||
-      //         (!event.isSubject && event.otherInOut);
-      return (event.isSubject && event.otherInOut) ||
-              (!event.isSubject && !event.otherInOut);
-    case XOR:
-      return true;
-    }
-    break;
-  case edgeType.SAME_TRANSITION:
-    return operation === INTERSECTION || operation === UNION;
-  case edgeType.DIFFERENT_TRANSITION:
-    return operation === DIFFERENCE;
-  case edgeType.NON_CONTRIBUTING:
-    return false;
+    case edgeType.NORMAL:
+      switch (operation) {
+        case INTERSECTION:
+          return !event.otherInOut;
+        case UNION:
+          return event.otherInOut;
+        case DIFFERENCE:
+          // return (event.isSubject && !event.otherInOut) ||
+          //         (!event.isSubject && event.otherInOut);
+          return (event.isSubject && event.otherInOut) ||
+                  (!event.isSubject && !event.otherInOut);
+        case XOR:
+          return true;
+      }
+      break;
+    case edgeType.SAME_TRANSITION:
+      return operation === INTERSECTION || operation === UNION;
+    case edgeType.DIFFERENT_TRANSITION:
+      return operation === DIFFERENCE;
+    case edgeType.NON_CONTRIBUTING:
+      return false;
   }
   return false;
 }

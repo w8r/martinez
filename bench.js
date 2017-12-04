@@ -46,3 +46,15 @@ new Benchmark.Suite('Asia union', options)
   })
   .add('JSTS', () => jstsUnion(asia.features[0], unionPoly))
   .run();
+
+const states = load.sync('./test/fixtures/states_source.geojson');
+new Benchmark.Suite('States clip', options)
+  .add('Martinez', () => {
+    martinez.union(
+      states.features[0].geometry.coordinates,
+      states.features[1].geometry.coordinates);
+  })
+  .add('JSTS', () => {
+    jstsUnion(states.features[0], states.features[1]);
+  })
+  .run();

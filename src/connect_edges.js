@@ -95,10 +95,10 @@ function nextPos(pos, resultEvents, processed, origIndex) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-module.exports = function (sortedEvents, operation) {
+module.exports = function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
-  //_renderPoints(sortedEvents, 'inResult');
+  //_renderPoints(resultEvents, 'inResult');
 
   // "false"-filled array
   var processed = {};
@@ -125,7 +125,6 @@ module.exports = function (sortedEvents, operation) {
     var pos = i;
 
     var initial = resultEvents[i].point;
-    // initial.push(resultEvents[i].isExteriorRing);
     contour[0].push(initial);
 
     while (pos >= i) {
@@ -139,6 +138,7 @@ module.exports = function (sortedEvents, operation) {
         event.otherEvent.resultInOut = true;
         event.otherEvent.contourId   = ringId;
       }
+      //new L.Marker(event.point.slice().reverse()).addTo(map);
 
       pos = event.pos;
       processed[pos] = true;
@@ -155,7 +155,7 @@ module.exports = function (sortedEvents, operation) {
     event.otherEvent.resultInOut = true;
     event.otherEvent.contourId   = ringId;
   }
-  // _renderPoints(resultEvents, 'resultInOut');
+  //_renderPoints(resultEvents, 'resultInOut');
 
   for (i = 0, len = result.length; i < len; i++) {
     var polygon = result[i];
@@ -181,25 +181,19 @@ module.exports = function (sortedEvents, operation) {
 /* eslint-disable no-unused-vars, no-debugger, no-undef, no-use-before-define */
 function _renderPoints(possiblePoints, prop) {
   var map = window.map;
+  var points = window.points;
   if (!map) return;
   if (points !== undefined) points.clearLayers();
 
-  var points = L.layerGroup([]).addTo(map);
+  points = window.points = L.layerGroup([]).addTo(map);
   possiblePoints.forEach(function (e) {
     var point = L.circleMarker([e.point[1], e.point[0]], {
-      radius: getRandomSize(),
-      color:  getColor(e[prop]),
+      radius: Math.floor(5 + Math.random() * 10),
+      color:  e[prop] ? 'green' : 'gray',
+      opacity: e[prop] ? 0.5 : 0.1,
       weight: 1
     }).addTo(points);
   });
 }
 
 /* eslint-enable no-unused-vars, no-debugger, no-undef */
-
-function getColor(prop) {
-  return prop ? 'green' : 'red';
-}
-
-function getRandomSize() {
-  return Math.floor(5 + Math.random() * 10);
-}

@@ -47,6 +47,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
           computeFields(event, next.key, operation);
         }
       }
+
       if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
           var prevprev = prev;
@@ -62,7 +63,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
       event = event.otherEvent;
       next = prev = sweepLine.find(event);
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (prev && next) {
 
@@ -75,9 +76,9 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
         // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
         if (next && prev) {
-          //if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
+          // if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
           possibleIntersection(prev.key, next.key, eventQueue);
-          //}
+          // }
         }
       }
     }
