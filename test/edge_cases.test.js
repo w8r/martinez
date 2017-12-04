@@ -42,6 +42,16 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
+    t.test('difference 2', function(t) {
+      var result = martinez.diff(
+        clipping.geometry.coordinates,
+        subject.geometry.coordinates
+      );
+      t.deepEqual(result, [[[[0,1],[0.25,0.75],[0.5,1],[0,1.5],[0,1]]],[[[0.5,1],[0.75,0.75],[1,1],[1,1.5],[0.5,1]]]]);
+
+      t.end();
+    });
+
     t.end();
   });
 

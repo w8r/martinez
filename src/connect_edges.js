@@ -75,7 +75,9 @@ function nextPos(pos, resultEvents, processed, origIndex) {
     if (!processed[newPos]) {
       // console.log(pos, newPos, length);
       return newPos;
-    } else                    newPos++;
+    } else   {
+      newPos++;
+    }
     p1 = resultEvents[newPos].point;
   }
 
@@ -96,7 +98,8 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 module.exports = function (sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
-  _renderPoints(resultEvents, 'inResult');
+  //_renderPoints(sortedEvents, 'inResult');
+
   // "false"-filled array
   var processed = {};
   var result = [];
@@ -185,10 +188,12 @@ function _renderPoints(possiblePoints, prop) {
   possiblePoints.forEach(function (e) {
     var point = L.circleMarker([e.point[1], e.point[0]], {
       radius: getRandomSize(),
-      color: getColor(e[prop])
+      color:  getColor(e[prop]),
+      weight: 1
     }).addTo(points);
   });
 }
+
 /* eslint-enable no-unused-vars, no-debugger, no-undef */
 
 function getColor(prop) {
@@ -196,5 +201,5 @@ function getColor(prop) {
 }
 
 function getRandomSize() {
-  return Math.floor(Math.random() * 30);
+  return Math.floor(5 + Math.random() * 10);
 }

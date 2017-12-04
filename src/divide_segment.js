@@ -15,7 +15,7 @@ module.exports = function divideSegment(se, p, queue)  {
   var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
   if (equals(se.point, se.otherEvent.point)) {
-    console.warn('what is that?', se);
+    console.warn('what is that, a collapsed segment?', se);
   }
 
   r.contourId = l.contourId = se.contourId;
