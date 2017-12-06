@@ -18,7 +18,6 @@ function orderEvents(sortedEvents) {
       resultEvents.push(event);
     }
   }
-
   // Due to overlapping edges the resultEvents array can be not wholly sorted
   var sorted = false;
   while (!sorted) {
@@ -33,8 +32,16 @@ function orderEvents(sortedEvents) {
       }
     }
   }
-
   for (i = 0, len = resultEvents.length; i < len; i++) {
+    if (i < len - 1) {
+      if (resultEvents[i].point[0] !== resultEvents[i + 1].point[0] &&
+          resultEvents[i].point[1] !== resultEvents[i + 1].point[1] &&
+          resultEvents[i].point[1] === resultEvents[i + 1].point[1]) {
+        var currentCloned = deepClone(resultEvents[i + 1]);
+        resultEvents.splice(i + 1, 0, currentCloned);
+        len = resultEvents.length;
+      }
+    }
     resultEvents[i].pos = i;
   }
 
@@ -51,6 +58,44 @@ function orderEvents(sortedEvents) {
 }
 
 
+function deepClone(obj) {
+    var visitedNodes = [];
+    var clonedCopy = [];
+    function clone(item) {
+        if (typeof item === "object" && !Array.isArray(item)) {
+            if (visitedNodes.indexOf(item) === -1) {
+                visitedNodes.push(item);
+                var cloneObject = {};
+                clonedCopy.push(cloneObject);
+                for (var i in item) {
+                    if (item.hasOwnProperty(i)) {
+                        cloneObject[i] = clone(item[i]);
+                    }
+                }
+                return cloneObject;
+            } else {
+                return clonedCopy[visitedNodes.indexOf(item)];
+            }
+        }
+        else if (typeof item === "object" && Array.isArray(item)) {
+            if (visitedNodes.indexOf(item) === -1) {
+                var cloneArray = [];
+                visitedNodes.push(item);
+                clonedCopy.push(cloneArray);
+                for (var j = 0; j < item.length; j++) {
+                    cloneArray.push(clone(item[j]));
+                }
+                return cloneArray;
+            } else {
+                return clonedCopy[visitedNodes.indexOf(item)];
+            }
+        }
+
+        return item; // not object, not array, therefore primitive
+    }
+    return clone(obj);
+}
+
 /**
  * @param  {Number} pos
  * @param  {Array.<SweepEvent>} resultEvents
@@ -63,7 +108,6 @@ function nextPos(pos, resultEvents, processed, origIndex) {
   if (newPos > length - 1) return pos - 1;
   var p  = resultEvents[pos].point;
   var p1 = resultEvents[newPos].point;
-
   // if (newPos < length &&
   //   p1[0] !== p[0] || p1[1] !== p[1] &&
   //   !processed[newPos]) return newPos;
@@ -106,6 +150,7 @@ module.exports = function connectEdges(sortedEvents, operation) {
   var event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
+    // console.log('i is ' + i)
     if (processed[i]) continue;
     var contour = [[]];
 
@@ -128,6 +173,8 @@ module.exports = function connectEdges(sortedEvents, operation) {
     contour[0].push(initial);
 
     while (pos >= i) {
+      // console.log('pos is ' + pos)
+
       event = resultEvents[pos];
       processed[pos] = true;
 
@@ -138,12 +185,13 @@ module.exports = function connectEdges(sortedEvents, operation) {
         event.otherEvent.resultInOut = true;
         event.otherEvent.contourId   = ringId;
       }
-      //new L.Marker(event.point.slice().reverse()).addTo(map);
+      // new L.Marker(event.point.slice().reverse()).addTo(map);
 
       pos = event.pos;
       processed[pos] = true;
       // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
-
+      // new L.circleMarker(resultEvents[pos].point.slice().reverse()).addTo(map);
+      // console.log(resultEvents[pos].point)
       contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed, i);
     }
