@@ -32,11 +32,12 @@ function orderEvents(sortedEvents) {
       }
     }
   }
+
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (i < len - 1) {
       if (resultEvents[i].point[0] !== resultEvents[i + 1].point[0] &&
           resultEvents[i].point[1] !== resultEvents[i + 1].point[1] &&
-          resultEvents[i].point[1] === resultEvents[i + 1].point[1]) {
+          resultEvents[i].point[1] === resultEvents[i].otherEvent.point[1]) {
         var currentCloned = deepClone(resultEvents[i + 1]);
         resultEvents.splice(i + 1, 0, currentCloned);
         len = resultEvents.length;
@@ -59,41 +60,40 @@ function orderEvents(sortedEvents) {
 
 
 function deepClone(obj) {
-    var visitedNodes = [];
-    var clonedCopy = [];
-    function clone(item) {
-        if (typeof item === "object" && !Array.isArray(item)) {
-            if (visitedNodes.indexOf(item) === -1) {
-                visitedNodes.push(item);
-                var cloneObject = {};
-                clonedCopy.push(cloneObject);
-                for (var i in item) {
-                    if (item.hasOwnProperty(i)) {
-                        cloneObject[i] = clone(item[i]);
-                    }
-                }
-                return cloneObject;
-            } else {
-                return clonedCopy[visitedNodes.indexOf(item)];
-            }
+  var visitedNodes = [];
+  var clonedCopy = [];
+  function clone(item) {
+    if (typeof item === 'object' && !Array.isArray(item)) {
+      if (visitedNodes.indexOf(item) === -1) {
+        visitedNodes.push(item);
+        var cloneObject = {};
+        clonedCopy.push(cloneObject);
+        for (var i in item) {
+          if (item.hasOwnProperty(i)) {
+            cloneObject[i] = clone(item[i]);
+          }
         }
-        else if (typeof item === "object" && Array.isArray(item)) {
-            if (visitedNodes.indexOf(item) === -1) {
-                var cloneArray = [];
-                visitedNodes.push(item);
-                clonedCopy.push(cloneArray);
-                for (var j = 0; j < item.length; j++) {
-                    cloneArray.push(clone(item[j]));
-                }
-                return cloneArray;
-            } else {
-                return clonedCopy[visitedNodes.indexOf(item)];
-            }
+        return cloneObject;
+      } else {
+        return clonedCopy[visitedNodes.indexOf(item)];
+      }
+    } else if (typeof item === 'object' && Array.isArray(item)) {
+      if (visitedNodes.indexOf(item) === -1) {
+        var cloneArray = [];
+        visitedNodes.push(item);
+        clonedCopy.push(cloneArray);
+        for (var j = 0; j < item.length; j++) {
+          cloneArray.push(clone(item[j]));
         }
-
-        return item; // not object, not array, therefore primitive
+        return cloneArray;
+      } else {
+        return clonedCopy[visitedNodes.indexOf(item)];
+      }
     }
-    return clone(obj);
+
+    return item; // not object, not array, therefore primitive
+  }
+  return clone(obj);
 }
 
 /**
