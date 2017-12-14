@@ -79,8 +79,8 @@ module.exports = function possibleIntersection(se1, se2, queue) {
 
   if ((leftCoincide && rightCoincide) || leftCoincide) {
     // both line segments are equal or share the left endpoint
-    se1.type = edgeType.NON_CONTRIBUTING;
-    se2.type = (se1.inOut === se2.inOut) ?
+    se2.type = edgeType.NON_CONTRIBUTING;
+    se1.type = (se2.inOut === se1.inOut) ?
       edgeType.SAME_TRANSITION :
       edgeType.DIFFERENT_TRANSITION;
 
