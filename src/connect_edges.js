@@ -38,7 +38,7 @@ function orderEvents(sortedEvents) {
       if (resultEvents[i].point[0] !== resultEvents[i + 1].point[0] &&
           resultEvents[i].point[1] !== resultEvents[i + 1].point[1] &&
           resultEvents[i].point[1] === resultEvents[i].otherEvent.point[1]) {
-        var currentCloned = deepClone(resultEvents[i + 1]);
+        var currentCloned = resultEvents[i + 1].clone();
         resultEvents.splice(i + 1, 0, currentCloned);
         len = resultEvents.length;
       }
@@ -59,43 +59,6 @@ function orderEvents(sortedEvents) {
 }
 
 
-function deepClone(obj) {
-  var visitedNodes = [];
-  var clonedCopy = [];
-  function clone(item) {
-    if (typeof item === 'object' && !Array.isArray(item)) {
-      if (visitedNodes.indexOf(item) === -1) {
-        visitedNodes.push(item);
-        var cloneObject = {};
-        clonedCopy.push(cloneObject);
-        for (var i in item) {
-          if (item.hasOwnProperty(i)) {
-            cloneObject[i] = clone(item[i]);
-          }
-        }
-        return cloneObject;
-      } else {
-        return clonedCopy[visitedNodes.indexOf(item)];
-      }
-    } else if (typeof item === 'object' && Array.isArray(item)) {
-      if (visitedNodes.indexOf(item) === -1) {
-        var cloneArray = [];
-        visitedNodes.push(item);
-        clonedCopy.push(cloneArray);
-        for (var j = 0; j < item.length; j++) {
-          cloneArray.push(clone(item[j]));
-        }
-        return cloneArray;
-      } else {
-        return clonedCopy[visitedNodes.indexOf(item)];
-      }
-    }
-
-    return item; // not object, not array, therefore primitive
-  }
-  return clone(obj);
-}
-
 /**
  * @param  {Number} pos
  * @param  {Array.<SweepEvent>} resultEvents
@@ -108,10 +71,6 @@ function nextPos(pos, resultEvents, processed, origIndex) {
   if (newPos > length - 1) return pos - 1;
   var p  = resultEvents[pos].point;
   var p1 = resultEvents[newPos].point;
-  // if (newPos < length &&
-  //   p1[0] !== p[0] || p1[1] !== p[1] &&
-  //   !processed[newPos]) return newPos;
-  // else return pos - 1;
 
 
   // while in range and not the current one by value

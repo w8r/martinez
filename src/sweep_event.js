@@ -110,6 +110,20 @@ SweepEvent.prototype = {
    */
   isVertical: function () {
     return this.point[0] === this.otherEvent.point[0];
+  },
+
+
+  clone: function () {
+    var copy = new SweepEvent(
+      this.point, this.left, this.otherEvent, this.isSubject, this.type);
+
+    copy.inResult       = this.inResult;
+    copy.prevInResult   = this.prevInResult;
+    copy.isExteriorRing = this.isExteriorRing;
+    copy.inOut          = this.inOut;
+    copy.otherInOut     = this.otherInOut;
+
+    return copy;
   }
 };
 
