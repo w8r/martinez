@@ -128,7 +128,7 @@ function run (op) {
   var subject = layers[0].toGeoJSON();
   var clipping = layers[1].toGeoJSON();
 
-  console.log('input', subject, clipping, op);
+  //console.log('input', subject, clipping, op);
 
   subject  = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
@@ -155,8 +155,8 @@ function run (op) {
   console.timeEnd('martinez');
 
   //if (op === OPERATIONS.UNION) result = result[0];
-  console.log('result', result);
-  console.log(JSON.stringify(result))
+  // console.log('result', result);
+  // console.log(JSON.stringify(result))
   results.clearLayers();
 
   if (result !== null) {

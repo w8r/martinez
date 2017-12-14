@@ -87,12 +87,12 @@ function height(node) {
 
 /**
  * @typedef {{
- *   parent:        Node|Null,
- *   left:          Node|Null,
- *   right:         Node|Null,
- *   balanceFactor: Number,
- *   key:           any,
- *   data:          object?
+ *   parent:        ?Node,
+ *   left:          ?Node,
+ *   right:         ?Node,
+ *   balanceFactor: number,
+ *   key:           Key,
+ *   data:          Value
  * }} Node
  */
 
@@ -101,9 +101,14 @@ function height(node) {
  */
 
 /**
+ * @typedef {*} Value
+ */
+
+/**
  * Default comparison function
- * @param {*} a
- * @param {*} b
+ * @param {Key} a
+ * @param {Key} b
+ * @returns {number}
  */
 function DEFAULT_COMPARE (a, b) { return a > b ? 1 : a < b ? -1 : 0; }
 
@@ -187,7 +192,7 @@ function rotateRight (node) {
 // }
 
 
-var Tree = function Tree (comparator, noDuplicates) {
+var AVLTree = function AVLTree (comparator, noDuplicates) {
   if ( noDuplicates === void 0 ) noDuplicates = false;
 
   this._comparator = comparator || DEFAULT_COMPARE;
@@ -201,14 +206,16 @@ var prototypeAccessors = { size: {} };
 
 /**
  * Clear the tree
+ * @return {AVLTree}
  */
-Tree.prototype.destroy = function destroy () {
+AVLTree.prototype.destroy = function destroy () {
   this._root = null;
+  return this;
 };
 
 /**
  * Number of nodes
- * @return {Number}
+ * @return {number}
  */
 prototypeAccessors.size.get = function () {
   return this._size;
@@ -218,9 +225,9 @@ prototypeAccessors.size.get = function () {
 /**
  * Whether the tree contains a node with the given key
  * @param{Key} key
- * @return {Boolean}
+ * @return {boolean} true/false
  */
-Tree.prototype.contains = function contains (key) {
+AVLTree.prototype.contains = function contains (key) {
   if (this._root){
     var node     = this._root;
     var comparator = this._comparator;
@@ -240,9 +247,9 @@ Tree.prototype.contains = function contains (key) {
 /**
  * Successor node
  * @param{Node} node
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.next = function next (node) {
+AVLTree.prototype.next = function next (node) {
   var successor = node;
   if (successor) {
     if (successor.right) {
@@ -262,9 +269,9 @@ Tree.prototype.next = function next (node) {
 /**
  * Predecessor node
  * @param{Node} node
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.prev = function prev (node) {
+AVLTree.prototype.prev = function prev (node) {
   var predecessor = node;
   if (predecessor) {
     if (predecessor.left) {
@@ -284,10 +291,17 @@ Tree.prototype.prev = function prev (node) {
 
 
 /**
- * @param{Function(node:Node):void} fn
+ * Callback for forEach
+ * @callback forEachCallback
+ * @param {Node} node
+ * @param {number} index
+ */
+
+/**
+ * @param{forEachCallback} callback
  * @return {AVLTree}
  */
-Tree.prototype.forEach = function forEach (fn) {
+AVLTree.prototype.forEach = function forEach (callback) {
   var current = this._root;
   var s = [], done = false, i = 0;
 
@@ -304,7 +318,7 @@ Tree.prototype.forEach = function forEach (fn) {
       // empty you are done
       if (s.length > 0) {
         current = s.pop();
-        fn(current, i++);
+        callback(current, i++);
 
         // We have visited the node and its left
         // subtree. Now, it's right subtree's turn
@@ -320,7 +334,7 @@ Tree.prototype.forEach = function forEach (fn) {
  * Returns all keys in order
  * @return {Array<Key>}
  */
-Tree.prototype.keys = function keys () {
+AVLTree.prototype.keys = function keys () {
   var current = this._root;
   var s = [], r = [], done = false;
 
@@ -342,9 +356,9 @@ Tree.prototype.keys = function keys () {
 
 /**
  * Returns `data` fields of all nodes in order.
- * @return {Array<*>}
+ * @return {Array<Value>}
  */
-Tree.prototype.values = function values () {
+AVLTree.prototype.values = function values () {
   var current = this._root;
   var s = [], r = [], done = false;
 
@@ -364,9 +378,15 @@ Tree.prototype.values = function values () {
 };
 
 
-Tree.prototype.at = function at (index) {
-  index = index % this.size;
-  if (index < 0) { index = this.size - index; }
+/**
+ * Returns node at given index
+ * @param{number} index
+ * @return {?Node}
+ */
+AVLTree.prototype.at = function at (index) {
+  // removed after a consideration, more misleading than useful
+  // index = index % this.size;
+  // if (index < 0) index = this.size - index;
 
   var current = this._root;
   var s = [], done = false, i = 0;
@@ -390,9 +410,9 @@ Tree.prototype.at = function at (index) {
 
 /**
  * Returns node with the minimum key
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.minNode = function minNode () {
+AVLTree.prototype.minNode = function minNode () {
   var node = this._root;
   if (!node) { return null; }
   while (node.left) { node = node.left; }
@@ -402,9 +422,9 @@ Tree.prototype.minNode = function minNode () {
 
 /**
  * Returns node with the max key
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.maxNode = function maxNode () {
+AVLTree.prototype.maxNode = function maxNode () {
   var node = this._root;
   if (!node) { return null; }
   while (node.right) { node = node.right; }
@@ -414,20 +434,21 @@ Tree.prototype.maxNode = function maxNode () {
 
 /**
  * Min key
- * @return {Key}
+ * @return {?Key}
  */
-Tree.prototype.min = function min () {
+AVLTree.prototype.min = function min () {
   var node = this._root;
   if (!node) { return null; }
   while (node.left) { node = node.left; }
   return node.key;
 };
 
+
 /**
  * Max key
- * @return {Key|Null}
+ * @return {?Key}
  */
-Tree.prototype.max = function max () {
+AVLTree.prototype.max = function max () {
   var node = this._root;
   if (!node) { return null; }
   while (node.right) { node = node.right; }
@@ -436,18 +457,18 @@ Tree.prototype.max = function max () {
 
 
 /**
- * @return {Boolean}
+ * @return {boolean} true/false
  */
-Tree.prototype.isEmpty = function isEmpty () {
+AVLTree.prototype.isEmpty = function isEmpty () {
   return !this._root;
 };
 
 
 /**
  * Removes and returns the node with smallest key
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.pop = function pop () {
+AVLTree.prototype.pop = function pop () {
   var node = this._root, returnValue = null;
   if (node) {
     while (node.left) { node = node.left; }
@@ -461,12 +482,12 @@ Tree.prototype.pop = function pop () {
 /**
  * Find node by key
  * @param{Key} key
- * @return {Node|Null}
+ * @return {?Node}
  */
-Tree.prototype.find = function find (key) {
+AVLTree.prototype.find = function find (key) {
   var root = this._root;
-  if (root === null)  { return null; }
-  if (key === root.key) { return root; }
+  // if (root === null)  return null;
+  // if (key === root.key) return root;
 
   var subtree = root, cmp;
   var compare = this._comparator;
@@ -484,10 +505,10 @@ Tree.prototype.find = function find (key) {
 /**
  * Insert a node into the tree
  * @param{Key} key
- * @param{*} [data]
- * @return {Node|Null}
+ * @param{Value} [data]
+ * @return {?Node}
  */
-Tree.prototype.insert = function insert (key, data) {
+AVLTree.prototype.insert = function insert (key, data) {
     var this$1 = this;
 
   if (!this._root) {
@@ -522,9 +543,12 @@ Tree.prototype.insert = function insert (key, data) {
   }
 
   var newNode = {
-    left: null, right: null, balanceFactor: 0,
+    left: null,
+    right: null,
+    balanceFactor: 0,
     parent: parent, key: key, data: data
   };
+  var newRoot;
   if (cmp <= 0) { parent.left= newNode; }
   else       { parent.right = newNode; }
 
@@ -535,18 +559,20 @@ Tree.prototype.insert = function insert (key, data) {
 
     if      (parent.balanceFactor === 0) { break; }
     else if (parent.balanceFactor < -1) {
-      //let newRoot = rightBalance(parent);
+      // inlined
+      //var newRoot = rightBalance(parent);
       if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
-      var newRoot = rotateLeft(parent);
+      newRoot = rotateLeft(parent);
 
       if (parent === this$1._root) { this$1._root = newRoot; }
       break;
     } else if (parent.balanceFactor > 1) {
-      // let newRoot = leftBalance(parent);
+      // inlined
+      // var newRoot = leftBalance(parent);
       if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
-      var newRoot$1 = rotateRight(parent);
+      newRoot = rotateRight(parent);
 
-      if (parent === this$1._root) { this$1._root = newRoot$1; }
+      if (parent === this$1._root) { this$1._root = newRoot; }
       break;
     }
     parent = parent.parent;
@@ -560,27 +586,30 @@ Tree.prototype.insert = function insert (key, data) {
 /**
  * Removes the node from the tree. If not found, returns null.
  * @param{Key} key
- * @return {Node:Null}
+ * @return {?Node}
  */
-Tree.prototype.remove = function remove (key) {
+AVLTree.prototype.remove = function remove (key) {
     var this$1 = this;
 
   if (!this._root) { return null; }
 
   var node = this._root;
   var compare = this._comparator;
+  var cmp = 0;
 
   while (node) {
-    var cmp = compare(key, node.key);
+    cmp = compare(key, node.key);
     if    (cmp === 0) { break; }
     else if (cmp < 0) { node = node.left; }
     else              { node = node.right; }
   }
   if (!node) { return null; }
+
   var returnValue = node.key;
+  var max, min;
 
   if (node.left) {
-    var max = node.left;
+    max = node.left;
 
     while (max.left || max.right) {
       while (max.right) { max = max.right; }
@@ -599,7 +628,7 @@ Tree.prototype.remove = function remove (key) {
   }
 
   if (node.right) {
-    var min = node.right;
+    min = node.right;
 
     while (min.left || min.right) {
       while (min.left) { min = min.left; }
@@ -619,25 +648,28 @@ Tree.prototype.remove = function remove (key) {
 
   var parent = node.parent;
   var pp   = node;
+  var newRoot;
 
   while (parent) {
     if (parent.left === pp) { parent.balanceFactor -= 1; }
     else                  { parent.balanceFactor += 1; }
 
     if      (parent.balanceFactor < -1) {
-      //let newRoot = rightBalance(parent);
+      // inlined
+      //var newRoot = rightBalance(parent);
       if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
-      var newRoot = rotateLeft(parent);
+      newRoot = rotateLeft(parent);
 
       if (parent === this$1._root) { this$1._root = newRoot; }
       parent = newRoot;
     } else if (parent.balanceFactor > 1) {
-      // let newRoot = leftBalance(parent);
+      // inlined
+      // var newRoot = leftBalance(parent);
       if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
-      var newRoot$1 = rotateRight(parent);
+      newRoot = rotateRight(parent);
 
-      if (parent === this$1._root) { this$1._root = newRoot$1; }
-      parent = newRoot$1;
+      if (parent === this$1._root) { this$1._root = newRoot; }
+      parent = newRoot;
     }
 
     if (parent.balanceFactor === -1 || parent.balanceFactor === 1) { break; }
@@ -660,11 +692,11 @@ Tree.prototype.remove = function remove (key) {
 
 /**
  * Bulk-load items
- * @param{Array}keys
- * @param{Array}[values]
- * @return {Tree}
+ * @param{Array<Key>}keys
+ * @param{Array<Value>}[values]
+ * @return {AVLTree}
  */
-Tree.prototype.load = function load (keys, values) {
+AVLTree.prototype.load = function load (keys, values) {
     var this$1 = this;
     if ( keys === void 0 ) keys = [];
     if ( values === void 0 ) values = [];
@@ -680,25 +712,25 @@ Tree.prototype.load = function load (keys, values) {
 
 /**
  * Returns true if the tree is balanced
- * @return {Boolean}
+ * @return {boolean}
  */
-Tree.prototype.isBalanced = function isBalanced$1 () {
+AVLTree.prototype.isBalanced = function isBalanced$1 () {
   return isBalanced(this._root);
 };
 
 
 /**
  * String representation of the tree - primitive horizontal print-out
- * @param{Function(Node):String} [printNode]
- * @return {String}
+ * @param{Function(Node):string} [printNode]
+ * @return {string}
  */
-Tree.prototype.toString = function toString (printNode) {
+AVLTree.prototype.toString = function toString (printNode) {
   return print(this._root, printNode);
 };
 
-Object.defineProperties( Tree.prototype, prototypeAccessors );
+Object.defineProperties( AVLTree.prototype, prototypeAccessors );
 
-return Tree;
+return AVLTree;
 
 })));
 
@@ -795,7 +827,7 @@ var signedArea = require('./signed_area');
  * @param  {SweepEvent} e2
  * @return {Number}
  */
-module.exports = function compareEvents (e1, e2) {
+module.exports = function compareEvents(e1, e2) {
   var p1 = e1.point;
   var p2 = e2.point;
 
@@ -818,12 +850,12 @@ function specialCases(e1, e2, p1, p2) {
   if (e1.left !== e2.left)
     return e1.left ? 1 : -1;
 
-  var p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
-  var sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+  // var p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
+  // var sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
-  if (sa/*signedArea(p1, e1.otherEvent.point, e2.otherEvent.point)*/ !== 0) {
+  if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
@@ -891,12 +923,15 @@ module.exports = function compareSegments(le1, le2) {
 };
 
 },{"./compare_events":4,"./equals":10,"./signed_area":16}],6:[function(require,module,exports){
-var edgeType = require('./edge_type');
+'use strict';
 
-var INTERSECTION = 0;
-var UNION        = 1;
-var DIFFERENCE   = 2;
-var XOR          = 3;
+var edgeType = require('./edge_type');
+var operationType = require('./operation');
+
+var INTERSECTION = operationType.INTERSECTION;
+var UNION        = operationType.UNION;
+var DIFFERENCE   = operationType.DIFFERENCE;
+var XOR          = operationType.XOR;
 
 /**
  * @param  {SweepEvent} event
@@ -935,33 +970,37 @@ module.exports = function computeFields(event, prev, operation) {
 
 function inResult(event, operation) {
   switch (event.type) {
-  case edgeType.NORMAL:
-    switch (operation) {
-    case INTERSECTION:
-      return !event.otherInOut;
-    case UNION:
-      return event.otherInOut;
-    case DIFFERENCE:
-      return (event.isSubject && event.otherInOut) ||
-              (!event.isSubject && !event.otherInOut);
-    case XOR:
-      return true;
-    }
-    break;
-  case edgeType.SAME_TRANSITION:
-    return operation === INTERSECTION || operation === UNION;
-  case edgeType.DIFFERENT_TRANSITION:
-    return operation === DIFFERENCE;
-  case edgeType.NON_CONTRIBUTING:
-    return false;
+    case edgeType.NORMAL:
+      switch (operation) {
+        case INTERSECTION:
+          return !event.otherInOut;
+        case UNION:
+          return event.otherInOut;
+        case DIFFERENCE:
+          // return (event.isSubject && !event.otherInOut) ||
+          //         (!event.isSubject && event.otherInOut);
+          return (event.isSubject && event.otherInOut) ||
+                  (!event.isSubject && !event.otherInOut);
+        case XOR:
+          return true;
+      }
+      break;
+    case edgeType.SAME_TRANSITION:
+      return operation === INTERSECTION || operation === UNION;
+    case edgeType.DIFFERENT_TRANSITION:
+      return operation === DIFFERENCE;
+    case edgeType.NON_CONTRIBUTING:
+      return false;
   }
   return false;
 }
 
-},{"./edge_type":9}],7:[function(require,module,exports){
-var equals = require('./equals');
-var compareEvents = require('./compare_events');
+},{"./edge_type":9,"./operation":13}],7:[function(require,module,exports){
+'use strict';
 
+// var equals = require('./equals');
+var compareEvents = require('./compare_events');
+var operationType = require('./operation');
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -977,7 +1016,6 @@ function orderEvents(sortedEvents) {
       resultEvents.push(event);
     }
   }
-
   // Due to overlapping edges the resultEvents array can be not wholly sorted
   var sorted = false;
   while (!sorted) {
@@ -994,11 +1032,20 @@ function orderEvents(sortedEvents) {
   }
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
+    if (i < len - 1) {
+      if (resultEvents[i].point[0] !== resultEvents[i + 1].point[0] &&
+          resultEvents[i].point[1] !== resultEvents[i + 1].point[1] &&
+          resultEvents[i].point[1] === resultEvents[i].otherEvent.point[1]) {
+        var currentCloned = resultEvents[i + 1].clone();
+        resultEvents.splice(i + 1, 0, currentCloned);
+        len = resultEvents.length;
+      }
+    }
     resultEvents[i].pos = i;
   }
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
-    var event = resultEvents[i];
+    event = resultEvents[i];
     if (!event.left) {
       tmp = event.pos;
       event.pos = event.otherEvent.pos;
@@ -1016,32 +1063,31 @@ function orderEvents(sortedEvents) {
  * @param  {Object>}    processed
  * @return {Number}
  */
-function nextPos(pos, resultEvents, processed) {
+function nextPos(pos, resultEvents, processed, origIndex) {
   var newPos = pos + 1;
   var length = resultEvents.length;
+  if (newPos > length - 1) return pos - 1;
   var p  = resultEvents[pos].point;
   var p1 = resultEvents[newPos].point;
-
-  // if (newPos < length &&
-  //   p1[0] !== p[0] || p1[1] !== p[1] &&
-  //   !processed[newPos]) return newPos;
-  // else return pos - 1;
 
 
   // while in range and not the current one by value
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
     if (!processed[newPos]) {
-      console.log(pos, newPos, length);
+      // console.log(pos, newPos, length);
       return newPos;
+    } else   {
+      newPos++;
     }
-    else                    newPos++;
-    p1 = resultEvents[newPos].point
+    p1 = resultEvents[newPos].point;
   }
 
   newPos = pos - 1;
 
-  while (processed[newPos]) newPos--;
-  console.log('other', pos, newPos, length);
+  while (processed[newPos] && newPos >= origIndex) {
+    newPos--;
+  }
+  // console.log('other', pos, newPos, length);
   return newPos;
 }
 
@@ -1050,9 +1096,10 @@ function nextPos(pos, resultEvents, processed) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-module.exports = function (sortedEvents, operation) {
+module.exports = function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
+  //_renderPoints(resultEvents, 'inResult');
 
   // "false"-filled array
   var processed = {};
@@ -1060,18 +1107,17 @@ module.exports = function (sortedEvents, operation) {
   var event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
+    // console.log('i is ' + i)
     if (processed[i]) continue;
     var contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
+      } else if (operation === operationType.UNION || operation === operationType.XOR) {
+        result[result.length - 1].push(contour[0]);
       } else {
-        if (operation === 1) {
-          result.push(contour)
-        } else {
-          result[result.length - 1].push(contour);
-        }
+        result[result.length - 1].push(contour);
       }
     } else {
       result.push(contour);
@@ -1081,11 +1127,12 @@ module.exports = function (sortedEvents, operation) {
     var pos = i;
 
     var initial = resultEvents[i].point;
-    // initial.push(resultEvents[i].isExteriorRing);
     contour[0].push(initial);
 
     while (pos >= i) {
-      var event = resultEvents[pos];
+      // console.log('pos is ' + pos)
+
+      event = resultEvents[pos];
       processed[pos] = true;
 
       if (event.left) {
@@ -1095,13 +1142,15 @@ module.exports = function (sortedEvents, operation) {
         event.otherEvent.resultInOut = true;
         event.otherEvent.contourId   = ringId;
       }
+      // new L.Marker(event.point.slice().reverse()).addTo(map);
 
       pos = event.pos;
       processed[pos] = true;
       // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
-
+      // new L.circleMarker(resultEvents[pos].point.slice().reverse()).addTo(map);
+      // console.log(resultEvents[pos].point)
       contour[0].push(resultEvents[pos].point);
-      pos = nextPos(pos, resultEvents, processed);
+      pos = nextPos(pos, resultEvents, processed, i);
     }
 
     pos = pos === -1 ? i : pos;
@@ -1111,6 +1160,7 @@ module.exports = function (sortedEvents, operation) {
     event.otherEvent.resultInOut = true;
     event.otherEvent.contourId   = ringId;
   }
+  //_renderPoints(resultEvents, 'resultInOut');
 
   for (i = 0, len = result.length; i < len; i++) {
     var polygon = result[i];
@@ -1126,10 +1176,36 @@ module.exports = function (sortedEvents, operation) {
     }
   }
 
+  // Handle if the result is a polygon (eg not multipoly)
+  // Commented it again, let's see what do we mean by that
+  // if (result.length === 1) result = result[0];
   return result;
 };
 
-},{"./compare_events":4,"./equals":10}],8:[function(require,module,exports){
+
+/* eslint-disable no-unused-vars, no-debugger, no-undef, no-use-before-define */
+function _renderPoints(possiblePoints, prop) {
+  var map = window.map;
+  var points = window.points;
+  if (!map) return;
+  if (points !== undefined) points.clearLayers();
+
+  points = window.points = L.layerGroup([]).addTo(map);
+  possiblePoints.forEach(function (e) {
+    var point = L.circleMarker([e.point[1], e.point[0]], {
+      radius: Math.floor(5 + Math.random() * 10),
+      color:  e[prop] ? 'green' : 'gray',
+      opacity: e[prop] ? 0.5 : 0.1,
+      weight: 1
+    }).addTo(points);
+  });
+}
+
+/* eslint-enable no-unused-vars, no-debugger, no-undef */
+
+},{"./compare_events":4,"./operation":13}],8:[function(require,module,exports){
+'use strict';
+
 var SweepEvent    = require('./sweep_event');
 var equals        = require('./equals');
 var compareEvents = require('./compare_events');
@@ -1145,7 +1221,7 @@ module.exports = function divideSegment(se, p, queue)  {
   var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
   if (equals(se.point, se.otherEvent.point)) {
-    console.warn('what is that?', se);
+    console.warn('what is that, a collapsed segment?', se);
   }
 
   r.contourId = l.contourId = se.contourId;
@@ -1185,7 +1261,14 @@ module.exports = {
 // var abs = Math.abs;
 
 module.exports = function equals(p1, p2) {
-  return p1[0] === p2[0] && p1[1] === p2[1];
+  if (p1[0] === p2[0]) {
+    if (p1[1] === p2[1]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
 };
 
 // TODO https://github.com/w8r/martinez/issues/6#issuecomment-262847164
@@ -1196,6 +1279,8 @@ module.exports = function equals(p1, p2) {
 // };
 
 },{}],11:[function(require,module,exports){
+'use strict';
+
 var Queue           = require('tinyqueue');
 var SweepEvent      = require('./sweep_event');
 var compareEvents   = require('./compare_events');
@@ -1208,9 +1293,9 @@ var contourId = 0;
 
 function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
   var i, len, s1, s2, e1, e2;
-  var d = depth + 1;
+  // var d = depth + 1;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
-    s1 = contourOrHole[i],
+    s1 = contourOrHole[i];
     s2 = contourOrHole[i + 1];
     //processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, Q, bbox, isExteriorRing);
     e1 = new SweepEvent(s1, false, undefined, isSubject);
@@ -1244,7 +1329,7 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 
 module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
   var eventQueue = new Queue(null, compareEvents);
-  var polygonSet, isExteriorRing, i, ii, j, jj, k, kk;
+  var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
@@ -1265,15 +1350,17 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
   }
 
   return eventQueue;
-}
+};
 
 },{"./compare_events":4,"./sweep_event":18,"tinyqueue":3}],12:[function(require,module,exports){
 'use strict';
+
 var subdivideSegments = require('./subdivide_segments');
 var connectEdges      = require('./connect_edges');
-var equals            = require('./equals');
 var fillQueue         = require('./fill_queue');
-var operations        = require('./operation')
+var operations        = require('./operation');
+
+var EMPTY = [];
 
 
 function trivialOperation(subject, clipping, operation) {
@@ -1371,7 +1458,9 @@ module.exports.intersection = function (subject, clipping) {
  */
 module.exports.operations = operations;
 
-},{"./connect_edges":7,"./equals":10,"./fill_queue":11,"./operation":13,"./subdivide_segments":17}],13:[function(require,module,exports){
+},{"./connect_edges":7,"./fill_queue":11,"./operation":13,"./subdivide_segments":17}],13:[function(require,module,exports){
+'use strict';
+
 module.exports = {
   INTERSECTION: 0,
   UNION:        1,
@@ -1380,6 +1469,8 @@ module.exports = {
 };
 
 },{}],14:[function(require,module,exports){
+'use strict';
+
 var divideSegment = require('./divide_segment');
 var intersection  = require('./segment_intersection');
 var equals        = require('./equals');
@@ -1459,8 +1550,8 @@ module.exports = function possibleIntersection(se1, se2, queue) {
 
   if ((leftCoincide && rightCoincide) || leftCoincide) {
     // both line segments are equal or share the left endpoint
-    se1.type = edgeType.NON_CONTRIBUTING;
-    se2.type = (se1.inOut === se2.inOut) ?
+    se2.type = edgeType.NON_CONTRIBUTING;
+    se1.type = (se2.inOut === se1.inOut) ?
       edgeType.SAME_TRANSITION :
       edgeType.DIFFERENT_TRANSITION;
 
@@ -1652,6 +1743,8 @@ module.exports = function signedArea(p0, p1, p2) {
 };
 
 },{}],17:[function(require,module,exports){
+'use strict';
+
 var Tree                 = require('avl');
 var computeFields        = require('./compute_fields');
 var possibleIntersection = require('./possible_intersection');
@@ -1659,13 +1752,13 @@ var compareSegments      = require('./compare_segments');
 var operations           = require('./operation');
 
 
-module.exports = function subdivide (eventQueue, subject, clipping, sbbox, cbbox, operation) {
+module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
   var sweepLine = new Tree(compareSegments);
   var sortedEvents = [];
 
   var rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  var prev, next, begin, end;
+  var prev, next, begin;
 
   var INTERSECTION = operations.INTERSECTION;
   var DIFFERENCE   = operations.DIFFERENCE;
@@ -1699,6 +1792,7 @@ module.exports = function subdivide (eventQueue, subject, clipping, sbbox, cbbox
           computeFields(event, next.key, operation);
         }
       }
+
       if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
           var prevprev = prev;
@@ -1714,7 +1808,7 @@ module.exports = function subdivide (eventQueue, subject, clipping, sbbox, cbbox
       event = event.otherEvent;
       next = prev = sweepLine.find(event);
 
-      // _renderSweepLine(sweepLine, event.otherEvent.point, event);
+      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
 
       if (prev && next) {
 
@@ -1727,9 +1821,9 @@ module.exports = function subdivide (eventQueue, subject, clipping, sbbox, cbbox
         // _renderSweepLine(sweepLine, event.otherEvent.point, event);
 
         if (next && prev) {
-          //if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
+          // if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
           possibleIntersection(prev.key, next.key, eventQueue);
-          //}
+          // }
         }
       }
     }
@@ -1748,8 +1842,8 @@ function _renderSweepLine(sweepLine, pos, event) {
   window.sws = [];
   sweepLine.forEach(function (e) {
     var poly = L.polyline([
-      e.point.slice().reverse(),
-      e.otherEvent.point.slice().reverse()
+      e.key.point.slice().reverse(),
+      e.key.otherEvent.point.slice().reverse()
     ], {color: 'green'}).addTo(map);
     window.sws.push(poly);
   });
@@ -1774,7 +1868,7 @@ function _renderSweepLine(sweepLine, pos, event) {
 },{"./compare_segments":5,"./compute_fields":6,"./operation":13,"./possible_intersection":14,"avl":2}],18:[function(require,module,exports){
 'use strict';
 
-var signedArea = require('./signed_area');
+//var signedArea = require('./signed_area');
 var EdgeType   = require('./edge_type');
 
 /**
@@ -1865,7 +1959,7 @@ SweepEvent.prototype = {
     return this.left ?
       (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0 :
       // signedArea(this.point, this.otherEvent.point, p) > 0 :
-      (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0
+      (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
       //signedArea(this.otherEvent.point, this.point, p) > 0;
   },
 
@@ -1884,10 +1978,24 @@ SweepEvent.prototype = {
    */
   isVertical: function () {
     return this.point[0] === this.otherEvent.point[0];
+  },
+
+
+  clone: function () {
+    var copy = new SweepEvent(
+      this.point, this.left, this.otherEvent, this.isSubject, this.type);
+
+    copy.inResult       = this.inResult;
+    copy.prevInResult   = this.prevInResult;
+    copy.isExteriorRing = this.isExteriorRing;
+    copy.inOut          = this.inOut;
+    copy.otherInOut     = this.otherInOut;
+
+    return copy;
   }
 };
 
 module.exports = SweepEvent;
 
-},{"./edge_type":9,"./signed_area":16}]},{},[1])(1)
+},{"./edge_type":9}]},{},[1])(1)
 });
