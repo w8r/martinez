@@ -98,14 +98,14 @@ module.exports = function connectEdges(sortedEvents, operation) {
   var event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
-    // console.log('i is ' + i)
     if (processed[i]) continue;
     var contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
-      } else if (operation === operationType.UNION || operation === operationType.XOR) {
+      } else if (operation === operationType.UNION ||
+                 operation === operationType.XOR) {
         result[result.length - 1].push(contour[0]);
       } else {
         result[result.length - 1].push(contour);
@@ -121,8 +121,6 @@ module.exports = function connectEdges(sortedEvents, operation) {
     contour[0].push(initial);
 
     while (pos >= i) {
-      // console.log('pos is ' + pos)
-
       event = resultEvents[pos];
       processed[pos] = true;
 
@@ -133,13 +131,9 @@ module.exports = function connectEdges(sortedEvents, operation) {
         event.otherEvent.resultInOut = true;
         event.otherEvent.contourId   = ringId;
       }
-      // new L.Marker(event.point.slice().reverse()).addTo(map);
 
       pos = event.pos;
       processed[pos] = true;
-      // resultEvents[pos].point.push(resultEvents[pos].isExteriorRing);
-      // new L.circleMarker(resultEvents[pos].point.slice().reverse()).addTo(map);
-      // console.log(resultEvents[pos].point)
       contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed, i);
     }
@@ -151,7 +145,6 @@ module.exports = function connectEdges(sortedEvents, operation) {
     event.otherEvent.resultInOut = true;
     event.otherEvent.contourId   = ringId;
   }
-  //_renderPoints(resultEvents, 'resultInOut');
 
   for (i = 0, len = result.length; i < len; i++) {
     var polygon = result[i];
@@ -160,8 +153,9 @@ module.exports = function connectEdges(sortedEvents, operation) {
       for (var k = 0, kk = polygonContour.length; k < kk; k++) {
         var coords = polygonContour[k];
         if (typeof coords[0] !== 'number') {
-          polygon.push(coords[0]);
+          console.log('p', polygon.slice(), 'c', coords);
           polygon.splice(j, 1);
+          polygon.push(coords);
         }
       }
     }

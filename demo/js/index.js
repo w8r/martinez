@@ -155,7 +155,7 @@ function run (op) {
   console.timeEnd('martinez');
 
   //if (op === OPERATIONS.UNION) result = result[0];
-  // console.log('result', result);
+  console.log('result', result);
   // console.log(JSON.stringify(result))
   results.clearLayers();
 
@@ -184,6 +184,7 @@ function run (op) {
       }
       res = writer.write(res);
       console.timeEnd('jsts');
+      console.log(res);
     }, 500);
   }
 }
