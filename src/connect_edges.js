@@ -34,20 +34,9 @@ function orderEvents(sortedEvents) {
   }
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
-    if (i < len - 1) {
-      if (resultEvents[i].point[0] !== resultEvents[i + 1].point[0] &&
-          resultEvents[i].point[1] !== resultEvents[i + 1].point[1] &&
-          resultEvents[i].point[1] === resultEvents[i].otherEvent.point[1]) {
-        var currentCloned = resultEvents[i + 1].clone();
-        resultEvents.splice(i + 1, 0, currentCloned);
-        len = resultEvents.length;
-      }
-    }
-    resultEvents[i].pos = i;
-  }
-
-  for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
+    event.pos = i;
+
     if (!event.left) {
       tmp = event.pos;
       event.pos = event.otherEvent.pos;

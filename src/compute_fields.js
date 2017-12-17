@@ -43,6 +43,7 @@ module.exports = function computeFields(event, prev, operation) {
 };
 
 
+/* eslint-disable indent */
 function inResult(event, operation) {
   switch (event.type) {
     case edgeType.NORMAL:
@@ -69,3 +70,4 @@ function inResult(event, operation) {
   }
   return false;
 }
+/* eslint-enable indent */
