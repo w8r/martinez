@@ -153,7 +153,6 @@ module.exports = function connectEdges(sortedEvents, operation) {
       for (var k = 0, kk = polygonContour.length; k < kk; k++) {
         var coords = polygonContour[k];
         if (typeof coords[0] !== 'number') {
-          console.log('p', polygon.slice(), 'c', coords);
           polygon.splice(j, 1);
           polygon.push(coords);
         }
