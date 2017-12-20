@@ -104,11 +104,8 @@ module.exports = function connectEdges(sortedEvents, operation) {
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
-      } else if (operation === operationType.UNION ||
-                 operation === operationType.XOR) {
-        result[result.length - 1].push(contour[0]);
       } else {
-        result[result.length - 1].push(contour);
+        result[result.length - 1].push(contour[0]);
       }
     } else {
       result.push(contour);
@@ -146,19 +143,19 @@ module.exports = function connectEdges(sortedEvents, operation) {
     event.otherEvent.contourId   = ringId;
   }
 
-  for (i = 0, len = result.length; i < len; i++) {
-    var polygon = result[i];
-    for (var j = 0, jj = polygon.length; j < jj; j++) {
-      var polygonContour = polygon[j];
-      for (var k = 0, kk = polygonContour.length; k < kk; k++) {
-        var coords = polygonContour[k];
-        if (typeof coords[0] !== 'number') {
-          polygon.splice(j, 1);
-          polygon.push(coords);
-        }
-      }
-    }
-  }
+  // for (i = 0, len = result.length; i < len; i++) {
+  //   var polygon = result[i];
+  //   for (var j = 0, jj = polygon.length; j < jj; j++) {
+  //     var polygonContour = polygon[j];
+  //     for (var k = 0, kk = polygonContour.length; k < kk; k++) {
+  //       var coords = polygonContour[k];
+  //       if (typeof coords[0] !== 'number') {
+  //         polygon.splice(j, 1);
+  //         polygon.push(coords);
+  //       }
+  //     }
+  //   }
+  // }
 
   // Handle if the result is a polygon (eg not multipoly)
   // Commented it again, let's see what do we mean by that
