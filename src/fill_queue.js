@@ -12,11 +12,9 @@ var contourId = 0;
 
 function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
   var i, len, s1, s2, e1, e2;
-  // var d = depth + 1;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
     s1 = contourOrHole[i];
     s2 = contourOrHole[i + 1];
-    //processSegment(contourOrHole[i], contourOrHole[i + 1], isSubject, depth + 1, Q, bbox, isExteriorRing);
     e1 = new SweepEvent(s1, false, undefined, isSubject);
     e2 = new SweepEvent(s2, false, e1,        isSubject);
     e1.otherEvent = e2;

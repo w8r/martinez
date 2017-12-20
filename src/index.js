@@ -57,43 +57,40 @@ function boolean(subject, clipping, operation) {
   var sbbox = [Infinity, Infinity, -Infinity, -Infinity];
   var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
-  //console.time('fill');
+  //console.time('fill queue');
   var eventQueue = fillQueue(subject, clipping, sbbox, cbbox);
-  //console.timeEnd('fill');
+  //console.timeEnd('fill queue');
 
   trivial = compareBBoxes(subject, clipping, sbbox, cbbox, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  //console.time('subdiv');
+  //console.time('subdivide edges');
   var sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
-  //console.timeEnd('subdiv');
-  //console.time('connect');
+  //console.timeEnd('subdivide edges');
+
+  //console.time('connect vertices');
   var result = connectEdges(sortedEvents, operation);
-  //console.timeEnd('connect');
+  //console.timeEnd('connect vertices');
   return result;
 }
 
-
-module.exports = boolean;
-
-
-module.exports.union = function (subject, clipping) {
+boolean.union = function (subject, clipping) {
   return boolean(subject, clipping, operations.UNION);
 };
 
 
-module.exports.diff = function (subject, clipping) {
+boolean.diff = function (subject, clipping) {
   return boolean(subject, clipping, operations.DIFFERENCE);
 };
 
 
-module.exports.xor = function (subject, clipping) {
+boolean.xor = function (subject, clipping) {
   return boolean(subject, clipping, operations.XOR);
 };
 
 
-module.exports.intersection = function (subject, clipping) {
+boolean.intersection = function (subject, clipping) {
   return boolean(subject, clipping, operations.INTERSECTION);
 };
 
@@ -101,4 +98,8 @@ module.exports.intersection = function (subject, clipping) {
 /**
  * @enum {Number}
  */
-module.exports.operations = operations;
+boolean.operations = operations;
+
+
+module.exports = boolean;
+module.exports.default = boolean;
