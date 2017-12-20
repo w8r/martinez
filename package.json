@@ -67,7 +67,6 @@
     "leaflet-editable": "^1.1.0",
     "load-json-file": "^2.0.0",
     "nodemon": "^1.9.2",
-    "smokestack": "^3.4.1",
     "superagent": "^2.1.0",
     "tap": "^6.2.0",
     "tap-status": "^1.0.1",

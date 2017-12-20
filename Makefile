@@ -18,4 +18,4 @@ compile: ${COMPILED}
 %.min.js: %.js
 	@echo " - $(<) -> $(@)";
 	@curl --silent --show-error --data-urlencode "js_code@$(<)" --data-urlencode "js_externs@src/externs.js" \
-	 --data "${QS}&output_info=compiled_code" ${URL} -o $(@)
+	 --data "${QS}&output_info=warnings" ${URL} -o $(@)

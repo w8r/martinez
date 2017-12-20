@@ -30,7 +30,6 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
 
     if (event.left) {
       next  = prev = sweepLine.insert(event);
-      //_renderSweepLine(sweepLine, event.point, event);
       begin = sweepLine.minNode();
 
       if (prev !== begin) prev = sweepLine.prev(prev);
@@ -63,8 +62,6 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
       event = event.otherEvent;
       next = prev = sweepLine.find(event);
 
-      //_renderSweepLine(sweepLine, event.otherEvent.point, event);
-
       if (prev && next) {
 
         if (prev !== begin) prev = sweepLine.prev(prev);
@@ -73,49 +70,11 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
         next = sweepLine.next(next);
         sweepLine.remove(event);
 
-        // _renderSweepLine(sweepLine, event.otherEvent.point, event);
-
         if (next && prev) {
-          // if (typeof prev !== 'undefined' && typeof next !== 'undefined') {
           possibleIntersection(prev.key, next.key, eventQueue);
-          // }
         }
       }
     }
   }
   return sortedEvents;
 };
-
-
-/* eslint-disable no-unused-vars, no-debugger, no-undef */
-function _renderSweepLine(sweepLine, pos, event) {
-  var map = window.map;
-  if (!map) return;
-  if (window.sws) window.sws.forEach(function (p) {
-    map.removeLayer(p);
-  });
-  window.sws = [];
-  sweepLine.forEach(function (e) {
-    var poly = L.polyline([
-      e.key.point.slice().reverse(),
-      e.key.otherEvent.point.slice().reverse()
-    ], {color: 'green'}).addTo(map);
-    window.sws.push(poly);
-  });
-
-  if (window.vt) map.removeLayer(window.vt);
-  var v = pos.slice();
-  var b = map.getBounds();
-  window.vt = L.polyline([
-    [b.getNorth(), v[0]],
-    [b.getSouth(), v[0]]
-  ], {color: 'green', weight: 1}).addTo(map);
-
-  if (window.ps) map.removeLayer(window.ps);
-  window.ps = L.polyline([
-    event.point.slice().reverse(),
-    event.otherEvent.point.slice().reverse()
-  ], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
-  debugger;
-}
-/* eslint-enable no-unused-vars, no-debugger, no-undef */

@@ -6,6 +6,7 @@ var EdgeType   = require('./edge_type');
 /**
  * Sweepline event
  *
+ * @class {SweepEvent}
  * @param {Array.<Number>}  point
  * @param {Boolean}         left
  * @param {SweepEvent=}     otherEvent

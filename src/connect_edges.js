@@ -65,7 +65,6 @@ function nextPos(pos, resultEvents, processed, origIndex) {
   // while in range and not the current one by value
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
     if (!processed[newPos]) {
-      // console.log(pos, newPos, length);
       return newPos;
     } else   {
       newPos++;
@@ -78,7 +77,6 @@ function nextPos(pos, resultEvents, processed, origIndex) {
   while (processed[newPos] && newPos >= origIndex) {
     newPos--;
   }
-  // console.log('other', pos, newPos, length);
   return newPos;
 }
 
@@ -90,7 +88,6 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 module.exports = function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
-  //_renderPoints(resultEvents, 'inResult');
 
   // "false"-filled array
   var processed = {};
@@ -165,24 +162,3 @@ module.exports = function connectEdges(sortedEvents, operation) {
   // if (result.length === 1) result = result[0];
   return result;
 };
-
-
-/* eslint-disable no-unused-vars, no-debugger, no-undef, no-use-before-define */
-function _renderPoints(possiblePoints, prop) {
-  var map = window.map;
-  var points = window.points;
-  if (!map) return;
-  if (points !== undefined) points.clearLayers();
-
-  points = window.points = L.layerGroup([]).addTo(map);
-  possiblePoints.forEach(function (e) {
-    var point = L.circleMarker([e.point[1], e.point[0]], {
-      radius: Math.floor(5 + Math.random() * 10),
-      color:  e[prop] ? 'green' : 'gray',
-      opacity: e[prop] ? 0.5 : 0.1,
-      weight: 1
-    }).addTo(points);
-  });
-}
-
-/* eslint-enable no-unused-vars, no-debugger, no-undef */
