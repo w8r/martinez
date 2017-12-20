@@ -104,6 +104,8 @@ module.exports = function connectEdges(sortedEvents, operation) {
       } else {
         result[result.length - 1].push(contour[0]);
       }
+    } else if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
+      result[result.length - 1].push(contour[0]);
     } else {
       result.push(contour);
     }
