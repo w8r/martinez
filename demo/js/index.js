@@ -55,8 +55,17 @@ switch (mode) {
   case 'overlap_y':
     file = 'overlap_y.geojson';
     break;
+  case 'overlap_two':
+    file = 'overlap_two.geojson';
+    break;
   case 'disjoint_boxes':
     file = 'disjoint_boxes.geojson';
+    break;
+  case 'polygons_edge_overlap':
+    file = 'polygons_edge_overlap.geojson';
+    break;
+  case 'collapsed':
+    file = 'collapsed.geojson';
     break;
   default:
     file = 'hole_hole.geojson';
@@ -85,7 +94,7 @@ var map = window.map = L.map('image-map', {
   center: [0, 0],
   zoom: 2,
   crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
-    transformation: new L.Transformation(0.5, 0, -0.5, 0)
+    transformation: new L.Transformation(1/8, 0, -1/8, 0)
   }),
   editable: true
 });

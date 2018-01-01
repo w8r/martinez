@@ -633,7 +633,7 @@ AVLTree.prototype.remove = function remove (key) {
     while (min.left || min.right) {
       while (min.left) { min = min.left; }
 
-      node.key= min.key;
+      node.key = min.key;
       node.data = min.data;
       if (min.right) {
         node = min;
@@ -641,20 +641,22 @@ AVLTree.prototype.remove = function remove (key) {
       }
     }
 
-    node.key= min.key;
+    node.key  = min.key;
     node.data = min.data;
     node = min;
   }
 
   var parent = node.parent;
-  var pp   = node;
+  var pp     = node;
   var newRoot;
 
   while (parent) {
     if (parent.left === pp) { parent.balanceFactor -= 1; }
-    else                  { parent.balanceFactor += 1; }
+    else                    { parent.balanceFactor += 1; }
 
-    if      (parent.balanceFactor < -1) {
+
+    if      (parent.balanceFactor === -2) {
+      if (!parent.right) { parent.balanceFactor += 1; break; }
       // inlined
       //var newRoot = rightBalance(parent);
       if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
@@ -662,7 +664,8 @@ AVLTree.prototype.remove = function remove (key) {
 
       if (parent === this$1._root) { this$1._root = newRoot; }
       parent = newRoot;
-    } else if (parent.balanceFactor > 1) {
+    } else if (parent.balanceFactor === 2) {
+      if (!parent.right) { parent.balanceFactor += 1; break; }
       // inlined
       // var newRoot = leftBalance(parent);
       if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
@@ -739,7 +742,6 @@ return AVLTree;
 'use strict';
 
 module.exports = TinyQueue;
-module.exports.default = TinyQueue;
 
 function TinyQueue(data, compare) {
     if (!(this instanceof TinyQueue)) return new TinyQueue(data, compare);
@@ -748,9 +750,7 @@ function TinyQueue(data, compare) {
     this.length = this.data.length;
     this.compare = compare || defaultCompare;
 
-    if (this.length > 0) {
-        for (var i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
-    }
+    if (data) for (var i = Math.floor(this.length / 2); i >= 0; i--) this._down(i);
 }
 
 function defaultCompare(a, b) {
@@ -766,17 +766,11 @@ TinyQueue.prototype = {
     },
 
     pop: function () {
-        if (this.length === 0) return undefined;
-
         var top = this.data[0];
+        this.data[0] = this.data[this.length - 1];
         this.length--;
-
-        if (this.length > 0) {
-            this.data[0] = this.data[this.length];
-            this._down(0);
-        }
         this.data.pop();
-
+        this._down(0);
         return top;
     },
 
@@ -785,45 +779,45 @@ TinyQueue.prototype = {
     },
 
     _up: function (pos) {
-        var data = this.data;
-        var compare = this.compare;
-        var item = data[pos];
+        var data = this.data,
+            compare = this.compare;
 
         while (pos > 0) {
-            var parent = (pos - 1) >> 1;
-            var current = data[parent];
-            if (compare(item, current) >= 0) break;
-            data[pos] = current;
-            pos = parent;
-        }
+            var parent = Math.floor((pos - 1) / 2);
+            if (compare(data[pos], data[parent]) < 0) {
+                swap(data, parent, pos);
+                pos = parent;
 
-        data[pos] = item;
+            } else break;
+        }
     },
 
     _down: function (pos) {
-        var data = this.data;
-        var compare = this.compare;
-        var halfLength = this.length >> 1;
-        var item = data[pos];
+        var data = this.data,
+            compare = this.compare,
+            len = this.length;
 
-        while (pos < halfLength) {
-            var left = (pos << 1) + 1;
-            var right = left + 1;
-            var best = data[left];
+        while (true) {
+            var left = 2 * pos + 1,
+                right = left + 1,
+                min = pos;
 
-            if (right < this.length && compare(data[right], best) < 0) {
-                left = right;
-                best = data[right];
-            }
-            if (compare(best, item) >= 0) break;
+            if (left < len && compare(data[left], data[min]) < 0) min = left;
+            if (right < len && compare(data[right], data[min]) < 0) min = right;
 
-            data[pos] = best;
-            pos = left;
+            if (min === pos) return;
+
+            swap(data, min, pos);
+            pos = min;
         }
-
-        data[pos] = item;
     }
 };
+
+function swap(data, i, j) {
+    var tmp = data[i];
+    data[i] = data[j];
+    data[j] = tmp;
+}
 
 },{}],4:[function(require,module,exports){
 'use strict';
@@ -1101,12 +1095,11 @@ module.exports = function connectEdges(sortedEvents, operation) {
     if (!resultEvents[i].isExteriorRing) {
       if (result.length === 0) {
         result.push([[contour]]);
-      } else if (operation === operationType.UNION ||
-                 operation === operationType.XOR) {
-        result[result.length - 1].push(contour[0]);
       } else {
-        result[result.length - 1].push(contour);
+        result[result.length - 1].push(contour[0]);
       }
+    } else if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
+      result[result.length - 1].push(contour[0]);
     } else {
       result.push(contour);
     }
@@ -1143,19 +1136,19 @@ module.exports = function connectEdges(sortedEvents, operation) {
     event.otherEvent.contourId   = ringId;
   }
 
-  for (i = 0, len = result.length; i < len; i++) {
-    var polygon = result[i];
-    for (var j = 0, jj = polygon.length; j < jj; j++) {
-      var polygonContour = polygon[j];
-      for (var k = 0, kk = polygonContour.length; k < kk; k++) {
-        var coords = polygonContour[k];
-        if (typeof coords[0] !== 'number') {
-          polygon.splice(j, 1);
-          polygon.push(coords);
-        }
-      }
-    }
-  }
+  // for (i = 0, len = result.length; i < len; i++) {
+  //   var polygon = result[i];
+  //   for (var j = 0, jj = polygon.length; j < jj; j++) {
+  //     var polygonContour = polygon[j];
+  //     for (var k = 0, kk = polygonContour.length; k < kk; k++) {
+  //       var coords = polygonContour[k];
+  //       if (typeof coords[0] !== 'number') {
+  //         polygon.splice(j, 1);
+  //         polygon.push(coords);
+  //       }
+  //     }
+  //   }
+  // }
 
   // Handle if the result is a polygon (eg not multipoly)
   // Commented it again, let's see what do we mean by that
@@ -1259,6 +1252,10 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
     e1 = new SweepEvent(s1, false, undefined, isSubject);
     e2 = new SweepEvent(s2, false, e1,        isSubject);
     e1.otherEvent = e2;
+
+    if (s1[0] === s2[0] && s1[1] === s2[1]) {
+      continue; // skip collapsed edges, or it breaks
+    }
 
     e1.contourId = e2.contourId = depth;
     if (!isExteriorRing) {

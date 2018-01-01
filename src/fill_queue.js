@@ -19,6 +19,10 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
     e2 = new SweepEvent(s2, false, e1,        isSubject);
     e1.otherEvent = e2;
 
+    if (s1[0] === s2[0] && s1[1] === s2[1]) {
+      continue; // skip collapsed edges, or it breaks
+    }
+
     e1.contourId = e2.contourId = depth;
     if (!isExteriorRing) {
       e1.isExteriorRing = false;
