@@ -1,0 +1,45 @@
+{
+  "type": "Feature",
+  "properties": {
+    "stroke": "#a50505",
+    "stroke-width": 2,
+    "stroke-opacity": 1,
+    "fill": "#1e8c7b",
+    "fill-opacity": 0.5
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.25
+        ],
+        [
+          0.25,
+          0.25
+        ],
+        [
+          0.25,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ]
+  }
+}

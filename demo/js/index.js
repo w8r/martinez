@@ -3,14 +3,24 @@ require('./polygoncontrol');
 require('./booleanopcontrol');
 var martinez = window.martinez = require('../../');
 //var martinez = require('../../dist/martinez.min');
-var xhr = require('superagent');
+var xhr  = require('superagent');
 var mode = window.location.hash.substring(1);
 var path = '../test/fixtures/';
+var ext  = '.geojson';
 var file;
+
+var files = [
+  'asia', 'trapezoid-box', 'canada', 'horseshoe', 'hourglasses', 'overlap_y',
+  'polygon_trapezoid_edge_overlap', 'touching_boxes', 'two_pointed_triangles',
+  'hole_cut', 'overlapping_segments', 'overlap_loop', 'disjoint_boxes'
+];
 
 switch (mode) {
   case 'geo':
     file = 'asia.geojson';
+    break;
+  case 'states':
+    file = 'states_source.geojson';
     break;
   case 'trapezoid':
     file = 'trapezoid-box.geojson';
@@ -27,11 +37,35 @@ switch (mode) {
   case 'edge_overlap':
     file = 'polygon_trapezoid_edge_overlap.geojson';
     break;
-  case 'touching':
+  case 'touching_boxes':
     file = 'touching_boxes.geojson';
     break;
   case 'triangles':
     file = 'two_pointed_triangles.geojson';
+    break;
+  case 'holecut':
+    file = 'hole_cut.geojson';
+    break;
+  case 'overlapping_segments':
+    file = 'overlapping_segments.geojson';
+    break;
+  case 'overlap_loop':
+    file = 'overlap_loop.geojson';
+    break;
+  case 'overlap_y':
+    file = 'overlap_y.geojson';
+    break;
+  case 'overlap_two':
+    file = 'overlap_two.geojson';
+    break;
+  case 'disjoint_boxes':
+    file = 'disjoint_boxes.geojson';
+    break;
+  case 'polygons_edge_overlap':
+    file = 'polygons_edge_overlap.geojson';
+    break;
+  case 'collapsed':
+    file = 'collapsed.geojson';
     break;
   default:
     file = 'hole_hole.geojson';
@@ -58,8 +92,10 @@ var map = window.map = L.map('image-map', {
   minZoom: 1,
   maxZoom: 20,
   center: [0, 0],
-  zoom: 1,
-  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.CRS.Simple,
+  zoom: 2,
+  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
+    transformation: new L.Transformation(1/8, 0, -1/8, 0)
+  }),
   editable: true
 });
 
@@ -76,12 +112,6 @@ var drawnItems = window.drawnItems = L.geoJson().addTo(map);
 
 function loadData(path) {
   console.log(path);
-  // var two_triangles = require('../../test/fixtures/two_shapes.geojson');
-  // var oneInside = require('../../test/fixtures/one_inside.geojson');
-  // var twoPointedTriangles = require('../../test/fixtures/two_pointed_triangles.geojson');
-  // var selfIntersecting = require('../../test/fixtures/self_intersecting.geojson');
-  // var holes = require('../../test/fixtures/hole_hole.geojson');
-  //var data =  require('../../test/fixtures/indonesia.geojson');
   xhr
     .get(path)
     .accept('json')
@@ -101,14 +131,13 @@ function clear() {
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
-
 function run (op) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   var subject = layers[0].toGeoJSON();
   var clipping = layers[1].toGeoJSON();
 
-  console.log('input', subject, clipping, op);
+  //console.log('input', subject, clipping, op);
 
   subject  = JSON.parse(JSON.stringify(subject));
   clipping = JSON.parse(JSON.stringify(clipping));
@@ -120,6 +149,12 @@ function run (op) {
     operation = martinez.union;
   } else if (op === OPERATIONS.DIFFERENCE) {
     operation = martinez.diff;
+  } else if (op === 5) { // B - A
+    operation = martinez.diff;
+
+    var temp = subject;
+    subject  = clipping;
+    clipping = temp;
   } else {
     operation = martinez.xor;
   }
@@ -128,34 +163,39 @@ function run (op) {
   var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd('martinez');
 
-  //console.log('result', result);
-
+  //if (op === OPERATIONS.UNION) result = result[0];
+  console.log('result', result);
+  // console.log(JSON.stringify(result))
   results.clearLayers();
-  results.addData({
-    'type': 'Feature',
-    'geometry': {
-      'type': 'MultiPolygon',
-      'coordinates': result
-    }
-  });
 
-  setTimeout(function() {
-    console.time('jsts');
-    var s = reader.read(subject);
-    var c = reader.read(clipping);
-    var res;
-    if (op === OPERATIONS.INTERSECTION) {
-      res = s.geometry.intersection(c.geometry);
-    } else if (op === OPERATIONS.UNION) {
-      res = s.geometry.union(c.geometry);
-    } else if (op === OPERATIONS.DIFFERENCE) {
-      res = s.geometry.difference(c.geometry);
-    } else {
-      res = s.geometry.symDifference(c.geometry);
-    }
-    res = writer.write(res);
-    console.timeEnd('jsts');
-  }, 500);
+  if (result !== null) {
+    results.addData({
+      'type': 'Feature',
+      'geometry': {
+        'type': 'MultiPolygon',
+        'coordinates': result
+      }
+    });
+
+    setTimeout(function() {
+      console.time('jsts');
+      var s = reader.read(subject);
+      var c = reader.read(clipping);
+      var res;
+      if (op === OPERATIONS.INTERSECTION) {
+        res = s.geometry.intersection(c.geometry);
+      } else if (op === OPERATIONS.UNION) {
+        res = s.geometry.union(c.geometry);
+      } else if (op === OPERATIONS.DIFFERENCE) {
+        res = s.geometry.difference(c.geometry);
+      } else {
+        res = s.geometry.symDifference(c.geometry);
+      }
+      res = writer.write(res);
+      console.timeEnd('jsts');
+      console.log(res);
+    }, 500);
+  }
 }
 
 //drawnItems.addData(oneInside);

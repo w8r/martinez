@@ -1,19 +1,23 @@
 'use strict';
 
-var tap           = require('tap');
-var path          = require('path');
-var Queue         = require('tinyqueue');
-var load          = require('load-json-file');
-var martinez      = require('../src/');
-var SweepEvent    = require('../src/sweep_event');
-var compareEvents = require('../src/compare_events').compare;
-var intersection  = require('../src/segment_intersection');
-var equals        = require('../src/equals');
+var tap               = require('tap');
+var path              = require('path');
+var Queue             = require('tinyqueue');
+var load              = require('load-json-file');
+var martinez          = require('../src/');
+var SweepEvent        = require('../src/sweep_event');
+var compareEvents     = require('../src/compare_events');
+var intersection      = require('../src/segment_intersection');
+var equals            = require('../src/equals');
+var fillQueue         = require('../src/fill_queue');
+var divideSegment     = require('../src/divide_segment');
+var subdivideSegments = require('../src/subdivide_segments');
+var possibleIntersection = require('../src/possible_intersection');
 
 // GeoJSON Data
 var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
 
-var Tree = require('functional-red-black-tree');
+var Tree = require('avl');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
@@ -35,8 +39,8 @@ tap.test('divide segments', function (main) {
     );
 
 
-    martinez.divideSegment(se1, iter[0], q);
-    martinez.divideSegment(se2, iter[0], q);
+    divideSegment(se1, iter[0], q);
+    divideSegment(se2, iter[0], q);
 
     t.equals(q.length, 6, 'subdivided in 4 segments by intersection point');
 
@@ -56,24 +60,25 @@ tap.test('divide segments', function (main) {
     // console.log(se1.point, se1.left, se1.otherEvent.point, se1.otherEvent.left);
     // console.log(se2.point, se2.left, se2.otherEvent.point, se2.otherEvent.left);
 
-    t.equals(martinez.possibleIntersection(se1, se2, q), 1);
+    t.equals(possibleIntersection(se1, se2, q), 1);
     t.equals(q.length, 4);
+
+
+    e = q.pop();
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [56, 181], '1');
+
+    e = q.pop();
+    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
+    t.strictSame(e.otherEvent.point, [16, 282], '2');
 
     var e = q.pop();
     t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [153, 203.5]);
+    t.strictSame(e.otherEvent.point, [153, 203.5], '3');
 
     e = q.pop();
     t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [56, 181]);
-
-    e = q.pop();
-    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [153, 294.5]);
-
-    e = q.pop();
-    t.strictSame(e.point, [100.79403384562251, 233.41363754101192]);
-    t.strictSame(e.otherEvent.point, [16, 282]);
+    t.strictSame(e.otherEvent.point, [153, 294.5], '4');
 
     t.end();
   });
@@ -83,7 +88,7 @@ tap.test('divide segments', function (main) {
     var c = [clipping.geometry.coordinates];
 
     var bbox = [Infinity, Infinity, -Infinity, -Infinity];
-    var q = martinez.fillQueue(s, c, bbox, bbox);
+    var q = fillQueue(s, c, bbox, bbox);
     var p0 = [16, 282];
     var p1 = [298, 359];
     var p2 = [156, 203.5];
@@ -98,8 +103,8 @@ tap.test('divide segments', function (main) {
 
     var tr = new Tree(compareSegments);
 
-    t.ok(tr = tr.insert(te), 'insert');
-    t.ok(tr = tr.insert(te3), 'insert');
+    t.ok(tr.insert(te), 'insert');
+    t.ok(tr.insert(te3), 'insert');
 
     t.equals(tr.find(te).key, te);
     t.equals(tr.find(te3).key, te3);
@@ -107,7 +112,7 @@ tap.test('divide segments', function (main) {
     t.equals(compareSegments(te, te3), 1);
     t.equals(compareSegments(te3, te), -1);
 
-    var segments = martinez.subdivideSegments(q, s, c, bbox, bbox, 0);
+    var segments = subdivideSegments(q, s, c, bbox, bbox, 0);
     var leftSegments = [];
     for (var i = 0; i < segments.length; i++) {
       if (segments[i].left) {

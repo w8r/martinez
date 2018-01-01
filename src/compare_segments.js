@@ -33,12 +33,11 @@ module.exports = function compareSegments(le1, le2) {
   }
 
   if (le1.isSubject === le2.isSubject) { // same polygon
-    if (equals(le1.point, le2.point)) {
-      if (equals(le1.otherEvent.point, le2.otherEvent.point)) {
-        return 0;
-      } else {
-        return le1.contourId > le2.contourId ? 1 : -1;
-      }
+    var p1 = le1.point, p2 = le2.point;
+    if (p1[0] === p2[0] && p1[1] === p2[1]/*equals(le1.point, le2.point)*/) {
+      p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
+      if (p1[0] === p2[0] && p1[1] === p2[1]) return 0;
+      else return le1.contourId > le2.contourId ? 1 : -1;
     }
   } else { // Segments are collinear, but belong to separate polygons
     return le1.isSubject ? -1 : 1;

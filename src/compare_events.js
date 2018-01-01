@@ -8,7 +8,7 @@ var signedArea = require('./signed_area');
  * @param  {SweepEvent} e2
  * @return {Number}
  */
-module.exports = function sweepEventsComp(e1, e2) {
+module.exports = function compareEvents(e1, e2) {
   var p1 = e1.point;
   var p2 = e2.point;
 
@@ -23,6 +23,7 @@ module.exports = function sweepEventsComp(e1, e2) {
   return specialCases(e1, e2, p1, p2);
 };
 
+
 /* eslint-disable no-unused-vars */
 function specialCases(e1, e2, p1, p2) {
   // Same coordinates, but one is a left endpoint and the other is
@@ -30,6 +31,8 @@ function specialCases(e1, e2, p1, p2) {
   if (e1.left !== e2.left)
     return e1.left ? 1 : -1;
 
+  // var p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
+  // var sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
@@ -37,15 +40,6 @@ function specialCases(e1, e2, p1, p2) {
     // the event associate to the bottom segment is processed first
     return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
   }
-
-  // uncomment this if you want to play with multipolygons
-  // if (e1.isSubject === e2.isSubject) {
-  //   if(equals(e1.point, e2.point) && e1.contourId === e2.contourId) {
-  //     return 0;
-  //   } else {
-  //     return e1.contourId > e2.contourId ? 1 : -1;
-  //   }
-  // }
 
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;
 }
