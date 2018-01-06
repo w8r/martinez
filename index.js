@@ -2,9 +2,12 @@
 
 var martinez = require('./src/index');
 
-module.exports = {
+var boolean = {
   union: martinez.union,
   diff: martinez.diff,
   xor: martinez.xor,
   intersection: martinez.intersection
 };
+boolean.default = boolean;
+
+module.exports = boolean;

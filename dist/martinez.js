@@ -3,12 +3,15 @@
 
 var martinez = require('./src/index');
 
-module.exports = {
+var boolean = {
   union: martinez.union,
   diff: martinez.diff,
   xor: martinez.xor,
   intersection: martinez.intersection
 };
+boolean.default = boolean;
+
+module.exports = boolean;
 
 },{"./src/index":12}],2:[function(require,module,exports){
 (function (global, factory) {
@@ -633,7 +636,7 @@ AVLTree.prototype.remove = function remove (key) {
     while (min.left || min.right) {
       while (min.left) { min = min.left; }
 
-      node.key = min.key;
+      node.key= min.key;
       node.data = min.data;
       if (min.right) {
         node = min;
@@ -641,22 +644,20 @@ AVLTree.prototype.remove = function remove (key) {
       }
     }
 
-    node.key  = min.key;
+    node.key= min.key;
     node.data = min.data;
     node = min;
   }
 
   var parent = node.parent;
-  var pp     = node;
+  var pp   = node;
   var newRoot;
 
   while (parent) {
     if (parent.left === pp) { parent.balanceFactor -= 1; }
-    else                    { parent.balanceFactor += 1; }
+    else                  { parent.balanceFactor += 1; }
 
-
-    if      (parent.balanceFactor === -2) {
-      if (!parent.right) { parent.balanceFactor += 1; break; }
+    if      (parent.balanceFactor < -1) {
       // inlined
       //var newRoot = rightBalance(parent);
       if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
@@ -664,8 +665,7 @@ AVLTree.prototype.remove = function remove (key) {
 
       if (parent === this$1._root) { this$1._root = newRoot; }
       parent = newRoot;
-    } else if (parent.balanceFactor === 2) {
-      if (!parent.right) { parent.balanceFactor += 1; break; }
+    } else if (parent.balanceFactor > 1) {
       // inlined
       // var newRoot = leftBalance(parent);
       if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
@@ -742,6 +742,7 @@ return AVLTree;
 'use strict';
 
 module.exports = TinyQueue;
+module.exports.default = TinyQueue;
 
 function TinyQueue(data, compare) {
     if (!(this instanceof TinyQueue)) return new TinyQueue(data, compare);
@@ -750,7 +751,9 @@ function TinyQueue(data, compare) {
     this.length = this.data.length;
     this.compare = compare || defaultCompare;
 
-    if (data) for (var i = Math.floor(this.length / 2); i >= 0; i--) this._down(i);
+    if (this.length > 0) {
+        for (var i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
+    }
 }
 
 function defaultCompare(a, b) {
@@ -766,11 +769,17 @@ TinyQueue.prototype = {
     },
 
     pop: function () {
+        if (this.length === 0) return undefined;
+
         var top = this.data[0];
-        this.data[0] = this.data[this.length - 1];
         this.length--;
+
+        if (this.length > 0) {
+            this.data[0] = this.data[this.length];
+            this._down(0);
+        }
         this.data.pop();
-        this._down(0);
+
         return top;
     },
 
@@ -779,45 +788,45 @@ TinyQueue.prototype = {
     },
 
     _up: function (pos) {
-        var data = this.data,
-            compare = this.compare;
+        var data = this.data;
+        var compare = this.compare;
+        var item = data[pos];
 
         while (pos > 0) {
-            var parent = Math.floor((pos - 1) / 2);
-            if (compare(data[pos], data[parent]) < 0) {
-                swap(data, parent, pos);
-                pos = parent;
-
-            } else break;
+            var parent = (pos - 1) >> 1;
+            var current = data[parent];
+            if (compare(item, current) >= 0) break;
+            data[pos] = current;
+            pos = parent;
         }
+
+        data[pos] = item;
     },
 
     _down: function (pos) {
-        var data = this.data,
-            compare = this.compare,
-            len = this.length;
+        var data = this.data;
+        var compare = this.compare;
+        var halfLength = this.length >> 1;
+        var item = data[pos];
 
-        while (true) {
-            var left = 2 * pos + 1,
-                right = left + 1,
-                min = pos;
+        while (pos < halfLength) {
+            var left = (pos << 1) + 1;
+            var right = left + 1;
+            var best = data[left];
 
-            if (left < len && compare(data[left], data[min]) < 0) min = left;
-            if (right < len && compare(data[right], data[min]) < 0) min = right;
+            if (right < this.length && compare(data[right], best) < 0) {
+                left = right;
+                best = data[right];
+            }
+            if (compare(best, item) >= 0) break;
 
-            if (min === pos) return;
-
-            swap(data, min, pos);
-            pos = min;
+            data[pos] = best;
+            pos = left;
         }
+
+        data[pos] = item;
     }
 };
-
-function swap(data, i, j) {
-    var tmp = data[i];
-    data[i] = data[j];
-    data[j] = tmp;
-}
 
 },{}],4:[function(require,module,exports){
 'use strict';
