@@ -75,7 +75,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "avl": "^1.4.0",
+    "avl": "^1.4.1",
     "tinyqueue": "^1.2.0"
   }
 }
