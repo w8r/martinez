@@ -14,19 +14,10 @@ boolean.default = boolean;
 module.exports = boolean;
 
 },{"./src/index":12}],2:[function(require,module,exports){
-/**
- * avl v1.4.1
- * Fast AVL tree for Node and browser
- *
- * @author Alexander Milevski <info@w8r.name>
- * @license MIT
- * @preserve
- */
-
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.AVLTree = factory());
+	(global.avl = factory());
 }(this, (function () { 'use strict';
 
 /**
@@ -741,8 +732,6 @@ AVLTree.prototype.toString = function toString (printNode) {
 };
 
 Object.defineProperties( AVLTree.prototype, prototypeAccessors );
-
-AVLTree.default = AVLTree;
 
 return AVLTree;
 
