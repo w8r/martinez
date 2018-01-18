@@ -1,7 +1,7 @@
 require('./coordinates');
 require('./polygoncontrol');
 require('./booleanopcontrol');
-var martinez = window.martinez = require('../../');
+var martinez = window.martinez = require('../../src/index');
 //var martinez = require('../../dist/martinez.min');
 var xhr  = require('superagent');
 var mode = window.location.hash.substring(1);
@@ -16,6 +16,9 @@ var files = [
 ];
 
 switch (mode) {
+  case 'multi':
+    file = 'multipolys.geojson';
+    break;
   case 'geo':
     file = 'asia.geojson';
     break;
