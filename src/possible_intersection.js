@@ -32,7 +32,7 @@ module.exports = function possibleIntersection(se1, se2, queue) {
     return 0;
   }
 
-  if (nintersections === 2 && (se1.isSubject === se2.isSubject || se1.contourId === se2.contourId)) {
+  if (nintersections === 2 && (se1.isSubject === se2.isSubject && se1.contourId === se2.contourId)) {
     // if(se1.contourId === se2.contourId){
     // console.warn('Edges of the same polygon overlap',
     //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
