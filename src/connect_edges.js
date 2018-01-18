@@ -3,6 +3,7 @@
 // var equals = require('./equals');
 var compareEvents = require('./compare_events');
 var operationType = require('./operation');
+var debug         = require('./debug_utils');
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -88,7 +89,7 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 module.exports = function connectEdges(sortedEvents, operation) {
   var i, len;
   var resultEvents = orderEvents(sortedEvents);
-
+  // debug.renderPoints(resultEvents);
   // "false"-filled array
   var processed = {};
   var result = [];
