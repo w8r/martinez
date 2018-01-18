@@ -21,7 +21,7 @@ module.exports = function computeFields(event, prev, operation) {
 
   // previous line segment in sweepline belongs to the same polygon
   } else {
-    if (event.isSubject === prev.isSubject || event.contourId === prev.contourId) {
+    if (event.contourId === prev.contourId) {
       event.inOut      = !prev.inOut;
       event.otherInOut = prev.otherInOut;
 

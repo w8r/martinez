@@ -32,7 +32,7 @@ module.exports = function compareSegments(le1, le2) {
     return le1.isBelow(le2.point) ? -1 : 1;
   }
 
-  if (le1.contourId === le2.contourId) { // same polygon
+  if (le1.isSubject === le2.isSubject || le1.contourId === le2.contourId) { // same polygon
     var p1 = le1.point, p2 = le2.point;
     if (p1[0] === p2[0] && p1[1] === p2[1]/*equals(le1.point, le2.point)*/) {
       p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
