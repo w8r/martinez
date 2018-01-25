@@ -3,6 +3,7 @@
 var Queue           = require('tinyqueue');
 var SweepEvent      = require('./sweep_event');
 var compareEvents   = require('./compare_events');
+var operations      = require('./operation');
 
 var max = Math.max;
 var min = Math.min;
@@ -48,7 +49,7 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 }
 
 
-module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
+module.exports = function fillQueue(subject, clipping, sbbox, cbbox, operation) {
   var eventQueue = new Queue(null, compareEvents);
   var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
@@ -65,6 +66,7 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
     polygonSet = clipping[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
       isExteriorRing = j === 0;
+      if (operation === operations.DIFFERENCE) isExteriorRing = false;
       if (isExteriorRing) contourId++;
       processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
     }

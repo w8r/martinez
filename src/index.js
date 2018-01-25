@@ -58,7 +58,7 @@ function boolean(subject, clipping, operation) {
   var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
   //console.time('fill queue');
-  var eventQueue = fillQueue(subject, clipping, sbbox, cbbox);
+  var eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('fill queue');
 
   trivial = compareBBoxes(subject, clipping, sbbox, cbbox, operation);

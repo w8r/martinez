@@ -99,7 +99,9 @@ module.exports = function connectEdges(sortedEvents, operation) {
     var contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
-      if (result.length === 0) {
+      if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
+        result.push(contour);
+      } else if (result.length === 0) {
         result.push([[contour]]);
       } else {
         result[result.length - 1].push(contour[0]);
