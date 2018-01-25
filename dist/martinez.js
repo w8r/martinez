@@ -1102,7 +1102,9 @@ module.exports = function connectEdges(sortedEvents, operation) {
     var contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
-      if (result.length === 0) {
+      if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
+        result.push(contour);
+      } else if (result.length === 0) {
         result.push([[contour]]);
       } else {
         result[result.length - 1].push(contour[0]);
@@ -1246,6 +1248,7 @@ module.exports = function equals(p1, p2) {
 var Queue           = require('tinyqueue');
 var SweepEvent      = require('./sweep_event');
 var compareEvents   = require('./compare_events');
+var operations      = require('./operation');
 
 var max = Math.max;
 var min = Math.min;
@@ -1291,7 +1294,7 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 }
 
 
-module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
+module.exports = function fillQueue(subject, clipping, sbbox, cbbox, operation) {
   var eventQueue = new Queue(null, compareEvents);
   var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
@@ -1308,6 +1311,7 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
     polygonSet = clipping[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
       isExteriorRing = j === 0;
+      if (operation === operations.DIFFERENCE) isExteriorRing = false;
       if (isExteriorRing) contourId++;
       processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
     }
@@ -1316,7 +1320,7 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox) {
   return eventQueue;
 };
 
-},{"./compare_events":4,"./sweep_event":18,"tinyqueue":3}],12:[function(require,module,exports){
+},{"./compare_events":4,"./operation":13,"./sweep_event":18,"tinyqueue":3}],12:[function(require,module,exports){
 'use strict';
 
 var subdivideSegments = require('./subdivide_segments');
@@ -1377,7 +1381,7 @@ function boolean(subject, clipping, operation) {
   var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
   //console.time('fill queue');
-  var eventQueue = fillQueue(subject, clipping, sbbox, cbbox);
+  var eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('fill queue');
 
   trivial = compareBBoxes(subject, clipping, sbbox, cbbox, operation);
