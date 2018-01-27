@@ -43,7 +43,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
       if (next) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
           computeFields(event, prevEvent, operation);
-          computeFields(event, next.key, operation);
+          computeFields(next.key, event, operation);
         }
       }
 
