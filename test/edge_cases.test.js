@@ -243,5 +243,17 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
+  main.test('overlapping edges difference', function (t) { // issue #35
+    const p1 = [ [ [0,0], [3,0], [3,3], [0,3], [0,0] ] ]
+    const p2 = [ [ [1,0], [2,0], [2,4], [1,4], [1,0] ] ]
+
+    var result = martinez.diff(p1, p2)
+    t.deepEqual(result, [
+      [[[0, 0], [1, 0], [1, 3], [0, 3], [0, 0]]],
+      [[[2, 0], [3, 0], [3, 3], [2, 3], [2, 0]]]
+    ])
+    t.end()
+  })
+
   main.end();
 });
