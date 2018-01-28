@@ -7,6 +7,7 @@ tap.test('intersection', function (t) {
 
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [2, 2]), null, 'null if no intersections');
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [10, 2]), null, 'null if no intersections');
+  t.strictSame(intersection([2, 2], [3, 3], [0, 6], [2, 4]), null, 'null if no intersections');
 
   t.strictSame(intersection([0, 0], [1, 1], [1, 0], [0, 1]), [[0.5, 0.5]], '1 intersection');
   t.strictSame(intersection([0, 0], [1, 1], [0, 1], [0, 0]), [[0, 0]], 'shared point 1');
@@ -35,6 +36,8 @@ tap.test('intersection', function (t) {
 
   t.strictSame(intersection([0, 0], [1, 1], [0, 0], [1, 1], true), null, 'full overlap, skip touches');
   t.strictSame(intersection([1, 1], [0, 0], [0, 0], [1, 1], true), null, 'full overlap, orientation, skip touches');
+
+  t.strictSame(intersection([0, 0], [1, 1], [1, 0], [0, 1], true), [[0.5, 0.5]], '1 intersection, skip touches');
 
   t.end();
 });
