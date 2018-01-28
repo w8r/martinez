@@ -94,7 +94,15 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
       // not on line segment b
       return null;
     }
-    return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    if (s === 0 || s === 1) {
+      // on an endpoint of line segment a
+      return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    }
+    if (t === 0 || t === 1) {
+      // on an endpoint of line segment b
+      return noEndpointTouch ? null : [toPoint(b1, t, vb)];
+    }
+    return [toPoint(a1, s, va)];
   }
 
   // If we've reached this point, then the lines are either parallel or the

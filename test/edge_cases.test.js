@@ -141,7 +141,7 @@ tap.test('Edge cases', function(main) {
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
-      t.deepEqual(result, [[[[-1883,-8.5],[-1783,-8.5],[-1783,-3],[-1783,-2.999999999999999],[-1883,-3],[-1883,-8.5]]]]);
+      t.deepEqual(result, [[[[-1883,-8.5],[-1783,-8.5],[-1783,-3],[-1883,-3],[-1883,-8.5]]]]);
 
       t.end();
     });
@@ -151,7 +151,7 @@ tap.test('Edge cases', function(main) {
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
-      t.deepEqual(result, [[[[-1883,-25],[-1783,-25],[-1783,-8.5],[-1783,-3],[-1783,-2.999999999999999],[-1783,75],[-1883,75],[-1883,-3],[-1883,-8.5],[-1883,-25]]]]);
+      t.deepEqual(result, [[[[-1883,-25],[-1783,-25],[-1783,-8.5],[-1783,-3],[-1783,75],[-1883,75],[-1883,-3],[-1883,-8.5],[-1883,-25]]]]);
 
       t.end();
     });
