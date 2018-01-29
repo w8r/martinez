@@ -14,10 +14,19 @@ boolean.default = boolean;
 module.exports = boolean;
 
 },{"./src/index":12}],2:[function(require,module,exports){
+/**
+ * avl v1.4.1
+ * Fast AVL tree for Node and browser
+ *
+ * @author Alexander Milevski <info@w8r.name>
+ * @license MIT
+ * @preserve
+ */
+
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.avl = factory());
+	(global.AVLTree = factory());
 }(this, (function () { 'use strict';
 
 /**
@@ -732,6 +741,8 @@ AVLTree.prototype.toString = function toString (printNode) {
 };
 
 Object.defineProperties( AVLTree.prototype, prototypeAccessors );
+
+AVLTree.default = AVLTree;
 
 return AVLTree;
 
@@ -1649,7 +1660,15 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
       // not on line segment b
       return null;
     }
-    return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    if (s === 0 || s === 1) {
+      // on an endpoint of line segment a
+      return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    }
+    if (t === 0 || t === 1) {
+      // on an endpoint of line segment b
+      return noEndpointTouch ? null : [toPoint(b1, t, vb)];
+    }
+    return [toPoint(a1, s, va)];
   }
 
   // If we've reached this point, then the lines are either parallel or the
@@ -1757,7 +1776,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
       if (next) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
           computeFields(event, prevEvent, operation);
-          computeFields(event, next.key, operation);
+          computeFields(next.key, event, operation);
         }
       }
 
