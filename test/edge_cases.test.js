@@ -218,6 +218,31 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
+  main.test('no rounding error between intersection calculation and triangle area', (t) => {
+    const p1 = [[
+      [-62.8, -41],
+      [-63.0001099, -41.1121599],
+      [-62.93564, -41.0940399],
+      [-62.8, -41]
+    ]];
+    const p2 =[[
+      [-62.8, -41.2],
+      [-62.8, -41],
+      [-62.964969880531925, -41.10228339712406],
+      [-63.0001099, -41.1121599],
+      [-62.8, -41.2]
+    ]];
+    const expected = [[[
+      [-63.0001099, -41.1121599],
+      [-62.964969880531925, -41.10228339712406],
+      [-62.8, -41],
+      [-63.0001099, -41.1121599]
+    ]]]
+
+    t.deepEqual(martinez.diff(p1, p2), expected)
+    t.end();
+  });
+
   main.test('collapsed edges removed', (t) => {
     const p1 = [[
       [355,139],
