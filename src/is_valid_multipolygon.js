@@ -10,10 +10,10 @@ function isValidPolygonRing(ringCoords) {
 
 module.exports = function isValidMultiPolygonCoords(coords) {
   try {
-    if (!coords.length || coords.length < 1) { return false; }
+    if (!coords.length) { return false; }
     for (let polygonI = 0; polygonI < coords.length; ++polygonI) {
       let polygon = coords[polygonI];
-      if (!polygon.length || polygon.length < 1) { return false; }
+      if (!polygon.length) { return false; }
       for (let ringI = 0; ringI < polygon.length; ++ringI) {
         let ring = polygon[ringI];
         if (!isValidPolygonRing(ring)) { return false; }
