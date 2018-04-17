@@ -1,6 +1,14 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.martinez = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+/**
+ * Martinez polygon clipping algorithm, does boolean operation on polygons
+ * (multipolygons, polygons with holes etc): intersection, union, difference, xor
+ *
+ * @license MIT
+ * @author Alexander Milevski
+ * @preserve
+ */
 var martinez = require('./src/index');
 
 var boolean = {
@@ -14,10 +22,19 @@ boolean.default = boolean;
 module.exports = boolean;
 
 },{"./src/index":12}],2:[function(require,module,exports){
+/**
+ * avl v1.4.1
+ * Fast AVL tree for Node and browser
+ *
+ * @author Alexander Milevski <info@w8r.name>
+ * @license MIT
+ * @preserve
+ */
+
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.avl = factory());
+	(global.AVLTree = factory());
 }(this, (function () { 'use strict';
 
 /**
@@ -732,6 +749,8 @@ AVLTree.prototype.toString = function toString (printNode) {
 };
 
 Object.defineProperties( AVLTree.prototype, prototypeAccessors );
+
+AVLTree.default = AVLTree;
 
 return AVLTree;
 
@@ -1649,7 +1668,15 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
       // not on line segment b
       return null;
     }
-    return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    if (s === 0 || s === 1) {
+      // on an endpoint of line segment a
+      return noEndpointTouch ? null : [toPoint(a1, s, va)];
+    }
+    if (t === 0 || t === 1) {
+      // on an endpoint of line segment b
+      return noEndpointTouch ? null : [toPoint(b1, t, vb)];
+    }
+    return [toPoint(a1, s, va)];
   }
 
   // If we've reached this point, then the lines are either parallel or the

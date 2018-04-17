@@ -17,7 +17,9 @@
     "test:watch": "nodemon --exec 'npm run test && npm run lint'",
     "start": "watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv & http-server -p 3000",
     "start:win": "start watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv && start serve",
-    "build": "browserify -s martinez ./index.js -o ./dist/martinez.js"
+    "build": "browserify -s martinez ./index.js -o ./dist/martinez.js && npm run min",
+    "min": "uglifyjs ./dist/martinez.js -o ./dist/martinez.min.js -m --comments",
+    "prepublish": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "polygon",
@@ -71,7 +73,7 @@
     "tap": "^6.2.0",
     "tap-status": "^1.0.1",
     "typescript": "^2.2.2",
-    "uglifyjs": "^2.4.10",
+    "uglify-js": "^3.3.21",
     "watchify": "^3.7.0"
   },
   "dependencies": {
