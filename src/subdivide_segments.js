@@ -1,6 +1,7 @@
 'use strict';
 
 var Tree                 = require('avl');
+var createLoopGuard      = require('./create_loop_guard');
 var computeFields        = require('./compute_fields');
 var possibleIntersection = require('./possible_intersection');
 var compareSegments      = require('./compare_segments');
@@ -18,7 +19,9 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
   var INTERSECTION = operations.INTERSECTION;
   var DIFFERENCE   = operations.DIFFERENCE;
 
+  var eventQueueGuard = createLoopGuard(eventQueue.length * 10, 'subdivide() event queue');
   while (eventQueue.length) {
+    eventQueueGuard.check();
     var event = eventQueue.pop();
     sortedEvents.push(event);
 

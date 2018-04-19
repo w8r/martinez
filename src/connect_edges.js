@@ -3,6 +3,7 @@
 // var equals = require('./equals');
 var compareEvents = require('./compare_events');
 var operationType = require('./operation');
+var createLoopGuard = require('./create_loop_guard');
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -118,7 +119,9 @@ module.exports = function connectEdges(sortedEvents, operation) {
     var initial = resultEvents[i].point;
     contour[0].push(initial);
 
+    var innerLoopGuard = createLoopGuard(resultEvents.length * 10, 'connectEdges() inner loop');
     while (pos >= i) {
+      innerLoopGuard.check();
       event = resultEvents[pos];
       processed[pos] = true;
 
