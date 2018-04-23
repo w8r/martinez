@@ -17,7 +17,7 @@ var possibleIntersection = require('../src/possible_intersection');
 // GeoJSON Data
 var shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
 
-var Tree = require('avl');
+var Tree = require('splaytree');
 var compareSegments = require('../src/compare_segments');
 
 var subject = shapes.features[0];
