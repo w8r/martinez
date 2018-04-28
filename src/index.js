@@ -4,6 +4,7 @@ var subdivideSegments = require('./subdivide_segments');
 var connectEdges      = require('./connect_edges');
 var fillQueue         = require('./fill_queue');
 var operations        = require('./operation');
+var isValidMultiPolygonCoords = require('./is_valid_multipolygon');
 
 var EMPTY = [];
 
@@ -50,6 +51,10 @@ function boolean(subject, clipping, operation) {
   if (typeof clipping[0][0][0] === 'number') {
     clipping = [clipping];
   }
+
+  if (!isValidMultiPolygonCoords(subject)) { throw new Error('bad subject param'); }
+  if (!isValidMultiPolygonCoords(clipping)) { throw new Error('bad clipping param'); }
+
   var trivial = trivialOperation(subject, clipping, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
