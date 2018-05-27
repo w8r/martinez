@@ -1425,7 +1425,7 @@
 
       if (!event.left) {
         tmp = event.pos;
-        event.pos = event.otherEvent.pos;
+        event.pos = event.otherEvent.pos || 0;
         event.otherEvent.pos = tmp;
       }
     }
@@ -1839,6 +1839,9 @@
       break;
     case 'fatal2':
       file = 'fatal2.geojson';
+      break;
+    case 'rectangles':
+      file = 'rectangles.geojson';
       break;
     default:
       file = 'hole_hole.geojson';

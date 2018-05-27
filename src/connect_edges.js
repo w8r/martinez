@@ -36,7 +36,7 @@ function orderEvents(sortedEvents) {
 
     if (!event.left) {
       tmp = event.pos;
-      event.pos = event.otherEvent.pos;
+      event.pos = event.otherEvent.pos || 0;
       event.otherEvent.pos = tmp;
     }
   }
