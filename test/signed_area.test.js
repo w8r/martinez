@@ -1,9 +1,7 @@
-'use strict';
+import tap        from 'tape';
+import signedArea from '../src/signed_area';
 
-var tap        = require('tap');
-var signedArea = require('../src/signed_area');
-
-tap.test('analytical signed area', function (t) {
+tap.test('analytical signed area', (t) => {
 
   t.equals(signedArea([0, 0], [0, 1], [1, 1]), -1, 'negative area');
   t.equals(signedArea([0, 1], [0, 0], [1, 0]),  1, 'positive area');

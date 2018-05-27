@@ -1,18 +1,16 @@
-'use strict';
+import Queue           from 'tinyqueue';
+import SweepEvent      from './sweep_event';
+import compareEvents   from './compare_events';
+import { DIFFERENCE }  from './operation';
 
-var Queue           = require('tinyqueue');
-var SweepEvent      = require('./sweep_event');
-var compareEvents   = require('./compare_events');
-var operations      = require('./operation');
+const max = Math.max;
+const min = Math.min;
 
-var max = Math.max;
-var min = Math.min;
-
-var contourId = 0;
+let contourId = 0;
 
 
 function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
-  var i, len, s1, s2, e1, e2;
+  let i, len, s1, s2, e1, e2;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
     s1 = contourOrHole[i];
     s2 = contourOrHole[i + 1];
@@ -35,7 +33,7 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
       e1.left = true;
     }
 
-    var x = s1[0], y = s1[1];
+    const x = s1[0], y = s1[1];
     bbox[0] = min(bbox[0], x);
     bbox[1] = min(bbox[1], y);
     bbox[2] = max(bbox[2], x);
@@ -49,9 +47,9 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 }
 
 
-module.exports = function fillQueue(subject, clipping, sbbox, cbbox, operation) {
-  var eventQueue = new Queue(null, compareEvents);
-  var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
+export default function fillQueue(subject, clipping, sbbox, cbbox, operation) {
+  const eventQueue = new Queue(null, compareEvents);
+  let polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
@@ -66,11 +64,11 @@ module.exports = function fillQueue(subject, clipping, sbbox, cbbox, operation) 
     polygonSet = clipping[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
       isExteriorRing = j === 0;
-      if (operation === operations.DIFFERENCE) isExteriorRing = false;
+      if (operation === DIFFERENCE) isExteriorRing = false;
       if (isExteriorRing) contourId++;
       processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
     }
   }
 
   return eventQueue;
-};
+}

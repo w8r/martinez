@@ -1,8 +1,6 @@
-'use strict';
-
-var SweepEvent    = require('./sweep_event');
-var equals        = require('./equals');
-var compareEvents = require('./compare_events');
+import SweepEvent    from './sweep_event';
+import equals        from './equals';
+import compareEvents from './compare_events';
 
 /**
  * @param  {SweepEvent} se
@@ -10,13 +8,16 @@ var compareEvents = require('./compare_events');
  * @param  {Queue} queue
  * @return {Queue}
  */
-module.exports = function divideSegment(se, p, queue)  {
-  var r = new SweepEvent(p, false, se,            se.isSubject);
-  var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
+export default function divideSegment(se, p, queue)  {
+  const r = new SweepEvent(p, false, se,            se.isSubject);
+  const l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
 
+  /* eslint-disable no-console */
   if (equals(se.point, se.otherEvent.point)) {
+
     console.warn('what is that, a collapsed segment?', se);
   }
+  /* eslint-enable no-console */
 
   r.contourId = l.contourId = se.contourId;
 
@@ -36,4 +37,4 @@ module.exports = function divideSegment(se, p, queue)  {
   queue.push(r);
 
   return queue;
-};
+}

@@ -1,8 +1,4 @@
-'use strict';
-
-module.exports = {
-  NORMAL:               0,
-  NON_CONTRIBUTING:     1,
-  SAME_TRANSITION:      2,
-  DIFFERENT_TRANSITION: 3
-};
+export const NORMAL               = 0;
+export const NON_CONTRIBUTING     = 1;
+export const SAME_TRANSITION      = 2;
+export const DIFFERENT_TRANSITION = 3;

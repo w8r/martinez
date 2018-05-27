@@ -1,19 +1,17 @@
-'use strict';
+import tap      from 'tape';
+import martinez from '../src/';
+import load     from 'load-json-file';
+import path     from 'path';
 
-var tap      = require('tap');
-var martinez = require('../src/');
-var load     = require('load-json-file');
-var path     = require('path');
+tap.test('Edge cases', (main) => {
 
-tap.test('Edge cases', function(main) {
+  main.test('touching hourglasses', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'hourglasses.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
 
-  main.test('touching hourglasses', function(t) {
-    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'hourglasses.geojson'));
-    var subject  = shapes.features[0];
-    var clipping = shapes.features[1];
-
-    t.test('intersection', function(t) {
-      var result = martinez.intersection(
+    t.test('intersection', (t) => {
+      const result = martinez.intersection(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -22,8 +20,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('union', function(t) {
-      var result = martinez.union(
+    t.test('union', (t) => {
+      const result = martinez.union(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -32,8 +30,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference', function(t) {
-      var result = martinez.diff(
+    t.test('difference', (t) => {
+      const result = martinez.diff(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -42,8 +40,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference 2', function(t) {
-      var result = martinez.diff(
+    t.test('difference 2', (t) => {
+      const result = martinez.diff(
         clipping.geometry.coordinates,
         subject.geometry.coordinates
       );
@@ -55,13 +53,13 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
-  main.test('polygon + trapezoid', function(t) {
-    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'polygon_trapezoid_edge_overlap.geojson'));
-    var subject  = shapes.features[0];
-    var clipping = shapes.features[1];
+  main.test('polygon + trapezoid', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'polygon_trapezoid_edge_overlap.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
 
     t.test('intersection', function(t) {
-      var result = martinez.intersection(
+      const result = martinez.intersection(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -70,8 +68,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('union', function(t) {
-      var result = martinez.union(
+    t.test('union', (t) => {
+      const result = martinez.union(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -80,8 +78,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference', function(t) {
-      var result = martinez.diff(
+    t.test('difference', (t) => {
+      const result = martinez.diff(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -93,13 +91,13 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
-  main.test('overlapping edge + one inside', function(t) {
-    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_loop.geojson'));
-    var subject  = shapes.features[0];
-    var clipping = shapes.features[1];
+  main.test('overlapping edge + one inside', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_loop.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
 
-    t.test('intersection', function(t) {
-      var result = martinez.intersection(
+    t.test('intersection', (t) => {
+      const result = martinez.intersection(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -108,8 +106,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('union', function(t) {
-      var result = martinez.union(
+    t.test('union', (t) => {
+      const result = martinez.union(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -118,8 +116,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference', function(t) {
-      var result = martinez.diff(
+    t.test('difference', (t) => {
+      const result = martinez.diff(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -131,13 +129,13 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
-  main.test('overlapping Y shift', function(t) {
-    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_y.geojson'));
-    var subject  = shapes.features[0];
-    var clipping = shapes.features[1];
+  main.test('overlapping Y shift', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_y.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
 
     t.test('intersection', function(t) {
-      var result = martinez.intersection(
+      const result = martinez.intersection(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -146,8 +144,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('union', function(t) {
-      var result = martinez.union(
+    t.test('union', (t) => {
+      const result = martinez.union(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -156,8 +154,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference', function(t) {
-      var result = martinez.diff(
+    t.test('difference', (t) => {
+      const result = martinez.diff(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -169,13 +167,13 @@ tap.test('Edge cases', function(main) {
     t.end();
   });
 
-  main.test('touching boxes', function(t) {
-    var shapes   = load.sync(path.join(__dirname, 'fixtures', 'touching_boxes.geojson'));
-    var subject  = shapes.features[0];
-    var clipping = shapes.features[1];
+  main.test('touching boxes', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'touching_boxes.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
 
-    t.test('intersection', function(t) {
-      var result = martinez.intersection(
+    t.test('intersection', (t) => {
+      const result = martinez.intersection(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -184,8 +182,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('union', function(t) {
-      var result = martinez.union(
+    t.test('union', (t) => {
+      const result = martinez.union(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );
@@ -194,8 +192,8 @@ tap.test('Edge cases', function(main) {
       t.end();
     });
 
-    t.test('difference', function(t) {
-      var result = martinez.diff(
+    t.test('difference', (t) => {
+      const result = martinez.diff(
         subject.geometry.coordinates,
         clipping.geometry.coordinates
       );

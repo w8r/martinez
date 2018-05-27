@@ -1,8 +1,6 @@
-'use strict';
-
-var signedArea    = require('./signed_area');
-var compareEvents = require('./compare_events');
-var equals        = require('./equals');
+import signedArea    from './signed_area';
+import compareEvents from './compare_events';
+import equals        from './equals';
 
 
 /**
@@ -10,7 +8,7 @@ var equals        = require('./equals');
  * @param  {SweepEvent} le2
  * @return {Number}
  */
-module.exports = function compareSegments(le1, le2) {
+export default function compareSegments(le1, le2) {
   if (le1 === le2) return 0;
 
   // Segments are not collinear
@@ -33,7 +31,7 @@ module.exports = function compareSegments(le1, le2) {
   }
 
   if (le1.isSubject === le2.isSubject) { // same polygon
-    var p1 = le1.point, p2 = le2.point;
+    let p1 = le1.point, p2 = le2.point;
     if (p1[0] === p2[0] && p1[1] === p2[1]/*equals(le1.point, le2.point)*/) {
       p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
       if (p1[0] === p2[0] && p1[1] === p2[1]) return 0;
@@ -44,4 +42,4 @@ module.exports = function compareSegments(le1, le2) {
   }
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
-};
+}

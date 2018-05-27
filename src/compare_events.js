@@ -1,16 +1,13 @@
-'use strict';
-
-var signedArea = require('./signed_area');
-// var equals = require('./equals');
+import signedArea from './signed_area';
 
 /**
  * @param  {SweepEvent} e1
  * @param  {SweepEvent} e2
  * @return {Number}
  */
-module.exports = function compareEvents(e1, e2) {
-  var p1 = e1.point;
-  var p2 = e2.point;
+export default function compareEvents(e1, e2) {
+  const p1 = e1.point;
+  const p2 = e2.point;
 
   // Different x-coordinate
   if (p1[0] > p2[0]) return 1;
@@ -21,7 +18,7 @@ module.exports = function compareEvents(e1, e2) {
   if (p1[1] !== p2[1]) return p1[1] > p2[1] ? 1 : -1;
 
   return specialCases(e1, e2, p1, p2);
-};
+}
 
 
 /* eslint-disable no-unused-vars */
@@ -31,8 +28,8 @@ function specialCases(e1, e2, p1, p2) {
   if (e1.left !== e2.left)
     return e1.left ? 1 : -1;
 
-  // var p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
-  // var sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+  // const p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
+  // const sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
