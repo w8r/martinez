@@ -1,6 +1,6 @@
 'use strict';
 
-var EPSILON = 1e-9;
+//var EPS = 1e-9;
 
 /**
  * Finds the magnitude of the cross product of two vectors (if we pretend
@@ -12,7 +12,7 @@ var EPSILON = 1e-9;
  * @returns {Number} The magnitude of the cross product
  */
 function crossProduct(a, b) {
-  return a[0] * b[1] - a[1] * b[0];
+  return (a[0] * b[1]) - (a[1] * b[0]);
 }
 
 /**
@@ -24,7 +24,7 @@ function crossProduct(a, b) {
  * @returns {Number} The dot product
  */
 function dotProduct(a, b) {
-  return a[0] * b[0] + a[1] * b[1];
+  return (a[0] * b[0]) + (a[1] * b[1]);
 }
 
 /**
@@ -73,14 +73,14 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   var kross    = crossProduct(va, vb);
   var sqrKross = kross * kross;
   var sqrLenA  = dotProduct(va, va);
-  var sqrLenB  = dotProduct(vb, vb);
+  //var sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
   // cross product is the 0 vector. The full calculation involves relative error
   // to account for possible very small line segments. See Schneider & Eberly
   // for details.
-  if (sqrKross > EPSILON * sqrLenA * sqrLenB) {
+  if (sqrKross > 0/* EPS * sqrLenB * sqLenA */) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
@@ -111,12 +111,12 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   // the (vector) difference between the two initial points. If this is parallel
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
-  var sqrLenE = dotProduct(e, e);
+  //var sqrLenE = dotProduct(e, e);
   kross = crossProduct(e, va);
   sqrKross = kross * kross;
 
-  if (sqrKross > EPSILON * sqrLenA * sqrLenE) {
-    // Lines are just parallel, not the same. No overlap.
+  if (sqrKross > 0 /* EPS * sqLenB * sqLenE */) {
+  // Lines are just parallel, not the same. No overlap.
     return null;
   }
 

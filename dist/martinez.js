@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.martinez = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.martinez = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23,8 +23,8 @@ module.exports = boolean;
 
 },{"./src/index":12}],2:[function(require,module,exports){
 /**
- * avl v1.4.1
- * Fast AVL tree for Node and browser
+ * splaytree v0.1.4
+ * Fast Splay tree for Node and browser
  *
  * @author Alexander Milevski <info@w8r.name>
  * @license MIT
@@ -34,188 +34,16 @@ module.exports = boolean;
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.AVLTree = factory());
+	(global.SplayTree = factory());
 }(this, (function () { 'use strict';
 
-/**
- * Prints tree horizontally
- * @param  {Node}                       root
- * @param  {Function(node:Node):String} [printNode]
- * @return {String}
- */
-function print (root, printNode) {
-  if ( printNode === void 0 ) printNode = function (n) { return n.key; };
-
-  var out = [];
-  row(root, '', true, function (v) { return out.push(v); }, printNode);
-  return out.join('');
-}
-
-/**
- * Prints level of the tree
- * @param  {Node}                        root
- * @param  {String}                      prefix
- * @param  {Boolean}                     isTail
- * @param  {Function(in:string):void}    out
- * @param  {Function(node:Node):String}  printNode
- */
-function row (root, prefix, isTail, out, printNode) {
-  if (root) {
-    out(("" + prefix + (isTail ? '└── ' : '├── ') + (printNode(root)) + "\n"));
-    var indent = prefix + (isTail ? '    ' : '│   ');
-    if (root.left)  { row(root.left,  indent, false, out, printNode); }
-    if (root.right) { row(root.right, indent, true,  out, printNode); }
-  }
-}
-
-
-/**
- * Is the tree balanced (none of the subtrees differ in height by more than 1)
- * @param  {Node}    root
- * @return {Boolean}
- */
-function isBalanced(root) {
-  if (root === null) { return true; } // If node is empty then return true
-
-  // Get the height of left and right sub trees
-  var lh = height(root.left);
-  var rh = height(root.right);
-
-  if (Math.abs(lh - rh) <= 1 &&
-      isBalanced(root.left)  &&
-      isBalanced(root.right)) { return true; }
-
-  // If we reach here then tree is not height-balanced
-  return false;
-}
-
-/**
- * The function Compute the 'height' of a tree.
- * Height is the number of nodes along the longest path
- * from the root node down to the farthest leaf node.
- *
- * @param  {Node} node
- * @return {Number}
- */
-function height(node) {
-  return node ? (1 + Math.max(height(node.left), height(node.right))) : 0;
-}
-
-// function createNode (parent, left, right, height, key, data) {
-//   return { parent, left, right, balanceFactor: height, key, data };
-// }
-
-/**
- * @typedef {{
- *   parent:        ?Node,
- *   left:          ?Node,
- *   right:         ?Node,
- *   balanceFactor: number,
- *   key:           Key,
- *   data:          Value
- * }} Node
- */
-
-/**
- * @typedef {*} Key
- */
-
-/**
- * @typedef {*} Value
- */
-
-/**
- * Default comparison function
- * @param {Key} a
- * @param {Key} b
- * @returns {number}
- */
 function DEFAULT_COMPARE (a, b) { return a > b ? 1 : a < b ? -1 : 0; }
 
-
-/**
- * Single left rotation
- * @param  {Node} node
- * @return {Node}
- */
-function rotateLeft (node) {
-  var rightNode = node.right;
-  node.right    = rightNode.left;
-
-  if (rightNode.left) { rightNode.left.parent = node; }
-
-  rightNode.parent = node.parent;
-  if (rightNode.parent) {
-    if (rightNode.parent.left === node) {
-      rightNode.parent.left = rightNode;
-    } else {
-      rightNode.parent.right = rightNode;
-    }
-  }
-
-  node.parent    = rightNode;
-  rightNode.left = node;
-
-  node.balanceFactor += 1;
-  if (rightNode.balanceFactor < 0) {
-    node.balanceFactor -= rightNode.balanceFactor;
-  }
-
-  rightNode.balanceFactor += 1;
-  if (node.balanceFactor > 0) {
-    rightNode.balanceFactor += node.balanceFactor;
-  }
-  return rightNode;
-}
-
-
-function rotateRight (node) {
-  var leftNode = node.left;
-  node.left = leftNode.right;
-  if (node.left) { node.left.parent = node; }
-
-  leftNode.parent = node.parent;
-  if (leftNode.parent) {
-    if (leftNode.parent.left === node) {
-      leftNode.parent.left = leftNode;
-    } else {
-      leftNode.parent.right = leftNode;
-    }
-  }
-
-  node.parent    = leftNode;
-  leftNode.right = node;
-
-  node.balanceFactor -= 1;
-  if (leftNode.balanceFactor > 0) {
-    node.balanceFactor -= leftNode.balanceFactor;
-  }
-
-  leftNode.balanceFactor -= 1;
-  if (node.balanceFactor < 0) {
-    leftNode.balanceFactor += node.balanceFactor;
-  }
-
-  return leftNode;
-}
-
-
-// function leftBalance (node) {
-//   if (node.left.balanceFactor === -1) rotateLeft(node.left);
-//   return rotateRight(node);
-// }
-
-
-// function rightBalance (node) {
-//   if (node.right.balanceFactor === 1) rotateRight(node.right);
-//   return rotateLeft(node);
-// }
-
-
-var AVLTree = function AVLTree (comparator, noDuplicates) {
+var SplayTree = function SplayTree(compare, noDuplicates) {
+  if ( compare === void 0 ) compare = DEFAULT_COMPARE;
   if ( noDuplicates === void 0 ) noDuplicates = false;
 
-  this._comparator = comparator || DEFAULT_COMPARE;
+  this._compare = compare;
   this._root = null;
   this._size = 0;
   this._noDuplicates = !!noDuplicates;
@@ -224,41 +52,323 @@ var AVLTree = function AVLTree (comparator, noDuplicates) {
 var prototypeAccessors = { size: {} };
 
 
-/**
- * Clear the tree
- * @return {AVLTree}
- */
-AVLTree.prototype.destroy = function destroy () {
-  this._root = null;
-  return this;
+SplayTree.prototype.rotateLeft = function rotateLeft (x) {
+  var y = x.right;
+  if (y) {
+    x.right = y.left;
+    if (y.left) { y.left.parent = x; }
+    y.parent = x.parent;
+  }
+
+  if (!x.parent)              { this._root = y; }
+  else if (x === x.parent.left) { x.parent.left = y; }
+  else                        { x.parent.right = y; }
+  if (y) { y.left = x; }
+  x.parent = y;
 };
 
-/**
- * Number of nodes
- * @return {number}
- */
-prototypeAccessors.size.get = function () {
-  return this._size;
+
+SplayTree.prototype.rotateRight = function rotateRight (x) {
+  var y = x.left;
+  if (y) {
+    x.left = y.right;
+    if (y.right) { y.right.parent = x; }
+    y.parent = x.parent;
+  }
+
+  if (!x.parent)             { this._root = y; }
+  else if(x === x.parent.left) { x.parent.left = y; }
+  else                       { x.parent.right = y; }
+  if (y) { y.right = x; }
+  x.parent = y;
 };
 
+
+SplayTree.prototype._splay = function _splay (x) {
+    var this$1 = this;
+
+  while (x.parent) {
+    var p = x.parent;
+    if (!p.parent) {
+      if (p.left === x) { this$1.rotateRight(p); }
+      else            { this$1.rotateLeft(p); }
+    } else if (p.left === x && p.parent.left === p) {
+      this$1.rotateRight(p.parent);
+      this$1.rotateRight(p);
+    } else if (p.right === x && p.parent.right === p) {
+      this$1.rotateLeft(p.parent);
+      this$1.rotateLeft(p);
+    } else if (p.left === x && p.parent.right === p) {
+      this$1.rotateRight(p);
+      this$1.rotateLeft(p);
+    } else {
+      this$1.rotateLeft(p);
+      this$1.rotateRight(p);
+    }
+  }
+};
+
+
+SplayTree.prototype.splay = function splay (x) {
+    var this$1 = this;
+
+  var p, gp, ggp, l, r;
+
+  while (x.parent) {
+    p = x.parent;
+    gp = p.parent;
+
+    if (gp && gp.parent) {
+      ggp = gp.parent;
+      if (ggp.left === gp) { ggp.left= x; }
+      else               { ggp.right = x; }
+      x.parent = ggp;
+    } else {
+      x.parent = null;
+      this$1._root = x;
+    }
+
+    l = x.left; r = x.right;
+
+    if (x === p.left) { // left
+      if (gp) {
+        if (gp.left === p) {
+          /* zig-zig */
+          if (p.right) {
+            gp.left = p.right;
+            gp.left.parent = gp;
+          } else { gp.left = null; }
+
+          p.right = gp;
+          gp.parent = p;
+        } else {
+          /* zig-zag */
+          if (l) {
+            gp.right = l;
+            l.parent = gp;
+          } else { gp.right = null; }
+
+          x.left  = gp;
+          gp.parent = x;
+        }
+      }
+      if (r) {
+        p.left = r;
+        r.parent = p;
+      } else { p.left = null; }
+
+      x.right= p;
+      p.parent = x;
+    } else { // right
+      if (gp) {
+        if (gp.right === p) {
+          /* zig-zig */
+          if (p.left) {
+            gp.right = p.left;
+            gp.right.parent = gp;
+          } else { gp.right = null; }
+
+          p.left = gp;
+          gp.parent = p;
+        } else {
+          /* zig-zag */
+          if (r) {
+            gp.left = r;
+            r.parent = gp;
+          } else { gp.left = null; }
+
+          x.right = gp;
+          gp.parent = x;
+        }
+      }
+      if (l) {
+        p.right = l;
+        l.parent = p;
+      } else { p.right = null; }
+
+      x.left = p;
+      p.parent = x;
+    }
+  }
+};
+
+
+SplayTree.prototype.replace = function replace (u, v) {
+  if (!u.parent) { this._root = v; }
+  else if (u === u.parent.left) { u.parent.left = v; }
+  else { u.parent.right = v; }
+  if (v) { v.parent = u.parent; }
+};
+
+
+SplayTree.prototype.minNode = function minNode (u) {
+    if ( u === void 0 ) u = this._root;
+
+  if (u) { while (u.left) { u = u.left; } }
+  return u;
+};
+
+
+SplayTree.prototype.maxNode = function maxNode (u) {
+    if ( u === void 0 ) u = this._root;
+
+  if (u) { while (u.right) { u = u.right; } }
+  return u;
+};
+
+
+SplayTree.prototype.insert = function insert (key, data) {
+  var z = this._root;
+  var p = null;
+  var comp = this._compare;
+  var cmp;
+
+  if (this._noDuplicates) {
+    while (z) {
+      p = z;
+      cmp = comp(z.key, key);
+      if (cmp === 0) { return; }
+      else if (comp(z.key, key) < 0) { z = z.right; }
+      else { z = z.left; }
+    }
+  } else {
+    while (z) {
+      p = z;
+      if (comp(z.key, key) < 0) { z = z.right; }
+      else { z = z.left; }
+    }
+  }
+
+  z = { key: key, data: data, left: null, right: null, parent: p };
+
+  if (!p)                        { this._root = z; }
+  else if (comp(p.key, z.key) < 0) { p.right = z; }
+  else                           { p.left= z; }
+
+  this.splay(z);
+  this._size++;
+  return z;
+};
+
+
+SplayTree.prototype.find = function find (key) {
+  var z  = this._root;
+  var comp = this._compare;
+  while (z) {
+    var cmp = comp(z.key, key);
+    if    (cmp < 0) { z = z.right; }
+    else if (cmp > 0) { z = z.left; }
+    else            { return z; }
+  }
+  return null;
+};
 
 /**
  * Whether the tree contains a node with the given key
  * @param{Key} key
  * @return {boolean} true/false
  */
-AVLTree.prototype.contains = function contains (key) {
-  if (this._root){
-    var node     = this._root;
-    var comparator = this._comparator;
-    while (node){
-      var cmp = comparator(key, node.key);
-      if    (cmp === 0) { return true; }
-      else if (cmp < 0) { node = node.left; }
-      else              { node = node.right; }
-    }
+SplayTree.prototype.contains = function contains (key) {
+  var node     = this._root;
+  var comparator = this._compare;
+  while (node){
+    var cmp = comparator(key, node.key);
+    if    (cmp === 0) { return true; }
+    else if (cmp < 0) { node = node.left; }
+    else              { node = node.right; }
   }
+
   return false;
+};
+
+
+SplayTree.prototype.remove = function remove (key) {
+  var z = this.find(key);
+
+  if (!z) { return false; }
+
+  this.splay(z);
+
+  if (!z.left) { this.replace(z, z.right); }
+  else if (!z.right) { this.replace(z, z.left); }
+  else {
+    var y = this.minNode(z.right);
+    if (y.parent !== z) {
+      this.replace(y, y.right);
+      y.right = z.right;
+      y.right.parent = y;
+    }
+    this.replace(z, y);
+    y.left = z.left;
+    y.left.parent = y;
+  }
+
+  this._size--;
+  return true;
+};
+
+
+SplayTree.prototype.removeNode = function removeNode (z) {
+  if (!z) { return false; }
+
+  this.splay(z);
+
+  if (!z.left) { this.replace(z, z.right); }
+  else if (!z.right) { this.replace(z, z.left); }
+  else {
+    var y = this.minNode(z.right);
+    if (y.parent !== z) {
+      this.replace(y, y.right);
+      y.right = z.right;
+      y.right.parent = y;
+    }
+    this.replace(z, y);
+    y.left = z.left;
+    y.left.parent = y;
+  }
+
+  this._size--;
+  return true;
+};
+
+
+SplayTree.prototype.erase = function erase (key) {
+  var z = this.find(key);
+  if (!z) { return; }
+
+  this.splay(z);
+
+  var s = z.left;
+  var t = z.right;
+
+  var sMax = null;
+  if (s) {
+    s.parent = null;
+    sMax = this.maxNode(s);
+    this.splay(sMax);
+    this._root = sMax;
+  }
+  if (t) {
+    if (s) { sMax.right = t; }
+    else { this._root = t; }
+    t.parent = sMax;
+  }
+
+  this._size--;
+};
+
+/**
+ * Removes and returns the node with smallest key
+ * @return {?Node}
+ */
+SplayTree.prototype.pop = function pop () {
+  var node = this._root, returnValue = null;
+  if (node) {
+    while (node.left) { node = node.left; }
+    returnValue = { key: node.key, data: node.data };
+    this.remove(node.key);
+  }
+  return returnValue;
 };
 
 
@@ -269,7 +379,7 @@ AVLTree.prototype.contains = function contains (key) {
  * @param{Node} node
  * @return {?Node}
  */
-AVLTree.prototype.next = function next (node) {
+SplayTree.prototype.next = function next (node) {
   var successor = node;
   if (successor) {
     if (successor.right) {
@@ -291,7 +401,7 @@ AVLTree.prototype.next = function next (node) {
  * @param{Node} node
  * @return {?Node}
  */
-AVLTree.prototype.prev = function prev (node) {
+SplayTree.prototype.prev = function prev (node) {
   var predecessor = node;
   if (predecessor) {
     if (predecessor.left) {
@@ -311,17 +421,10 @@ AVLTree.prototype.prev = function prev (node) {
 
 
 /**
- * Callback for forEach
- * @callback forEachCallback
- * @param {Node} node
- * @param {number} index
- */
-
-/**
  * @param{forEachCallback} callback
- * @return {AVLTree}
+ * @return {SplayTree}
  */
-AVLTree.prototype.forEach = function forEach (callback) {
+SplayTree.prototype.forEach = function forEach (callback) {
   var current = this._root;
   var s = [], done = false, i = 0;
 
@@ -351,10 +454,43 @@ AVLTree.prototype.forEach = function forEach (callback) {
 
 
 /**
+ * Walk key range from `low` to `high`. Stops if `fn` returns a value.
+ * @param{Key}    low
+ * @param{Key}    high
+ * @param{Function} fn
+ * @param{*?}     ctx
+ * @return {SplayTree}
+ */
+SplayTree.prototype.range = function range (low, high, fn, ctx) {
+    var this$1 = this;
+
+  var Q = [];
+  var compare = this._compare;
+  var node = this._root, cmp;
+
+  while (Q.length !== 0 || node) {
+    if (node) {
+      Q.push(node);
+      node = node.left;
+    } else {
+      node = Q.pop();
+      cmp = compare(node.key, high);
+      if (cmp > 0) {
+        break;
+      } else if (compare(node.key, low) >= 0) {
+        if (fn.call(ctx, node)) { return this$1; } // stop if smth is returned
+      }
+      node = node.right;
+    }
+  }
+  return this;
+};
+
+/**
  * Returns all keys in order
  * @return {Array<Key>}
  */
-AVLTree.prototype.keys = function keys () {
+SplayTree.prototype.keys = function keys () {
   var current = this._root;
   var s = [], r = [], done = false;
 
@@ -378,7 +514,7 @@ AVLTree.prototype.keys = function keys () {
  * Returns `data` fields of all nodes in order.
  * @return {Array<Value>}
  */
-AVLTree.prototype.values = function values () {
+SplayTree.prototype.values = function values () {
   var current = this._root;
   var s = [], r = [], done = false;
 
@@ -403,7 +539,7 @@ AVLTree.prototype.values = function values () {
  * @param{number} index
  * @return {?Node}
  */
-AVLTree.prototype.at = function at (index) {
+SplayTree.prototype.at = function at (index) {
   // removed after a consideration, more misleading than useful
   // index = index % this.size;
   // if (index < 0) index = this.size - index;
@@ -427,332 +563,105 @@ AVLTree.prototype.at = function at (index) {
   return null;
 };
 
-
 /**
- * Returns node with the minimum key
- * @return {?Node}
- */
-AVLTree.prototype.minNode = function minNode () {
-  var node = this._root;
-  if (!node) { return null; }
-  while (node.left) { node = node.left; }
-  return node;
-};
-
-
-/**
- * Returns node with the max key
- * @return {?Node}
- */
-AVLTree.prototype.maxNode = function maxNode () {
-  var node = this._root;
-  if (!node) { return null; }
-  while (node.right) { node = node.right; }
-  return node;
-};
-
-
-/**
- * Min key
- * @return {?Key}
- */
-AVLTree.prototype.min = function min () {
-  var node = this._root;
-  if (!node) { return null; }
-  while (node.left) { node = node.left; }
-  return node.key;
-};
-
-
-/**
- * Max key
- * @return {?Key}
- */
-AVLTree.prototype.max = function max () {
-  var node = this._root;
-  if (!node) { return null; }
-  while (node.right) { node = node.right; }
-  return node.key;
-};
-
-
-/**
- * @return {boolean} true/false
- */
-AVLTree.prototype.isEmpty = function isEmpty () {
-  return !this._root;
-};
-
-
-/**
- * Removes and returns the node with smallest key
- * @return {?Node}
- */
-AVLTree.prototype.pop = function pop () {
-  var node = this._root, returnValue = null;
-  if (node) {
-    while (node.left) { node = node.left; }
-    returnValue = { key: node.key, data: node.data };
-    this.remove(node.key);
-  }
-  return returnValue;
-};
-
-
-/**
- * Find node by key
- * @param{Key} key
- * @return {?Node}
- */
-AVLTree.prototype.find = function find (key) {
-  var root = this._root;
-  // if (root === null)  return null;
-  // if (key === root.key) return root;
-
-  var subtree = root, cmp;
-  var compare = this._comparator;
-  while (subtree) {
-    cmp = compare(key, subtree.key);
-    if    (cmp === 0) { return subtree; }
-    else if (cmp < 0) { subtree = subtree.left; }
-    else              { subtree = subtree.right; }
-  }
-
-  return null;
-};
-
-
-/**
- * Insert a node into the tree
- * @param{Key} key
- * @param{Value} [data]
- * @return {?Node}
- */
-AVLTree.prototype.insert = function insert (key, data) {
-    var this$1 = this;
-
-  if (!this._root) {
-    this._root = {
-      parent: null, left: null, right: null, balanceFactor: 0,
-      key: key, data: data
-    };
-    this._size++;
-    return this._root;
-  }
-
-  var compare = this._comparator;
-  var node  = this._root;
-  var parent= null;
-  var cmp   = 0;
-
-  if (this._noDuplicates) {
-    while (node) {
-      cmp = compare(key, node.key);
-      parent = node;
-      if    (cmp === 0) { return null; }
-      else if (cmp < 0) { node = node.left; }
-      else              { node = node.right; }
-    }
-  } else {
-    while (node) {
-      cmp = compare(key, node.key);
-      parent = node;
-      if    (cmp <= 0){ node = node.left; } //return null;
-      else              { node = node.right; }
-    }
-  }
-
-  var newNode = {
-    left: null,
-    right: null,
-    balanceFactor: 0,
-    parent: parent, key: key, data: data
-  };
-  var newRoot;
-  if (cmp <= 0) { parent.left= newNode; }
-  else       { parent.right = newNode; }
-
-  while (parent) {
-    cmp = compare(parent.key, key);
-    if (cmp < 0) { parent.balanceFactor -= 1; }
-    else       { parent.balanceFactor += 1; }
-
-    if      (parent.balanceFactor === 0) { break; }
-    else if (parent.balanceFactor < -1) {
-      // inlined
-      //var newRoot = rightBalance(parent);
-      if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
-      newRoot = rotateLeft(parent);
-
-      if (parent === this$1._root) { this$1._root = newRoot; }
-      break;
-    } else if (parent.balanceFactor > 1) {
-      // inlined
-      // var newRoot = leftBalance(parent);
-      if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
-      newRoot = rotateRight(parent);
-
-      if (parent === this$1._root) { this$1._root = newRoot; }
-      break;
-    }
-    parent = parent.parent;
-  }
-
-  this._size++;
-  return newNode;
-};
-
-
-/**
- * Removes the node from the tree. If not found, returns null.
- * @param{Key} key
- * @return {?Node}
- */
-AVLTree.prototype.remove = function remove (key) {
-    var this$1 = this;
-
-  if (!this._root) { return null; }
-
-  var node = this._root;
-  var compare = this._comparator;
-  var cmp = 0;
-
-  while (node) {
-    cmp = compare(key, node.key);
-    if    (cmp === 0) { break; }
-    else if (cmp < 0) { node = node.left; }
-    else              { node = node.right; }
-  }
-  if (!node) { return null; }
-
-  var returnValue = node.key;
-  var max, min;
-
-  if (node.left) {
-    max = node.left;
-
-    while (max.left || max.right) {
-      while (max.right) { max = max.right; }
-
-      node.key = max.key;
-      node.data = max.data;
-      if (max.left) {
-        node = max;
-        max = max.left;
-      }
-    }
-
-    node.key= max.key;
-    node.data = max.data;
-    node = max;
-  }
-
-  if (node.right) {
-    min = node.right;
-
-    while (min.left || min.right) {
-      while (min.left) { min = min.left; }
-
-      node.key= min.key;
-      node.data = min.data;
-      if (min.right) {
-        node = min;
-        min = min.right;
-      }
-    }
-
-    node.key= min.key;
-    node.data = min.data;
-    node = min;
-  }
-
-  var parent = node.parent;
-  var pp   = node;
-  var newRoot;
-
-  while (parent) {
-    if (parent.left === pp) { parent.balanceFactor -= 1; }
-    else                  { parent.balanceFactor += 1; }
-
-    if      (parent.balanceFactor < -1) {
-      // inlined
-      //var newRoot = rightBalance(parent);
-      if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
-      newRoot = rotateLeft(parent);
-
-      if (parent === this$1._root) { this$1._root = newRoot; }
-      parent = newRoot;
-    } else if (parent.balanceFactor > 1) {
-      // inlined
-      // var newRoot = leftBalance(parent);
-      if (parent.left.balanceFactor === -1) { rotateLeft(parent.left); }
-      newRoot = rotateRight(parent);
-
-      if (parent === this$1._root) { this$1._root = newRoot; }
-      parent = newRoot;
-    }
-
-    if (parent.balanceFactor === -1 || parent.balanceFactor === 1) { break; }
-
-    pp   = parent;
-    parent = parent.parent;
-  }
-
-  if (node.parent) {
-    if (node.parent.left === node) { node.parent.left= null; }
-    else                         { node.parent.right = null; }
-  }
-
-  if (node === this._root) { this._root = null; }
-
-  this._size--;
-  return returnValue;
-};
-
-
-/**
- * Bulk-load items
- * @param{Array<Key>}keys
+ * Bulk-load items. Both array have to be same size
+ * @param{Array<Key>}  keys
  * @param{Array<Value>}[values]
+ * @param{Boolean}     [presort=false] Pre-sort keys and values, using
+ *                                       tree's comparator. Sorting is done
+ *                                       in-place
  * @return {AVLTree}
  */
-AVLTree.prototype.load = function load (keys, values) {
-    var this$1 = this;
+SplayTree.prototype.load = function load (keys, values, presort) {
     if ( keys === void 0 ) keys = [];
     if ( values === void 0 ) values = [];
+    if ( presort === void 0 ) presort = false;
 
-  if (Array.isArray(keys)) {
-    for (var i = 0, len = keys.length; i < len; i++) {
-      this$1.insert(keys[i], values[i]);
-    }
-  }
+  if (this._size !== 0) { throw new Error('bulk-load: tree is not empty'); }
+  var size = keys.length;
+  if (presort) { sort(keys, values, 0, size - 1, this._compare); }
+  this._root = loadRecursive(null, keys, values, 0, size);
+  this._size = size;
   return this;
 };
 
 
-/**
- * Returns true if the tree is balanced
- * @return {boolean}
- */
-AVLTree.prototype.isBalanced = function isBalanced$1 () {
-  return isBalanced(this._root);
+SplayTree.prototype.min = function min () {
+  var node = this.minNode(this._root);
+  if (node) { return node.key; }
+  else    { return null; }
 };
 
 
-/**
- * String representation of the tree - primitive horizontal print-out
- * @param{Function(Node):string} [printNode]
- * @return {string}
- */
-AVLTree.prototype.toString = function toString (printNode) {
-  return print(this._root, printNode);
+SplayTree.prototype.max = function max () {
+  var node = this.maxNode(this._root);
+  if (node) { return node.key; }
+  else    { return null; }
 };
 
-Object.defineProperties( AVLTree.prototype, prototypeAccessors );
+SplayTree.prototype.isEmpty = function isEmpty () { return this._root === null; };
+prototypeAccessors.size.get = function () { return this._size; };
 
-AVLTree.default = AVLTree;
 
-return AVLTree;
+/**
+ * Create a tree and load it with items
+ * @param{Array<Key>}        keys
+ * @param{Array<Value>?}      [values]
+
+ * @param{Function?}          [comparator]
+ * @param{Boolean?}           [presort=false] Pre-sort keys and values, using
+ *                                             tree's comparator. Sorting is done
+ *                                             in-place
+ * @param{Boolean?}           [noDuplicates=false] Allow duplicates
+ * @return {SplayTree}
+ */
+SplayTree.createTree = function createTree (keys, values, comparator, presort, noDuplicates) {
+  return new SplayTree(comparator, noDuplicates).load(keys, values, presort);
+};
+
+Object.defineProperties( SplayTree.prototype, prototypeAccessors );
+
+function loadRecursive (parent, keys, values, start, end) {
+  var size = end - start;
+  if (size > 0) {
+    var middle = start + Math.floor(size / 2);
+    var key    = keys[middle];
+    var data   = values[middle];
+    var node   = { key: key, data: data, parent: parent };
+    node.left    = loadRecursive(node, keys, values, start, middle);
+    node.right   = loadRecursive(node, keys, values, middle + 1, end);
+    return node;
+  }
+  return null;
+}
+
+
+function sort(keys, values, left, right, compare) {
+  if (left >= right) { return; }
+
+  var pivot = keys[(left + right) >> 1];
+  var i = left - 1;
+  var j = right + 1;
+
+  while (true) {
+    do { i++; } while (compare(keys[i], pivot) < 0);
+    do { j--; } while (compare(keys[j], pivot) > 0);
+    if (i >= j) { break; }
+
+    var tmp = keys[i];
+    keys[i] = keys[j];
+    keys[j] = tmp;
+
+    tmp = values[i];
+    values[i] = values[j];
+    values[j] = tmp;
+  }
+
+  sort(keys, values,  left,     j, compare);
+  sort(keys, values, j + 1, right, compare);
+}
+
+return SplayTree;
 
 })));
 
@@ -1574,8 +1483,6 @@ module.exports = function possibleIntersection(se1, se2, queue) {
 },{"./compare_events":4,"./divide_segment":8,"./edge_type":9,"./equals":10,"./segment_intersection":15}],15:[function(require,module,exports){
 'use strict';
 
-var EPSILON = 1e-9;
-
 /**
  * Finds the magnitude of the cross product of two vectors (if we pretend
  * they're in three dimensions)
@@ -1586,7 +1493,7 @@ var EPSILON = 1e-9;
  * @returns {Number} The magnitude of the cross product
  */
 function crossProduct(a, b) {
-  return a[0] * b[1] - a[1] * b[0];
+  return (a[0] * b[1]) - (a[1] * b[0]);
 }
 
 /**
@@ -1598,7 +1505,7 @@ function crossProduct(a, b) {
  * @returns {Number} The dot product
  */
 function dotProduct(a, b) {
-  return a[0] * b[0] + a[1] * b[1];
+  return (a[0] * b[0]) + (a[1] * b[1]);
 }
 
 /**
@@ -1647,14 +1554,14 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   var kross    = crossProduct(va, vb);
   var sqrKross = kross * kross;
   var sqrLenA  = dotProduct(va, va);
-  var sqrLenB  = dotProduct(vb, vb);
+  //var sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
   // cross product is the 0 vector. The full calculation involves relative error
   // to account for possible very small line segments. See Schneider & Eberly
   // for details.
-  if (sqrKross > EPSILON * sqrLenA * sqrLenB) {
+  if (sqrKross > 0) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
@@ -1685,12 +1592,12 @@ module.exports = function (a1, a2, b1, b2, noEndpointTouch) {
   // the (vector) difference between the two initial points. If this is parallel
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
-  var sqrLenE = dotProduct(e, e);
+  //var sqrLenE = dotProduct(e, e);
   kross = crossProduct(e, va);
   sqrKross = kross * kross;
 
-  if (sqrKross > EPSILON * sqrLenA * sqrLenE) {
-    // Lines are just parallel, not the same. No overlap.
+  if (sqrKross > 0) {
+  // Lines are just parallel, not the same. No overlap.
     return null;
   }
 
@@ -1741,7 +1648,7 @@ module.exports = function signedArea(p0, p1, p2) {
 },{}],17:[function(require,module,exports){
 'use strict';
 
-var Tree                 = require('avl');
+var Tree                 = require('splaytree');
 var computeFields        = require('./compute_fields');
 var possibleIntersection = require('./possible_intersection');
 var compareSegments      = require('./compare_segments');
@@ -1759,7 +1666,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
   var INTERSECTION = operations.INTERSECTION;
   var DIFFERENCE   = operations.DIFFERENCE;
 
-  while (eventQueue.length) {
+  while (eventQueue.length !== 0) {
     var event = eventQueue.pop();
     sortedEvents.push(event);
 
@@ -1820,7 +1727,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
   return sortedEvents;
 };
 
-},{"./compare_segments":5,"./compute_fields":6,"./operation":13,"./possible_intersection":14,"avl":2}],18:[function(require,module,exports){
+},{"./compare_segments":5,"./compute_fields":6,"./operation":13,"./possible_intersection":14,"splaytree":2}],18:[function(require,module,exports){
 'use strict';
 
 //var signedArea = require('./signed_area');

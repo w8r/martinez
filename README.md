@@ -38,6 +38,25 @@ var intersection = {
 `<Operation>` is an enum of `{ INTERSECTION: 0, UNION: 1, DIFFERENCE: 2, XOR: 3 }` in case you have to decide programmatically
 which operation do you need
 
+### Benchmarks
+
+```
+Hole_Hole
+Martinez x 28,831 ops/sec ±2.30% (89 runs sampled)
+JSTS x 1,742 ops/sec ±11.64% (79 runs sampled)
+- Fastest is Martinez
+
+Asia union
+Martinez x 8.66 ops/sec ±6.53% (26 runs sampled)
+JSTS x 7.57 ops/sec ±4.79% (23 runs sampled)
+- Fastest is Martinez
+
+States clip
+Martinez x 218 ops/sec ±3.93% (83 runs sampled)
+JSTS x 95.26 ops/sec ±4.22% (70 runs sampled)
+- Fastest is Martinez
+```
+
 ### Features
 
 The algorithm of Matrinez et al. was extended to work with multipolygons without cascading.

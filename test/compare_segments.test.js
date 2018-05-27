@@ -1,7 +1,7 @@
 'use strict';
 
 var tap             = require('tap');
-var Tree            = require('avl');
+var Tree            = require('splaytree');
 var compareSegments = require('../src/compare_segments');
 var compareEvents   = require('../src/compare_events');
 var SweepEvent      = require('../src/sweep_event');
