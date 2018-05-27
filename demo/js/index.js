@@ -76,6 +76,9 @@ switch (mode) {
   case 'fatal2':
     file = 'fatal2.geojson';
     break;
+  case 'rectangles':
+    file = 'rectangles.geojson';
+    break;
   default:
     file = 'hole_hole.geojson';
     break;

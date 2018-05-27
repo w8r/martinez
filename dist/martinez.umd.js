@@ -1328,10 +1328,16 @@
       }
     }
 
+
     for (i = 0, len = resultEvents.length; i < len; i++) {
       event = resultEvents[i];
       event.pos = i;
+    }
 
+    // imagine, the right event is found in the beginning of the queue,
+    // when his left counterpart is not marked yet
+    for (i = 0, len = resultEvents.length; i < len; i++) {
+      event = resultEvents[i];
       if (!event.left) {
         tmp = event.pos;
         event.pos = event.otherEvent.pos;
