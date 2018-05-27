@@ -1,50 +1,50 @@
 'use strict';
 
-var tap             = require('tap');
-var Tree            = require('splaytree');
-var compareSegments = require('../src/compare_segments');
-var compareEvents   = require('../src/compare_events');
-var SweepEvent      = require('../src/sweep_event');
+import tap             from 'tape';
+import Tree            from 'splaytree';
+import compareSegments from '../src/compare_segments';
+import compareEvents   from '../src/compare_events';
+import SweepEvent      from '../src/sweep_event';
 
 tap.test('compare segments', (main) => {
 
   main.test('not collinear', (secondary) => {
 
     secondary.test('shared left point - right point first', (t) => {
-      var tree = new Tree(compareSegments);
-      var pt = [0.0, 0.0];
-      var se1 = new SweepEvent(pt, true, new SweepEvent([1, 1], false));
-      var se2 = new SweepEvent(pt, true, new SweepEvent([2, 3], false));
+      const tree = new Tree(compareSegments);
+      const pt = [0.0, 0.0];
+      const se1 = new SweepEvent(pt, true, new SweepEvent([1, 1], false));
+      const se2 = new SweepEvent(pt, true, new SweepEvent([2, 3], false));
 
       tree.insert(se1);
       tree.insert(se2);
 
-      t.strictSame(tree.maxNode().key.otherEvent.point, [2, 3]);
-      t.strictSame(tree.minNode().key.otherEvent.point, [1, 1]);
+      t.deepEqual(tree.maxNode().key.otherEvent.point, [2, 3]);
+      t.deepEqual(tree.minNode().key.otherEvent.point, [1, 1]);
 
       t.end();
     });
 
     secondary.test('different left point - right point y coord to sort', (t) => {
-      var tree = new Tree(compareSegments);
-      var se1 = new SweepEvent([0, 1], true, new SweepEvent([1, 1], false));
-      var se2 = new SweepEvent([0, 2], true, new SweepEvent([2, 3], false));
+      const tree = new Tree(compareSegments);
+      const se1 = new SweepEvent([0, 1], true, new SweepEvent([1, 1], false));
+      const se2 = new SweepEvent([0, 2], true, new SweepEvent([2, 3], false));
 
       tree.insert(se1);
       tree.insert(se2);
 
-      t.strictSame(tree.minNode().key.otherEvent.point, [1, 1]);
-      t.strictSame(tree.maxNode().key.otherEvent.point, [2, 3]);
+      t.deepEqual(tree.minNode().key.otherEvent.point, [1, 1]);
+      t.deepEqual(tree.maxNode().key.otherEvent.point, [2, 3]);
 
       t.end();
     });
 
     secondary.test('events order in sweep line', (t) => {
-      var se1 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
-      var se2 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
+      const se1 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
+      const se2 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
 
-      var se3 = new SweepEvent([0, 1], true, new SweepEvent([3, 4], false));
-      var se4 = new SweepEvent([-1, 0], true, new SweepEvent([3, 1], false));
+      const se3 = new SweepEvent([0, 1], true, new SweepEvent([3, 4], false));
+      const se4 = new SweepEvent([-1, 0], true, new SweepEvent([3, 1], false));
 
       t.equal(compareEvents(se1, se2), 1);
       t.notOk(se2.isBelow(se1.point));
@@ -60,8 +60,8 @@ tap.test('compare segments', (main) => {
     });
 
     secondary.test('first point is below', (t) => {
-      var se2 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
-      var se1 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
+      const se2 = new SweepEvent([0, 1],  true, new SweepEvent([2, 1], false));
+      const se1 = new SweepEvent([-1, 0], true, new SweepEvent([2, 3], false));
 
       t.notOk(se1.isBelow(se2.point));
       t.equal(compareSegments(se1, se2), 1, 'compare segments');
@@ -73,8 +73,8 @@ tap.test('compare segments', (main) => {
   });
 
   main.test('collinear segments', (t) => {
-    var se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
-    var se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), false);
+    const se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
+    const se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), false);
 
     t.notEqual(se1.isSubject, se2.isSubject);
     t.equal(compareSegments(se1, se2), -1);
@@ -83,10 +83,10 @@ tap.test('compare segments', (main) => {
   });
 
   main.test('collinear shared left point', (t) => {
-    var pt = [0, 1];
+    const pt = [0, 1];
 
-    var se1 = new SweepEvent(pt, true, new SweepEvent([5, 1], false), false);
-    var se2 = new SweepEvent(pt, true, new SweepEvent([3, 1], false), false);
+    const se1 = new SweepEvent(pt, true, new SweepEvent([5, 1], false), false);
+    const se2 = new SweepEvent(pt, true, new SweepEvent([3, 1], false), false);
 
     se1.contourId = 1;
     se2.contourId = 2;
@@ -106,8 +106,8 @@ tap.test('compare segments', (main) => {
 
 
   main.test('collinear same polygon different left points', (t) => {
-    var se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
-    var se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), true);
+    const se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
+    const se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), true);
 
     t.equal(se1.isSubject, se2.isSubject);
     t.notEqual(se1.point, se2.point);

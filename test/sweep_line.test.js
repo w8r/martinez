@@ -1,29 +1,27 @@
-'use strict';
-
-var tap             = require('tap');
-var path            = require('path');
-var Tree            = require('splaytree');
-var load            = require('load-json-file');
-var compareSegments = require('../src/compare_segments');
-var SweepEvent      = require('../src/sweep_event');
+import tap             from 'tape';
+import path            from 'path';
+import Tree            from 'splaytree';
+import load            from 'load-json-file';
+import compareSegments from '../src/compare_segments';
+import SweepEvent      from '../src/sweep_event';
 
 // GeoJSON Data
-var data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
+const data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
 
-var subject  = data.features[0];
-var clipping = data.features[1];
+const subject  = data.features[0];
+const clipping = data.features[1];
 
-tap.test('sweep line', function (t) {
+tap.test('sweep line', (t) => {
 
-  var s = subject.geometry.coordinates;
-  var c = clipping.geometry.coordinates;
+  const s = subject.geometry.coordinates;
+  const c = clipping.geometry.coordinates;
 
-  var EF = new SweepEvent(s[0][0], true, new SweepEvent(s[0][2], false), true);
+  const EF = new SweepEvent(s[0][0], true, new SweepEvent(s[0][2], false), true);
   EF.name = 'EF';
-  var EG = new SweepEvent(s[0][0], true, new SweepEvent(s[0][1], false), true);
+  const EG = new SweepEvent(s[0][0], true, new SweepEvent(s[0][1], false), true);
   EG.name = 'EG';
 
-  var tree = new Tree(compareSegments);
+  const tree = new Tree(compareSegments);
   tree.insert(EF);
   tree.insert(EG);
 
@@ -32,7 +30,7 @@ tap.test('sweep line', function (t) {
   t.equals(tree.minNode().key, EF, 'EF is at the begin');
   t.equals(tree.maxNode().key, EG, 'EG is at the end');
 
-  var it = tree.find(EF);
+  let it = tree.find(EF);
 
   t.equals(tree.next(it).key, EG);
 
@@ -40,13 +38,13 @@ tap.test('sweep line', function (t) {
 
   t.equals(tree.prev(it).key, EF);
 
-  var DA = new SweepEvent(c[0][0], true, new SweepEvent(c[0][2], false), true);
-  var DC = new SweepEvent(c[0][0], true, new SweepEvent(c[0][1], false), true);
+  const DA = new SweepEvent(c[0][0], true, new SweepEvent(c[0][2], false), true);
+  const DC = new SweepEvent(c[0][0], true, new SweepEvent(c[0][1], false), true);
 
   tree.insert(DA);
   tree.insert(DC);
 
-  var begin = tree.minNode();
+  let begin = tree.minNode();
 
   t.equals(begin.key, DA, 'DA');
   begin = tree.next(begin);

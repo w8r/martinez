@@ -1,14 +1,12 @@
-'use strict';
+import tap      from 'tape';
+import path     from 'path';
+import load     from 'load-json-file';
+import martinez from '../src/';
 
-var tap      = require('tap');
-var path     = require('path');
-var load     = require('load-json-file');
-var martinez = require('../src/');
+const clipping = load.sync(path.join(__dirname, 'featureTypes', 'clippingPoly.geojson'));
+const outDir = path.join(__dirname, 'featureTypes', 'out');
 
-var clipping = load.sync(path.join(__dirname, 'featureTypes', 'clippingPoly.geojson'));
-var outDir = path.join(__dirname, 'featureTypes', 'out');
-
-var testScenarios = [
+const testScenarios = [
   {
     testName: 'polyToClipping',
     subjectPoly: 'poly',
@@ -27,28 +25,28 @@ var testScenarios = [
   }
 ];
 
-testScenarios.forEach(function (ts) {
-  var subject = load.sync(path.join(__dirname, 'featureTypes', ts.subjectPoly + '.geojson'));
-  tap.test(ts.testName, function (t) {
+testScenarios.forEach((ts) => {
+  const subject = load.sync(path.join(__dirname, 'featureTypes', ts.subjectPoly + '.geojson'));
+  tap.test(ts.testName, (t) => {
 
-    var expectedIntResult = load.sync(path.join(outDir, 'intersection', t.name + '.geojson'))
+    const expectedIntResult = load.sync(path.join(outDir, 'intersection', t.name + '.geojson'))
     if (expectedIntResult.geometry.type === 'Polygon') expectedIntResult.geometry.coordinates = [expectedIntResult.geometry.coordinates]
-    var intResult = martinez.intersection(subject.geometry.coordinates, clipping.geometry.coordinates);
+    const intResult = martinez.intersection(subject.geometry.coordinates, clipping.geometry.coordinates);
     t.same(intResult, expectedIntResult.geometry.coordinates, ts.testName + ' - Intersect');
 
-    var expectedXorResult = load.sync(path.join(outDir, 'xor', t.name + '.geojson'))
+    const expectedXorResult = load.sync(path.join(outDir, 'xor', t.name + '.geojson'))
     if (expectedXorResult.geometry.type === 'Polygon') expectedXorResult.geometry.coordinates = [expectedXorResult.geometry.coordinates]
-    var xorResult = martinez.xor(subject.geometry.coordinates, clipping.geometry.coordinates);
+    const xorResult = martinez.xor(subject.geometry.coordinates, clipping.geometry.coordinates);
     t.same(xorResult, expectedXorResult.geometry.coordinates, ts.testName + ' - XOR');
 
-    var expectedDiffResult = load.sync(path.join(outDir, 'difference', t.name + '.geojson'))
+    const expectedDiffResult = load.sync(path.join(outDir, 'difference', t.name + '.geojson'))
     if (expectedDiffResult.geometry.type === 'Polygon') expectedDiffResult.geometry.coordinates = [expectedDiffResult.geometry.coordinates]
-    var diffResult = martinez.diff(subject.geometry.coordinates, clipping.geometry.coordinates);
+    const diffResult = martinez.diff(subject.geometry.coordinates, clipping.geometry.coordinates);
     t.same(diffResult, expectedDiffResult.geometry.coordinates, ts.testName + ' - Difference');
 
-    var expectedUnionResult = load.sync(path.join(outDir, 'union', t.name + '.geojson'))
+    const expectedUnionResult = load.sync(path.join(outDir, 'union', t.name + '.geojson'))
     if (expectedUnionResult.geometry.type === 'Polygon') expectedUnionResult.geometry.coordinates = [expectedUnionResult.geometry.coordinates]
-    var unionResult = martinez.union(subject.geometry.coordinates, clipping.geometry.coordinates);
+    const unionResult = martinez.union(subject.geometry.coordinates, clipping.geometry.coordinates);
     t.same(unionResult, expectedUnionResult.geometry.coordinates, ts.testName + ' - Union');
 
     t.end();

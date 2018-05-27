@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
+.reify-cache
 npm-debug.log
