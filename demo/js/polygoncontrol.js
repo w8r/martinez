@@ -1,3 +1,5 @@
+import L from 'leaflet';
+
 L.EditControl = L.Control.extend({
 
   options: {

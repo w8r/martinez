@@ -1,10 +1,12 @@
-'use strict';
-
-var divideSegment = require('./divide_segment');
-var intersection  = require('./segment_intersection');
-var equals        = require('./equals');
-var compareEvents = require('./compare_events');
-var edgeType      = require('./edge_type');
+import divideSegment from './divide_segment';
+import intersection  from './segment_intersection';
+import equals        from './equals';
+import compareEvents from './compare_events';
+import {
+  NON_CONTRIBUTING,
+  SAME_TRANSITION,
+  DIFFERENT_TRANSITION
+} from './edge_type';
 
 /**
  * @param  {SweepEvent} se1
@@ -12,17 +14,17 @@ var edgeType      = require('./edge_type');
  * @param  {Queue}      queue
  * @return {Number}
  */
-module.exports = function possibleIntersection(se1, se2, queue) {
+export default function possibleIntersection (se1, se2, queue) {
   // that disallows self-intersecting polygons,
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
-  var inter = intersection(
+  const inter = intersection(
     se1.point, se1.otherEvent.point,
     se2.point, se2.otherEvent.point
   );
 
-  var nintersections = inter ? inter.length : 0;
+  const nintersections = inter ? inter.length : 0;
   if (nintersections === 0) return 0; // no intersection
 
   // the line segments intersect at an endpoint of both line segments
@@ -57,9 +59,9 @@ module.exports = function possibleIntersection(se1, se2, queue) {
   }
 
   // The line segments associated to se1 and se2 overlap
-  var events        = [];
-  var leftCoincide  = false;
-  var rightCoincide = false;
+  const events        = [];
+  let leftCoincide  = false;
+  let rightCoincide = false;
 
   if (equals(se1.point, se2.point)) {
     leftCoincide = true; // linked
@@ -79,10 +81,9 @@ module.exports = function possibleIntersection(se1, se2, queue) {
 
   if ((leftCoincide && rightCoincide) || leftCoincide) {
     // both line segments are equal or share the left endpoint
-    se2.type = edgeType.NON_CONTRIBUTING;
-    se1.type = (se2.inOut === se1.inOut) ?
-      edgeType.SAME_TRANSITION :
-      edgeType.DIFFERENT_TRANSITION;
+    se2.type = NON_CONTRIBUTING;
+    se1.type = (se2.inOut === se1.inOut)
+      ? SAME_TRANSITION : DIFFERENT_TRANSITION;
 
     if (leftCoincide && !rightCoincide) {
       // honestly no idea, but changing events selection from [2, 1]
@@ -110,4 +111,4 @@ module.exports = function possibleIntersection(se1, se2, queue) {
   divideSegment(events[3].otherEvent, events[2].point, queue);
 
   return 3;
-};
+}

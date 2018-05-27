@@ -13,11 +13,11 @@ polygons with holes, self-intersecting polygons and degenerate polygons with ove
 Play with it by [forking this Codepen](http://codepen.io/w8r/pen/rrBkER)
 
 ```js
-var martinez = require('martinez-polygon-clipping');
-var gj1 = { "type": "Feature", ..., "geometry": { "type": "Polygon", "coordinates": [ [ [x, y], ... ] ]};
-var gj2 = { "type": "Feature", ..., "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [x, y], ...] ] ]};
+import martinez from 'martinez-polygon-clipping';
+const gj1 = { "type": "Feature", ..., "geometry": { "type": "Polygon", "coordinates": [ [ [x, y], ... ] ]};
+const gj2 = { "type": "Feature", ..., "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [x, y], ...] ] ]};
 
-var intersection = {
+const intersection = {
   "type": "Feature",
   "properties": { ... },
   "geometry": {
@@ -42,18 +42,18 @@ which operation do you need
 
 ```
 Hole_Hole
-Martinez x 28,831 ops/sec ±2.30% (89 runs sampled)
-JSTS x 1,742 ops/sec ±11.64% (79 runs sampled)
+Martinez x 29,530 ops/sec ±1.65% (85 runs sampled)
+JSTS x 2,051 ops/sec ±2.62% (85 runs sampled)
 - Fastest is Martinez
 
 Asia union
-Martinez x 8.66 ops/sec ±6.53% (26 runs sampled)
-JSTS x 7.57 ops/sec ±4.79% (23 runs sampled)
+Martinez x 9.19 ops/sec ±3.30% (26 runs sampled)
+JSTS x 7.60 ops/sec ±4.24% (23 runs sampled)
 - Fastest is Martinez
 
 States clip
-Martinez x 218 ops/sec ±3.93% (83 runs sampled)
-JSTS x 95.26 ops/sec ±4.22% (70 runs sampled)
+Martinez x 227 ops/sec ±1.10% (82 runs sampled)
+JSTS x 100 ops/sec ±2.54% (73 runs sampled)
 - Fastest is Martinez
 ```
 
@@ -74,7 +74,7 @@ The algorithm of Matrinez et al. was extended to work with multipolygons without
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Alexander Milevski
+Copyright (c) 2018 Alexander Milevski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

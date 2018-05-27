@@ -2,7 +2,9 @@
   "name": "martinez-polygon-clipping",
   "version": "0.3.4",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
-  "main": "dist/martinez.js",
+  "main": "dist/martinez.umd.js",
+  "module": "index",
+  "jsnext:main": "index",
   "types": "index.d.ts",
   "files": [
     "index.js",
@@ -12,13 +14,13 @@
   ],
   "scripts": {
     "test": "tape -r reify buble/register test/*.test.js | tap-spec",
-    "bench": "node bench.js",
+    "bench": "node --require reify bench.js",
     "lint": "eslint ./src/",
     "watch": "rollup -c -w",
-    "serve": "ttp-server -p 3000",
+    "serve": "http-server -p 3000",
     "start": "run-p watch serve",
     "build": "npm run lint && rollup -c && npm run min",
-    "min": "uglifyjs ./dist/martinez.js -o ./dist/martinez.min.js -m --comments",
+    "min": "uglifyjs ./dist/martinez.umd.js -o ./dist/martinez.min.js -m --comments",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
@@ -35,21 +37,6 @@
     "url": "git+https://github.com/w8r/martinez.git",
     "type": "git"
   },
-  "eslintConfig": {
-    "extends": "mourner",
-    "rules": {
-      "indent": [
-        2,
-        2
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "mode": "minimum"
-        }
-      ]
-    }
-  },
   "homepage": "https://github.com/w8r/martinez",
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
@@ -60,6 +47,9 @@
     "buble": "^0.19.3",
     "eslint": "^3.19.0",
     "eslint-config-mourner": "^2.0.1",
+    "eslint-plugin-import-order": "^2.1.4",
+    "eslint-plugin-jsdoc": "^3.7.1",
+    "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",
     "http-server": "^0.10.0",
     "leaflet": "^1.2.0",
@@ -72,7 +62,6 @@
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
     "serve": "^6.5.6",
-    "superagent": "^2.1.0",
     "tap": "^12.0.1",
     "tap-spec": "^4.1.1",
     "tap-status": "^1.0.1",

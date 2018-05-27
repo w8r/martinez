@@ -1,8 +1,4 @@
-'use strict';
-
-module.exports = {
-  INTERSECTION: 0,
-  UNION:        1,
-  DIFFERENCE:   2,
-  XOR:          3
-};
+export const INTERSECTION = 0;
+export const UNION        = 1;
+export const DIFFERENCE   = 2;
+export const XOR          = 3;

@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable */
 /**
  * Externs file for google closure compiler
  */
@@ -74,3 +74,5 @@ window.martinez.union = function (polygonA, polygonB) {};
  * @return {Array<Array<Array<Number>>>|Null}
  */
 window.martinez.intersection = function (polygonA, polygonB) {};
+
+/* eslint-enable */
