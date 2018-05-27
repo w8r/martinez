@@ -30,13 +30,18 @@ function orderEvents(sortedEvents) {
     }
   }
 
+
+
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
     event.pos = i;
+  }
 
+  for (i = 0, len = resultEvents.length; i < len; i++) {
+    event = resultEvents[i];
     if (!event.left) {
       tmp = event.pos;
-      event.pos = event.otherEvent.pos || 0;
+      event.pos = event.otherEvent.pos;
       event.otherEvent.pos = tmp;
     }
   }
