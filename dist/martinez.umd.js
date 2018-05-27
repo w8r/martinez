@@ -1682,15 +1682,6 @@
   boolean.xor          = function (subject, clipping) { return boolean(subject, clipping, XOR); };
   boolean.intersection = function (subject, clipping) { return boolean(subject, clipping, INTERSECTION); };
 
-  /**
-   * Martinez polygon clipping algorithm, does boolean operation on polygons
-   * (multipolygons, polygons with holes etc): intersection, union, difference, xor
-   *
-   * @license MIT
-   * @author Alexander Milevski
-   * @preserve
-   */
-
   return boolean;
 
 })));
