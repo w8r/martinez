@@ -1781,6 +1781,8 @@
 
   //var martinez = require('../../dist/martinez.min');
 
+  window.martinez = boolean;
+
   var mode = window.location.hash.substring(1);
   var path = '../test/fixtures/';
   var file;
@@ -1849,6 +1851,9 @@
     case 'rectangles':
       file = 'rectangles.geojson';
       break;
+    case 'boxes_overlap':
+      file = 'boxes_overlap.geojson';
+      break;
     default:
       file = 'hole_hole.geojson';
       break;
@@ -1897,6 +1902,7 @@
     fetch(path)
       .then(function (r) { return r.json(); })
       .then(function (json) {
+          window.data = json;
           drawnItems.addData(json);
           map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
       });
