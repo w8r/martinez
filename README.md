@@ -1,4 +1,4 @@
-# Martinez-Rueda polygon clipping algorithm [![npm version](https://badge.fury.io/js/martinez-polygon-clipping.svg)](https://badge.fury.io/js/martinez-polygon-clipping) [![CircleCI](https://circleci.com/gh/w8r/martinez.svg?style=svg)](https://circleci.com/gh/w8r/martinez)
+# Martinez-Rueda polygon clipping algorithm [![npm version](https://badge.fury.io/js/martinez-polygon-clipping.svg)](https://badge.fury.io/js/martinez-polygon-clipping) [![TravisCI](https://travis-ci.org/w8r/martinez.svg?branch=master)](https://travis-ci.org/w8r/martinez)
 
 ![screenshot 2016-07-26 10 54 01](https://cloud.githubusercontent.com/assets/26884/17131796/611b3b20-531f-11e6-941c-b0f8fd385016.png)
 ![screenshot 2016-07-25 18 53 44](https://cloud.githubusercontent.com/assets/26884/17131805/64b74134-531f-11e6-913b-81c0cbd1a618.png)
