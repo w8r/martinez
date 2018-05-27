@@ -64,8 +64,17 @@ switch (mode) {
   case 'polygons_edge_overlap':
     file = 'polygons_edge_overlap.geojson';
     break;
+  case 'vertical_boxes':
+    file = 'vertical_boxes.geojson';
+    break;
   case 'collapsed':
     file = 'collapsed.geojson';
+    break;
+  case 'fatal1':
+    file = 'fatal1.geojson';
+    break;
+  case 'fatal2':
+    file = 'fatal2.geojson';
     break;
   default:
     file = 'hole_hole.geojson';

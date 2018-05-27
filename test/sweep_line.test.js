@@ -2,7 +2,7 @@
 
 var tap             = require('tap');
 var path            = require('path');
-var Tree            = require('avl');
+var Tree            = require('splaytree');
 var load            = require('load-json-file');
 var compareSegments = require('../src/compare_segments');
 var SweepEvent      = require('../src/sweep_event');
