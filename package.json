@@ -19,7 +19,7 @@
     "start:win": "start watchify ./demo/js/index.js -o ./demo/js/bundle.js -dv && start serve",
     "build": "browserify -s martinez ./index.js -o ./dist/martinez.js && npm run min",
     "min": "uglifyjs ./dist/martinez.js -o ./dist/martinez.min.js -m --comments",
-    "prepublish": "npm run lint && npm run test && npm run build"
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "polygon",
