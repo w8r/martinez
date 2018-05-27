@@ -438,5 +438,39 @@ tap.test('Edge cases', (main) => {
     t.end();
   });
 
+
+  main.test('issue #80', (t) => {
+    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'boxes_overlap.geojson'));
+    const subject  = shapes.features[0];
+    const clipping = shapes.features[1];
+
+    console.log(shapes);
+
+
+    t.test('difference', (t) => {
+      const result = martinez.diff(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      t.deepEqual(result, [[[
+        [10, 10],
+        [20, 10],
+        [20, 80],
+        [10, 80],
+        [10, 10]
+      ]], [[
+        [30, 10],
+        [80, 10],
+        [80, 80],
+        [30, 80],
+        [30, 10]
+      ]]]);
+
+      t.end();
+    });
+
+    t.end();
+  });
+
   main.end();
 });

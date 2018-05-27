@@ -4,6 +4,8 @@ import './booleanopcontrol';
 import martinez from '../../src/index';
 //var martinez = require('../../dist/martinez.min');
 
+window.martinez = martinez;
+
 let mode = window.location.hash.substring(1);
 let path = '../test/fixtures/';
 const ext  = '.geojson';
@@ -79,6 +81,9 @@ switch (mode) {
   case 'rectangles':
     file = 'rectangles.geojson';
     break;
+  case 'boxes_overlap':
+    file = 'boxes_overlap.geojson';
+    break;
   default:
     file = 'hole_hole.geojson';
     break;
@@ -127,6 +132,7 @@ function loadData(path) {
   fetch(path)
     .then((r) => r.json())
     .then((json) => {
+        window.data = json;
         drawnItems.addData(json);
         map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
     });
