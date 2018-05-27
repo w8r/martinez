@@ -1,6 +1,3 @@
-// var EPSILON = 1e-9;
-// var abs = Math.abs;
-
 export default function equals(p1, p2) {
   if (p1[0] === p2[0]) {
     if (p1[1] === p2[1]) {
@@ -12,6 +9,8 @@ export default function equals(p1, p2) {
   return false;
 }
 
+// const EPSILON = 1e-9;
+// const abs = Math.abs;
 // TODO https://github.com/w8r/martinez/issues/6#issuecomment-262847164
 // Precision problem.
 //

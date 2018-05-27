@@ -824,9 +824,6 @@
     return copy;
   };
 
-  // var EPSILON = 1e-9;
-  // var abs = Math.abs;
-
   function equals(p1, p2) {
     if (p1[0] === p2[0]) {
       if (p1[1] === p2[1]) {
@@ -838,6 +835,8 @@
     return false;
   }
 
+  // const EPSILON = 1e-9;
+  // const abs = Math.abs;
   // TODO https://github.com/w8r/martinez/issues/6#issuecomment-262847164
   // Precision problem.
   //
@@ -884,8 +883,8 @@
     if (e1.left !== e2.left)
       { return e1.left ? 1 : -1; }
 
-    // var p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
-    // var sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+    // const p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
+    // const sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
     // Same coordinates, both events
     // are left endpoints or right endpoints.
     // not collinear
