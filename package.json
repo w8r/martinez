@@ -3,6 +3,7 @@
   "version": "0.4.1",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
   "main": "dist/martinez.umd.js",
+  "browser": "dist/martinez.umd.js",
   "module": "index",
   "jsnext:main": "index",
   "types": "index.d.ts",
