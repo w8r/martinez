@@ -8,10 +8,10 @@
  */
 
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global.martinez = factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.martinez = {})));
+}(this, (function (exports) { 'use strict';
 
   function DEFAULT_COMPARE (a, b) { return a > b ? 1 : a < b ? -1 : 0; }
 
@@ -1688,7 +1688,24 @@
   boolean.xor          = function (subject, clipping) { return boolean(subject, clipping, XOR); };
   boolean.intersection = function (subject, clipping) { return boolean(subject, clipping, INTERSECTION); };
 
-  return boolean;
+  var union = boolean.union;
+  var diff = boolean.diff;
+  var xor = boolean.xor;
+  var intersection$1 = boolean.intersection;
+
+  /**
+   * @enum {Number}
+   */
+  var operations = { UNION: UNION, DIFFERENCE: DIFFERENCE, INTERSECTION: INTERSECTION, XOR: XOR };
+
+  exports.default = boolean;
+  exports.union = union;
+  exports.diff = diff;
+  exports.xor = xor;
+  exports.intersection = intersection$1;
+  exports.operations = operations;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 //# sourceMappingURL=martinez.umd.js.map

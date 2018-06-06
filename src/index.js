@@ -46,7 +46,7 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 }
 
 
-export default function boolean(subject, clipping, operation) {
+function boolean(subject, clipping, operation) {
   if (typeof subject[0][0][0] === 'number') {
     subject = [subject];
   }
@@ -83,6 +83,12 @@ boolean.diff         = (subject, clipping) => boolean(subject, clipping, DIFFERE
 boolean.xor          = (subject, clipping) => boolean(subject, clipping, XOR);
 boolean.intersection = (subject, clipping) => boolean(subject, clipping, INTERSECTION);
 
+export default boolean;
+
+export const union = boolean.union;
+export const diff = boolean.diff;
+export const xor = boolean.xor;
+export const intersection = boolean.intersection;
 
 /**
  * @enum {Number}
