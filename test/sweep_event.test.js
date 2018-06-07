@@ -1,13 +1,11 @@
-'use strict';
+import tap        from 'tape';
+import SweepEvent from '../src/sweep_event';
 
-var tap        = require('tap');
-var SweepEvent = require('../src/sweep_event');
+tap.test('sweep event', (main) => {
 
-tap.test('sweep event', function (main) {
-
-  main.test('isBelow', function (t) {
-    var s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
-    var s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
+  main.test('isBelow', (t) => {
+    const s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
+    const s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
 
     t.ok(s1.isBelow([0, 1]));
     t.ok(s1.isBelow([1, 2]));
@@ -23,10 +21,10 @@ tap.test('sweep event', function (main) {
   });
 
 
-  main.test('isAbove', function (t) {
+  main.test('isAbove', (t) => {
 
-    var s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
-    var s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
+    const s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
+    const s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
 
     t.notOk(s1.isAbove([0, 1]));
     t.notOk(s1.isAbove([1, 2]));
@@ -42,7 +40,7 @@ tap.test('sweep event', function (main) {
   });
 
 
-  main.test('isVertical', function (t) {
+  main.test('isVertical', (t) => {
     t.ok(new SweepEvent([0, 0], true, new SweepEvent([0, 1], false)).isVertical());
     t.notOk(new SweepEvent([0, 0], true, new SweepEvent([0.0001, 1], false)).isVertical());
 

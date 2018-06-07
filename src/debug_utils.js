@@ -1,5 +1,5 @@
-/* eslint-disable no-unused-vars, no-debugger, no-undef, no-use-before-define */
-module.exports.renderPoints = function renderPoints(possiblePoints, prop) {
+/* eslint-disable */
+export function renderPoints(possiblePoints, prop) {
   var map = window.map;
   var points = window.points;
   if (!map) return;
@@ -14,9 +14,9 @@ module.exports.renderPoints = function renderPoints(possiblePoints, prop) {
       weight: 1
     }).addTo(points);
   });
-}
+};
 
-module.exports.renderSweepLine = function renderSweepLine(sweepLine, pos, event) {
+export function renderSweepLine(sweepLine, pos, event) {
   var map = window.map;
   if (!map) return;
   if (window.sws) window.sws.forEach(function (p) {
@@ -45,6 +45,6 @@ module.exports.renderSweepLine = function renderSweepLine(sweepLine, pos, event)
     event.otherEvent.point.slice().reverse()
   ], {color: 'black', weight: 9, opacity: 0.4}).addTo(map);
   debugger;
-}
+};
 
-/* eslint-enable no-unused-vars, no-debugger, no-undef, no-use-before-define */
+/* eslint-enable */

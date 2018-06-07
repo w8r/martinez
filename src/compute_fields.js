@@ -1,19 +1,22 @@
-'use strict';
-
-var edgeType = require('./edge_type');
-var operationType = require('./operation');
-
-var INTERSECTION = operationType.INTERSECTION;
-var UNION        = operationType.UNION;
-var DIFFERENCE   = operationType.DIFFERENCE;
-var XOR          = operationType.XOR;
+import {
+  NORMAL,
+  SAME_TRANSITION,
+  DIFFERENT_TRANSITION,
+  NON_CONTRIBUTING
+} from './edge_type';
+import {
+  INTERSECTION,
+  UNION,
+  DIFFERENCE,
+  XOR
+} from './operation';
 
 /**
  * @param  {SweepEvent} event
  * @param  {SweepEvent} prev
  * @param  {Operation} operation
  */
-module.exports = function computeFields(event, prev, operation) {
+export default function computeFields (event, prev, operation) {
   // compute inOut and otherInOut fields
   if (prev === null) {
     event.inOut      = false;
@@ -33,20 +36,20 @@ module.exports = function computeFields(event, prev, operation) {
 
     // compute prevInResult field
     if (prev) {
-      event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ?
-         prev.prevInResult : prev;
+      event.prevInResult = (!inResult(prev, operation) || prev.isVertical())
+        ? prev.prevInResult : prev;
     }
   }
 
   // check if the line segment belongs to the Boolean operation
   event.inResult = inResult(event, operation);
-};
+}
 
 
 /* eslint-disable indent */
 function inResult(event, operation) {
   switch (event.type) {
-    case edgeType.NORMAL:
+    case NORMAL:
       switch (operation) {
         case INTERSECTION:
           return !event.otherInOut;
@@ -61,11 +64,11 @@ function inResult(event, operation) {
           return true;
       }
       break;
-    case edgeType.SAME_TRANSITION:
+    case SAME_TRANSITION:
       return operation === INTERSECTION || operation === UNION;
-    case edgeType.DIFFERENT_TRANSITION:
+    case DIFFERENT_TRANSITION:
       return operation === DIFFERENCE;
-    case edgeType.NON_CONTRIBUTING:
+    case NON_CONTRIBUTING:
       return false;
   }
   return false;

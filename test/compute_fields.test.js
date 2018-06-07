@@ -1,9 +1,7 @@
-'use strict';
-
-var tap = require('tap');
+import tap from 'tape';
 // var martinez = require('../src/');
 // var computeFields = martinez.computeFields;
 
-tap.test('compute fields', function (t) {
+tap.test('compute fields', (t) => {
   t.end();
 });
