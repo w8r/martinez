@@ -1779,6 +1779,11 @@
   boolean.xor          = function (subject, clipping) { return boolean(subject, clipping, XOR); };
   boolean.intersection = function (subject, clipping) { return boolean(subject, clipping, INTERSECTION); };
 
+  var union = boolean.union;
+  var diff = boolean.diff;
+  var xor = boolean.xor;
+  var intersection$1 = boolean.intersection;
+
   //var martinez = require('../../dist/martinez.min');
 
   var mode = window.location.hash.substring(1);
@@ -1923,19 +1928,19 @@
 
     var operation;
     if (op === OPERATIONS.INTERSECTION) {
-      operation = boolean.intersection;
+      operation = intersection$1;
     } else if (op === OPERATIONS.UNION) {
-      operation = boolean.union;
+      operation = union;
     } else if (op === OPERATIONS.DIFFERENCE) {
-      operation = boolean.diff;
+      operation = diff;
     } else if (op === 5) { // B - A
-      operation = boolean.diff;
+      operation = diff;
 
       var temp = subject;
       subject  = clipping;
       clipping = temp;
     } else {
-      operation = boolean.xor;
+      operation = xor;
     }
 
     console.time('martinez');

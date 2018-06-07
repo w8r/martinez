@@ -1,7 +1,7 @@
 import './coordinates';
 import './polygoncontrol';
 import './booleanopcontrol';
-import martinez from '../../src/index';
+import * as martinez from '../../src/index';
 //var martinez = require('../../dist/martinez.min');
 
 let mode = window.location.hash.substring(1);
