@@ -13,7 +13,7 @@ polygons with holes, self-intersecting polygons and degenerate polygons with ove
 Play with it by [forking this Codepen](http://codepen.io/w8r/pen/rrBkER)
 
 ```js
-import martinez from 'martinez-polygon-clipping';
+import * as martinez from 'martinez-polygon-clipping';
 const gj1 = { "type": "Feature", ..., "geometry": { "type": "Polygon", "coordinates": [ [ [x, y], ... ] ]};
 const gj2 = { "type": "Feature", ..., "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [x, y], ...] ] ]};
 
@@ -59,7 +59,7 @@ JSTS x 100 ops/sec ±2.54% (73 runs sampled)
 
 ### Features
 
-The algorithm of Matrinez et al. was extended to work with multipolygons without cascading.
+The algorithm of Martinez et al. was extended to work with multipolygons without cascading.
 
 ### Authors
 

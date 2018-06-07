@@ -1698,7 +1698,6 @@
    */
   var operations = { UNION: UNION, DIFFERENCE: DIFFERENCE, INTERSECTION: INTERSECTION, XOR: XOR };
 
-  exports.default = boolean;
   exports.union = union;
   exports.diff = diff;
   exports.xor = xor;
