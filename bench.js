@@ -1,9 +1,9 @@
-const path = require('path');
-const load = require('load-json-file');
-const Benchmark = require('benchmark');
-const jstsUnion = require('@turf/union');
-const fs = require('fs');
-const martinez = require('./src/index');
+import path      from 'path';
+import load      from 'load-json-file';
+import Benchmark from 'benchmark';
+import jstsUnion from '@turf/union';
+import fs        from 'fs';
+import martinez  from './dist/martinez.umd';
 
 
 /**

@@ -1,16 +1,13 @@
-'use strict';
-
-// var equals = require('./equals');
-var compareEvents = require('./compare_events');
-var operationType = require('./operation');
+import compareEvents from './compare_events';
+import { DIFFERENCE } from './operation';
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<SweepEvent>}
  */
 function orderEvents(sortedEvents) {
-  var event, i, len, tmp;
-  var resultEvents = [];
+  let event, i, len, tmp;
+  const resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
@@ -19,7 +16,7 @@ function orderEvents(sortedEvents) {
     }
   }
   // Due to overlapping edges the resultEvents array can be not wholly sorted
-  var sorted = false;
+  let sorted = false;
   while (!sorted) {
     sorted = true;
     for (i = 0, len = resultEvents.length; i < len; i++) {
@@ -33,10 +30,16 @@ function orderEvents(sortedEvents) {
     }
   }
 
+
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
     event.pos = i;
+  }
 
+  // imagine, the right event is found in the beginning of the queue,
+  // when his left counterpart is not marked yet
+  for (i = 0, len = resultEvents.length; i < len; i++) {
+    event = resultEvents[i];
     if (!event.left) {
       tmp = event.pos;
       event.pos = event.otherEvent.pos;
@@ -55,11 +58,11 @@ function orderEvents(sortedEvents) {
  * @return {Number}
  */
 function nextPos(pos, resultEvents, processed, origIndex) {
-  var newPos = pos + 1;
-  var length = resultEvents.length;
+  let newPos = pos + 1;
+  const length = resultEvents.length;
   if (newPos > length - 1) return pos - 1;
-  var p  = resultEvents[pos].point;
-  var p1 = resultEvents[newPos].point;
+  let p  = resultEvents[pos].point;
+  let p1 = resultEvents[newPos].point;
 
 
   // while in range and not the current one by value
@@ -85,37 +88,37 @@ function nextPos(pos, resultEvents, processed, origIndex) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-module.exports = function connectEdges(sortedEvents, operation) {
-  var i, len;
-  var resultEvents = orderEvents(sortedEvents);
+export default function connectEdges(sortedEvents, operation) {
+  let i, len;
+  const resultEvents = orderEvents(sortedEvents);
 
   // "false"-filled array
-  var processed = {};
-  var result = [];
-  var event;
+  const processed = {};
+  const result = [];
+  let event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
-    var contour = [[]];
+    const contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
-      if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
+      if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
         result.push(contour);
       } else if (result.length === 0) {
         result.push([[contour]]);
       } else {
         result[result.length - 1].push(contour[0]);
       }
-    } else if (operation === operationType.DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
+    } else if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
       result[result.length - 1].push(contour[0]);
     } else {
       result.push(contour);
     }
 
-    var ringId = result.length - 1;
-    var pos = i;
+    const ringId = result.length - 1;
+    let pos = i;
 
-    var initial = resultEvents[i].point;
+    const initial = resultEvents[i].point;
     contour[0].push(initial);
 
     while (pos >= i) {
@@ -144,22 +147,8 @@ module.exports = function connectEdges(sortedEvents, operation) {
     event.otherEvent.contourId   = ringId;
   }
 
-  // for (i = 0, len = result.length; i < len; i++) {
-  //   var polygon = result[i];
-  //   for (var j = 0, jj = polygon.length; j < jj; j++) {
-  //     var polygonContour = polygon[j];
-  //     for (var k = 0, kk = polygonContour.length; k < kk; k++) {
-  //       var coords = polygonContour[k];
-  //       if (typeof coords[0] !== 'number') {
-  //         polygon.splice(j, 1);
-  //         polygon.push(coords);
-  //       }
-  //     }
-  //   }
-  // }
-
   // Handle if the result is a polygon (eg not multipoly)
   // Commented it again, let's see what do we mean by that
   // if (result.length === 1) result = result[0];
   return result;
-};
+}

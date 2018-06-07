@@ -1,0 +1,215 @@
+{
+  "env": {
+    "es6": true,
+    "node": true,
+    "mocha": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "globals": {
+    "XMLSerializer": true,
+    "Blob": true,
+    "Image": true,
+    "Promise": true,
+    "XMLHttpRequest": true,
+    "FileReader": true,
+    "HTMLElement": true,
+    "CanvasRenderingContext2D": true,
+    "Worker": true,
+    "URL": true
+  },
+  "plugins": [
+    "promise",
+    "import-order",
+    "jsdoc"
+  ],
+  "rules": {
+    "indent": 0,
+    //    "prefer-const": "error",
+    //    "no-var": "error",
+    "prefer-arrow-callback": "error",
+    "arrow-parens": 0,
+    "strict": [
+      // use strict mode
+      "error",
+      "global"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-constant-condition": [
+      "error"
+    ],
+    "no-multi-spaces": 0,
+    "semi": [
+      // semicolons are required
+      "error",
+      "always"
+    ],
+    "max-len": [
+      // max line length is 120 chars (except for comments)
+      "error",
+      120,
+      {
+        "ignoreComments": true
+      }
+    ],
+    "eol-last": [
+      // \n is required at the end of the file
+      "error",
+      "always"
+    ],
+    "camelcase": [
+      // enforce camelcase style for variable names and property names
+      "error",
+      {
+        "properties": "always"
+      }
+    ],
+    "dot-notation": [
+      // always use the dot notation to access properties, except if property contains '_'
+      "error",
+      {
+        "allowPattern": "^.*_.*$"
+      }
+    ],
+    "quotes": [
+      // use single quotes (or backticks if there is a substitution)
+      "error",
+      "single"
+    ],
+    "comma-dangle": [
+      // no trailing commas in object or array literals
+      "error",
+      "never"
+    ],
+    "no-multi-str": [
+      // no multi line strings using \
+      "error"
+    ],
+    "no-multiple-empty-lines": [
+      "error"
+    ],
+    "no-trailing-spaces": [
+      "error"
+    ],
+    "no-mixed-spaces-and-tabs": [
+      "error"
+    ],
+    "curly": 0,
+    "brace-style": 0,
+    "keyword-spacing": [
+      // in `} else {` both spaces are required (in general, around keywords)
+      "error",
+      {
+        "before": true,
+        "after": true,
+        "overrides": {
+          "catch": {
+            "before": true,
+            "after": false
+          }
+        }
+      }
+    ],
+    "space-before-blocks": [
+      // in `if (foo) {` the second space is required
+      "error",
+      "always"
+    ],
+    "arrow-spacing": [
+      // in `(foo) => {` both spaces are required
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "operator-linebreak": [
+      // linebreak goes after the operator except for '?' and ':'
+      "error",
+      "after",
+      {
+        "overrides": {
+          "?": "before",
+          ":": "before"
+        }
+      }
+    ],
+    "space-unary-ops": [
+      // space is required for new, delete, etc. but not for +, -, ++, --, etc.
+      "error",
+      {
+        "words": true,
+        "nonwords": false,
+        "overrides": {
+          "typeof": false
+          // also no space for typeof(...)
+        }
+      }
+    ],
+    "space-infix-ops": [
+      // space is required around infix operators, e.g: 'a + b'
+      "error"
+    ],
+    "comma-spacing": [
+      // space is required after a comma
+      "error",
+      {
+        "after": true
+      }
+    ],
+    "array-bracket-spacing": 0,
+    "space-in-parens": [
+      // '( x + y )' is not allowed, use '(x + y)'
+      "error",
+      "never"
+    ],
+    "key-spacing": 0,
+    "yoda": [
+      // disallow yoda conditions, e.g. `(true === foo)`
+      "error",
+      "never"
+    ],
+    "no-with": [
+      // the with statements is not allowed
+      "error"
+    ],
+    "linebreak-style": [
+      // use unix linebreak '\n'
+      "error",
+      "unix"
+    ],
+    "wrap-iife": [
+      // require IIFE to be wrapped in parenthesis
+      "error"
+    ],
+    "func-call-spacing": [
+      // no space between the function name and the opening parenthesis on invocation
+      "error",
+      "never"
+    ],
+    "space-before-function-paren": 0,
+    "no-cond-assign": [
+      // no assignment operators in if, for and while except if enclosed in parentheses
+      "error",
+      "except-parens"
+    ],
+    "no-inner-declarations": [
+      "error"
+    ],
+    "no-console": 2,
+    // `console.log(...)` is allowed
+    "import-order/import-order": 0,
+    // import order is not enfored
+    "no-case-declarations": 0
+  }
+}

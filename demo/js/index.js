@@ -1,15 +1,15 @@
-require('./coordinates');
-require('./polygoncontrol');
-require('./booleanopcontrol');
-var martinez = window.martinez = require('../../src/index');
+import './coordinates';
+import './polygoncontrol';
+import './booleanopcontrol';
+import martinez from '../../src/index';
 //var martinez = require('../../dist/martinez.min');
-var xhr  = require('superagent');
-var mode = window.location.hash.substring(1);
-var path = '../test/fixtures/';
-var ext  = '.geojson';
-var file;
 
-var files = [
+let mode = window.location.hash.substring(1);
+let path = '../test/fixtures/';
+const ext  = '.geojson';
+let file;
+
+let files = [
   'asia', 'trapezoid-box', 'canada', 'horseshoe', 'hourglasses', 'overlap_y',
   'polygon_trapezoid_edge_overlap', 'touching_boxes', 'two_pointed_triangles',
   'hole_cut', 'overlapping_segments', 'overlap_loop', 'disjoint_boxes'
@@ -64,8 +64,20 @@ switch (mode) {
   case 'polygons_edge_overlap':
     file = 'polygons_edge_overlap.geojson';
     break;
+  case 'vertical_boxes':
+    file = 'vertical_boxes.geojson';
+    break;
   case 'collapsed':
     file = 'collapsed.geojson';
+    break;
+  case 'fatal1':
+    file = 'fatal1.geojson';
+    break;
+  case 'fatal2':
+    file = 'fatal2.geojson';
+    break;
+  case 'rectangles':
+    file = 'rectangles.geojson';
     break;
   default:
     file = 'hole_hole.geojson';
@@ -112,14 +124,11 @@ var drawnItems = window.drawnItems = L.geoJson().addTo(map);
 
 function loadData(path) {
   console.log(path);
-  xhr
-    .get(path)
-    .accept('json')
-    .end(function(e, r) {
-      if (!e) {
-        drawnItems.addData(JSON.parse(r.text));
+  fetch(path)
+    .then((r) => r.json())
+    .then((json) => {
+        drawnItems.addData(json);
         map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
-      }
     });
 }
 

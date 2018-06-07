@@ -1,3 +1,5 @@
+import L from 'leaflet';
+
 L.Coordinates = L.Control.extend({
   options: {
     position: 'bottomright'

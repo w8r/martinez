@@ -1,25 +1,23 @@
-'use strict';
+import Tree                 from 'splaytree';
+import computeFields        from './compute_fields';
+import possibleIntersection from './possible_intersection';
+import compareSegments      from './compare_segments';
+import {
+  INTERSECTION,
+  DIFFERENCE
+} from './operation';
 
-var Tree                 = require('avl');
-var computeFields        = require('./compute_fields');
-var possibleIntersection = require('./possible_intersection');
-var compareSegments      = require('./compare_segments');
-var operations           = require('./operation');
 
+export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
+  const sweepLine = new Tree(compareSegments);
+  const sortedEvents = [];
 
-module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
-  var sweepLine = new Tree(compareSegments);
-  var sortedEvents = [];
+  const rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  var rightbound = Math.min(sbbox[2], cbbox[2]);
+  let prev, next, begin;
 
-  var prev, next, begin;
-
-  var INTERSECTION = operations.INTERSECTION;
-  var DIFFERENCE   = operations.DIFFERENCE;
-
-  while (eventQueue.length) {
-    var event = eventQueue.pop();
+  while (eventQueue.length !== 0) {
+    let event = eventQueue.pop();
     sortedEvents.push(event);
 
     // optimization by bboxes for intersection and difference goes here
@@ -37,8 +35,8 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
 
       next = sweepLine.next(next);
 
-      var prevEvent = prev ? prev.key : null;
-      var prevprevEvent;
+      const prevEvent = prev ? prev.key : null;
+      let prevprevEvent;
       computeFields(event, prevEvent, operation);
       if (next) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
@@ -49,7 +47,7 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
 
       if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
-          var prevprev = prev;
+          let prevprev = prev;
           if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
           else                    prevprev = null;
 
@@ -77,4 +75,4 @@ module.exports = function subdivide(eventQueue, subject, clipping, sbbox, cbbox,
     }
   }
   return sortedEvents;
-};
+}

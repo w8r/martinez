@@ -1,3 +1,5 @@
+import L from 'leaflet';
+
 L.BooleanControl = L.Control.extend({
   options: {
     position: 'topright'
