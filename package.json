@@ -7,6 +7,7 @@
   "module": "src/index",
   "jsnext:main": "src/index",
   "files": [
+    "index.d.ts",
     "src/",
     "dist/"
   ],
