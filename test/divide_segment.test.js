@@ -2,7 +2,7 @@ import tap               from 'tape';
 import path              from 'path';
 import Queue             from 'tinyqueue';
 import load              from 'load-json-file';
-import martinez          from '../src/';
+import martinez          from '../';
 import SweepEvent        from '../src/sweep_event';
 import compareEvents     from '../src/compare_events';
 import intersection      from '../src/segment_intersection';

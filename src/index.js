@@ -77,14 +77,3 @@ export default function boolean(subject, clipping, operation) {
   //console.timeEnd('connect vertices');
   return result;
 }
-
-boolean.union        = (subject, clipping) => boolean(subject, clipping, UNION);
-boolean.diff         = (subject, clipping) => boolean(subject, clipping, DIFFERENCE);
-boolean.xor          = (subject, clipping) => boolean(subject, clipping, XOR);
-boolean.intersection = (subject, clipping) => boolean(subject, clipping, INTERSECTION);
-
-
-/**
- * @enum {Number}
- */
-export const operations = { UNION, DIFFERENCE, INTERSECTION, XOR };

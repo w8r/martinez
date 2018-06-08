@@ -1,5 +1,5 @@
 import tap      from 'tape';
-import martinez from '../src/';
+import * as martinez from '../index';
 import load     from 'load-json-file';
 import path     from 'path';
 

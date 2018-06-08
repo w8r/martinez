@@ -1,7 +1,7 @@
 import tap       from 'tape';
 import path      from 'path';
 import load      from 'load-json-file';
-import martinez  from '../src/';
+import martinez  from '../';
 import fillQueue from '../src/fill_queue';
 
 // GeoJSON Data

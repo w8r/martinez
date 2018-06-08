@@ -1774,10 +1774,21 @@
     return result;
   }
 
-  boolean.union        = function (subject, clipping) { return boolean(subject, clipping, UNION); };
-  boolean.diff         = function (subject, clipping) { return boolean(subject, clipping, DIFFERENCE); };
-  boolean.xor          = function (subject, clipping) { return boolean(subject, clipping, XOR); };
-  boolean.intersection = function (subject, clipping) { return boolean(subject, clipping, INTERSECTION); };
+  function union (subject, clipping) {
+    return boolean(subject, clipping, UNION);
+  }
+
+  function diff (subject, clipping) {
+    return boolean(subject, clipping, DIFFERENCE);
+  }
+
+  function xor (subject, clipping){
+    return boolean(subject, clipping, XOR);
+  }
+
+  function intersection$1 (subject, clipping) {
+    return boolean(subject, clipping, INTERSECTION);
+  }
 
   //var martinez = require('../../dist/martinez.min');
 
@@ -1923,19 +1934,19 @@
 
     var operation;
     if (op === OPERATIONS.INTERSECTION) {
-      operation = boolean.intersection;
+      operation = intersection$1;
     } else if (op === OPERATIONS.UNION) {
-      operation = boolean.union;
+      operation = union;
     } else if (op === OPERATIONS.DIFFERENCE) {
-      operation = boolean.diff;
+      operation = diff;
     } else if (op === 5) { // B - A
-      operation = boolean.diff;
+      operation = diff;
 
       var temp = subject;
       subject  = clipping;
       clipping = temp;
     } else {
-      operation = boolean.xor;
+      operation = xor;
     }
 
     console.time('martinez');

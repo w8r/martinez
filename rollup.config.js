@@ -17,7 +17,7 @@ const banner = `\
 `;
 
 module.exports = [{
-  input: 'index.js',
+  input: './index.js',
   output: {
     file: `dist/${name}.umd.js`,
     name: 'martinez',
