@@ -46,7 +46,7 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 }
 
 
-function boolean(subject, clipping, operation) {
+export default function boolean(subject, clipping, operation) {
   if (typeof subject[0][0][0] === 'number') {
     subject = [subject];
   }
@@ -77,18 +77,3 @@ function boolean(subject, clipping, operation) {
   //console.timeEnd('connect vertices');
   return result;
 }
-
-boolean.union        = (subject, clipping) => boolean(subject, clipping, UNION);
-boolean.diff         = (subject, clipping) => boolean(subject, clipping, DIFFERENCE);
-boolean.xor          = (subject, clipping) => boolean(subject, clipping, XOR);
-boolean.intersection = (subject, clipping) => boolean(subject, clipping, INTERSECTION);
-
-export const union = boolean.union;
-export const diff = boolean.diff;
-export const xor = boolean.xor;
-export const intersection = boolean.intersection;
-
-/**
- * @enum {Number}
- */
-export const operations = { UNION, DIFFERENCE, INTERSECTION, XOR };

@@ -1,7 +1,7 @@
 import tap      from 'tape';
 import path     from 'path';
 import load     from 'load-json-file';
-import martinez from '../src/';
+import * as martinez from '../index';
 
 const clipping = load.sync(path.join(__dirname, 'featureTypes', 'clippingPoly.geojson'));
 const outDir = path.join(__dirname, 'featureTypes', 'out');

@@ -1683,15 +1683,21 @@
     return result;
   }
 
-  boolean.union        = function (subject, clipping) { return boolean(subject, clipping, UNION); };
-  boolean.diff         = function (subject, clipping) { return boolean(subject, clipping, DIFFERENCE); };
-  boolean.xor          = function (subject, clipping) { return boolean(subject, clipping, XOR); };
-  boolean.intersection = function (subject, clipping) { return boolean(subject, clipping, INTERSECTION); };
+  function union (subject, clipping) {
+    return boolean(subject, clipping, UNION);
+  }
 
-  var union = boolean.union;
-  var diff = boolean.diff;
-  var xor = boolean.xor;
-  var intersection$1 = boolean.intersection;
+  function diff (subject, clipping) {
+    return boolean(subject, clipping, DIFFERENCE);
+  }
+
+  function xor (subject, clipping){
+    return boolean(subject, clipping, XOR);
+  }
+
+  function intersection$1 (subject, clipping) {
+    return boolean(subject, clipping, INTERSECTION);
+  }
 
   /**
    * @enum {Number}
