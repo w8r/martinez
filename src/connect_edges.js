@@ -94,6 +94,7 @@ export default function connectEdges(sortedEvents, operation) {
 
   // "false"-filled array
   const processed = {};
+  let nProcessed = 0;
   const result = [];
   let event;
 
@@ -121,8 +122,9 @@ export default function connectEdges(sortedEvents, operation) {
     const initial = resultEvents[i].point;
     contour[0].push(initial);
 
-    while (pos >= i) {
+    while (pos >= i && nProcessed < resultEvents.length) {
       event = resultEvents[pos];
+      if (processed[pos] === undefined) nProcessed++;
       processed[pos] = true;
 
       if (event.left) {
@@ -134,6 +136,7 @@ export default function connectEdges(sortedEvents, operation) {
       }
 
       pos = event.pos;
+      if (processed[pos] === undefined) nProcessed++;
       processed[pos] = true;
       contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed, i);
