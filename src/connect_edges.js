@@ -58,11 +58,14 @@ function orderEvents(sortedEvents) {
  * @return {Number}
  */
 function nextPos(pos, resultEvents, processed, origIndex) {
+  let p, p1;
   let newPos = pos + 1;
   const length = resultEvents.length;
-  if (newPos > length - 1) return pos - 1;
-  let p  = resultEvents[pos].point;
-  let p1 = resultEvents[newPos].point;
+
+  p  = resultEvents[pos].point;
+
+  if (newPos < length)
+    p1 = resultEvents[newPos].point;
 
 
   // while in range and not the current one by value
@@ -94,7 +97,6 @@ export default function connectEdges(sortedEvents, operation) {
 
   // "false"-filled array
   const processed = {};
-  let nProcessed = 0;
   const result = [];
   let event;
 
@@ -122,9 +124,8 @@ export default function connectEdges(sortedEvents, operation) {
     const initial = resultEvents[i].point;
     contour[0].push(initial);
 
-    while (pos >= i && nProcessed < resultEvents.length) {
+    while (pos >= i) {
       event = resultEvents[pos];
-      if (processed[pos] === undefined) nProcessed++;
       processed[pos] = true;
 
       if (event.left) {
@@ -136,7 +137,6 @@ export default function connectEdges(sortedEvents, operation) {
       }
 
       pos = event.pos;
-      if (processed[pos] === undefined) nProcessed++;
       processed[pos] = true;
       contour[0].push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed, i);
