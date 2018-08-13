@@ -1,5 +1,5 @@
 /**
- * martinez v0.4.3
+ * martinez v0.5.0
  * Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor
  *
  * @author Alex Milevski <info@w8r.name>
@@ -1356,11 +1356,14 @@
    * @return {Number}
    */
   function nextPos(pos, resultEvents, processed, origIndex) {
+    var p, p1;
     var newPos = pos + 1;
     var length = resultEvents.length;
-    if (newPos > length - 1) { return pos - 1; }
-    var p  = resultEvents[pos].point;
-    var p1 = resultEvents[newPos].point;
+
+    p  = resultEvents[pos].point;
+
+    if (newPos < length)
+      { p1 = resultEvents[newPos].point; }
 
 
     // while in range and not the current one by value

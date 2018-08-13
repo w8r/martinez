@@ -76,6 +76,12 @@ switch (mode) {
   case 'fatal2':
     file = 'fatal2.geojson';
     break;
+  case 'fatal3':
+    file = 'fatal3.geojson';
+    break;
+  case 'fatal4':
+    file = 'fatal4.geojson';
+    break;
   case 'rectangles':
     file = 'rectangles.geojson';
     break;
