@@ -58,11 +58,14 @@ function orderEvents(sortedEvents) {
  * @return {Number}
  */
 function nextPos(pos, resultEvents, processed, origIndex) {
+  let p, p1;
   let newPos = pos + 1;
   const length = resultEvents.length;
-  if (newPos > length - 1) return pos - 1;
-  let p  = resultEvents[pos].point;
-  let p1 = resultEvents[newPos].point;
+
+  p  = resultEvents[pos].point;
+
+  if (newPos < length)
+    p1 = resultEvents[newPos].point;
 
 
   // while in range and not the current one by value
