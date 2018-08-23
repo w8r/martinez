@@ -75,7 +75,8 @@ function nextPos(pos, resultEvents, processed, origIndex) {
     } else   {
       newPos++;
     }
-    p1 = resultEvents[newPos].point;
+    if (newPos < length)
+      p1 = resultEvents[newPos].point;
   }
 
   newPos = pos - 1;
