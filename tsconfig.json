@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "declaration": false,
+    "declarationDir": "./typings/",
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "importHelpers": true,
+    "lib": ["es5", "es6", "dom"],
+    "target": "es6",
+    "moduleResolution": "node"
+  },
+  "target": "ESNext",
+  "module": "ES6",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

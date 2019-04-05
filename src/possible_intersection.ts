@@ -7,6 +7,8 @@ import {
   SAME_TRANSITION,
   DIFFERENT_TRANSITION
 } from './edge_type';
+import SweepEvent from './sweep_event';
+import Queue from 'tinyqueue';
 
 /**
  * @param  {SweepEvent} se1
@@ -14,14 +16,18 @@ import {
  * @param  {Queue}      queue
  * @return {Number}
  */
-export default function possibleIntersection (se1, se2, queue) {
+export default function possibleIntersection (
+  se1:SweepEvent, se2:SweepEvent,
+  queue:Queue<SweepEvent>
+):0|1|2|3 {
   // that disallows self-intersecting polygons,
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
   const inter = intersection(
     se1.point, se1.otherEvent.point,
-    se2.point, se2.otherEvent.point
+    se2.point, se2.otherEvent.point,
+    false
   );
 
   const nintersections = inter ? inter.length : 0;

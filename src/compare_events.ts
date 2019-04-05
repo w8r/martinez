@@ -1,13 +1,10 @@
 import signedArea from './signed_area';
+import SweepEvent from './sweep_event';
+import { Point } from './types';
 
-/**
- * @param  {SweepEvent} e1
- * @param  {SweepEvent} e2
- * @return {Number}
- */
-export default function compareEvents(e1, e2) {
-  const p1 = e1.point;
-  const p2 = e2.point;
+export default function compareEvents(e1:SweepEvent, e2:SweepEvent):-1|0|1 {
+  const p1:Point = e1.point;
+  const p2:Point = e2.point;
 
   // Different x-coordinate
   if (p1[0] > p2[0]) return 1;
@@ -22,7 +19,7 @@ export default function compareEvents(e1, e2) {
 
 
 /* eslint-disable no-unused-vars */
-function specialCases(e1, e2, p1, p2) {
+function specialCases(e1:SweepEvent, e2:SweepEvent, p1:Point, p2:Point):-1|1 {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
   if (e1.left !== e2.left)

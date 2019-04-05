@@ -5,13 +5,19 @@ import {
   INTERSECTION,
   DIFFERENCE,
   UNION,
-  XOR
+  XOR,
+  OperationType
 }        from './operation';
+import { MultiPolygon, BoundingBox, Polygon, Geometry } from './types';
 
-const EMPTY = [];
+const EMPTY:MultiPolygon = [];
 
 
-function trivialOperation(subject, clipping, operation) {
+function trivialOperation(
+  subject:MultiPolygon,
+  clipping:MultiPolygon,
+  operation:OperationType
+):MultiPolygon {
   let result = null;
   if (subject.length * clipping.length === 0) {
     if        (operation === INTERSECTION) {
@@ -27,7 +33,11 @@ function trivialOperation(subject, clipping, operation) {
 }
 
 
-function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
+function compareBBoxes(
+  subject:MultiPolygon, clipping:MultiPolygon,
+  sbbox:BoundingBox, cbbox:BoundingBox,
+  operation:OperationType
+):MultiPolygon {
   let result = null;
   if (sbbox[0] > cbbox[2] ||
       cbbox[0] > sbbox[2] ||
@@ -46,7 +56,7 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 }
 
 
-export default function boolean(subject, clipping, operation) {
+export default function boolean(subject:Geometry, clipping:Geometry, operation) {
   if (typeof subject[0][0][0] === 'number') {
     subject = [subject];
   }

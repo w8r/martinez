@@ -1,4 +1,5 @@
 //const EPS = 1e-9;
+import { Point } from './types';
 
 /**
  * Finds the magnitude of the cross product of two vectors (if we pretend
@@ -9,7 +10,7 @@
  * @private
  * @returns {Number} The magnitude of the cross product
  */
-function crossProduct(a, b) {
+function crossProduct(a:Point, b:Point):number {
   return (a[0] * b[1]) - (a[1] * b[0]);
 }
 
@@ -21,7 +22,7 @@ function crossProduct(a, b) {
  * @private
  * @returns {Number} The dot product
  */
-function dotProduct(a, b) {
+function dotProduct(a:Point, b:Point):number {
   return (a[0] * b[0]) + (a[1] * b[1]);
 }
 
@@ -44,20 +45,22 @@ function dotProduct(a, b) {
  * intersection. If they overlap, the two end points of the overlapping segment.
  * Otherwise, null.
  */
-export default function (a1, a2, b1, b2, noEndpointTouch) {
+export default function (
+  a1:Point, a2:Point, b1:Point, b2:Point, noEndpointTouch:boolean
+):Point[]|null {
   // The algorithm expects our lines in the form P + sd, where P is a point,
   // s is on the interval [0, 1], and d is a vector.
   // We are passed two points. P can be the first point of each pair. The
   // vector, then, could be thought of as the distance (in x and y components)
   // from the first point to the second point.
   // So first, let's make our vectors:
-  const va = [a2[0] - a1[0], a2[1] - a1[1]];
-  const vb = [b2[0] - b1[0], b2[1] - b1[1]];
+  const va:Point = [a2[0] - a1[0], a2[1] - a1[1]];
+  const vb:Point = [b2[0] - b1[0], b2[1] - b1[1]];
   // We also define a function to convert back to regular point form:
 
   /* eslint-disable arrow-body-style */
 
-  function toPoint(p, s, d) {
+  function toPoint(p:Point, s:number, d:Point):Point {
     return [
       p[0] + s * d[0],
       p[1] + s * d[1]
@@ -67,7 +70,7 @@ export default function (a1, a2, b1, b2, noEndpointTouch) {
   /* eslint-enable arrow-body-style */
 
   // The rest is pretty much a straight port of the algorithm.
-  const e = [b1[0] - a1[0], b1[1] - a1[1]];
+  const e:Point = [b1[0] - a1[0], b1[1] - a1[1]];
   let kross    = crossProduct(va, vb);
   let sqrKross = kross * kross;
   const sqrLenA  = dotProduct(va, va);

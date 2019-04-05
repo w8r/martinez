@@ -1,4 +1,6 @@
-export default function equals(p1, p2) {
+import { Point } from './types';
+
+export default function equals(p1:Point, p2:Point):boolean {
   if (p1[0] === p2[0]) {
     if (p1[1] === p2[1]) {
       return true;

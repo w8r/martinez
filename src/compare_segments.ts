@@ -1,14 +1,10 @@
 import signedArea    from './signed_area';
 import compareEvents from './compare_events';
 import equals        from './equals';
+import SweepEvent from './sweep_event';
 
 
-/**
- * @param  {SweepEvent} le1
- * @param  {SweepEvent} le2
- * @return {Number}
- */
-export default function compareSegments(le1, le2) {
+export default function compareSegments(le1:SweepEvent, le2:SweepEvent):number {
   if (le1 === le2) return 0;
 
   // Segments are not collinear

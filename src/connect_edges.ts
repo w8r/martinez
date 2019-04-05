@@ -1,11 +1,13 @@
 import compareEvents from './compare_events';
-import { DIFFERENCE } from './operation';
+import { DIFFERENCE, OperationType } from './operation';
+import SweepEvent from './sweep_event';
+import { Contour, Polygon } from './types';
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<SweepEvent>}
  */
-function orderEvents(sortedEvents) {
+function orderEvents(sortedEvents:SweepEvent[]) {
   let event, i, len, tmp;
   const resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
@@ -57,7 +59,10 @@ function orderEvents(sortedEvents) {
  * @param  {Object>}    processed
  * @return {Number}
  */
-function nextPos(pos, resultEvents, processed, origIndex) {
+function nextPos(
+  pos:number, resultEvents:SweepEvent[],
+  processed:{ [index:number]: boolean }, origIndex:number
+) {
   let p, p1;
   let newPos = pos + 1;
   const length = resultEvents.length;
@@ -91,18 +96,18 @@ function nextPos(pos, resultEvents, processed, origIndex) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-export default function connectEdges(sortedEvents, operation) {
+export default function connectEdges(sortedEvents:SweepEvent[], operation:OperationType) {
   let i, len;
   const resultEvents = orderEvents(sortedEvents);
 
   // "false"-filled array
-  const processed = {};
+  const processed:{[index:number]:boolean} = {};
   const result = [];
   let event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
-    const contour = [[]];
+    const contour:Contour = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
       if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
