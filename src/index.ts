@@ -56,19 +56,26 @@ function compareBBoxes(
 }
 
 
-export default function boolean(subject:Geometry, clipping:Geometry, operation) {
-  if (typeof subject[0][0][0] === 'number') {
-    subject = [subject];
+export default function boolean(
+  subjectGeometry:Geometry,
+  clippingGeometry:Geometry,
+  operation:OperationType
+) {
+  if (typeof subjectGeometry[0][0][0] === 'number') {
+    subjectGeometry = <MultiPolygon>[subjectGeometry];
   }
-  if (typeof clipping[0][0][0] === 'number') {
-    clipping = [clipping];
+  if (typeof clippingGeometry[0][0][0] === 'number') {
+    clippingGeometry = <MultiPolygon>[clippingGeometry];
   }
+  const subject = <MultiPolygon>subjectGeometry;
+  const clipping = <MultiPolygon>clippingGeometry;
+
   let trivial = trivialOperation(subject, clipping, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  const sbbox = [Infinity, Infinity, -Infinity, -Infinity];
-  const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
+  const sbbox:BoundingBox = [Infinity, Infinity, -Infinity, -Infinity];
+  const cbbox:BoundingBox = [Infinity, Infinity, -Infinity, -Infinity];
 
   //console.time('fill queue');
   const eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);

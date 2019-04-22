@@ -7,15 +7,12 @@
     "noEmitOnError": true,
     "importHelpers": true,
     "lib": ["es5", "es6", "dom"],
-    "target": "es6",
-    "moduleResolution": "node"
+    "module": "es2015",
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
-  "target": "ESNext",
-  "module": "ES6",
+  "module": "es2015",
   "include": [
     "src"
   ],
-  "exclude": [
-    "node_modules"
-  ]
 }

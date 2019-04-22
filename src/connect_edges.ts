@@ -1,7 +1,7 @@
 import compareEvents from './compare_events';
 import { DIFFERENCE, OperationType } from './operation';
 import SweepEvent from './sweep_event';
-import { Contour, Polygon } from './types';
+import { Contour, Polygon, Point, MultiPolygon } from './types';
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -102,18 +102,18 @@ export default function connectEdges(sortedEvents:SweepEvent[], operation:Operat
 
   // "false"-filled array
   const processed:{[index:number]:boolean} = {};
-  const result = [];
+  const result:MultiPolygon = [];
   let event;
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
-    const contour:Contour = [[]];
+    const contour:Polygon = [[]];
 
     if (!resultEvents[i].isExteriorRing) {
       if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
         result.push(contour);
       } else if (result.length === 0) {
-        result.push([[contour]]);
+        result.push([[]]);
       } else {
         result[result.length - 1].push(contour[0]);
       }
@@ -126,7 +126,7 @@ export default function connectEdges(sortedEvents:SweepEvent[], operation:Operat
     const ringId = result.length - 1;
     let pos = i;
 
-    const initial = resultEvents[i].point;
+    const initial:Point = resultEvents[i].point;
     contour[0].push(initial);
 
     while (pos >= i) {

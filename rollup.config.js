@@ -1,9 +1,14 @@
-import resolve  from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import buble    from 'rollup-plugin-buble';
-import { version, author, license, description } from './package.json';
 
-const name = 'martinez';
+import typescript from 'rollup-plugin-typescript2';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+
+import {
+  version, author,
+  module as esmBundle,
+  main as umdBundle,
+  name, license, description
+} from './package.json';
 
 const banner = `\
 /**
@@ -16,20 +21,32 @@ const banner = `\
  */
 `;
 
-module.exports = [{
-  input: './index.js',
+export default [{
+  input: './index.ts',
   output: {
-    file: `dist/${name}.umd.js`,
-    name: 'martinez',
-    sourcemap: true,
+    name, banner,
+    format: 'es',
+    file: esmBundle,
+    sourcemap: true
+  },
+  plugins: [
+    resolve(),  // so Rollup can find external libs,
+    typescript({ outDir: "dist" })]
+}, {
+  input: './index.ts',
+  output: {
+    name, banner,
     format: 'umd',
-    banner
+    file: umdBundle,
+    sourcemap: true
   },
   plugins: [
     resolve(),  // so Rollup can find external libs
-    commonjs(), // so Rollup can convert commonJS to an ES module
-    buble()
-  ]
+    typescript({
+    tsconfigOverride: {
+      compilerOptions: { outDir: "dist", target: 'es5' }
+    }
+  })]
 }, {
   input: 'demo/js/index.js',
   output: {
@@ -38,12 +55,12 @@ module.exports = [{
     globals: {
       leaflet: 'L',
       jsts: 'jsts'
-    }
+    },
+    sourcemap: true
   },
   external: ['jsts', 'leaflet'],
   plugins: [
     resolve(),  // so Rollup can find external libs
     commonjs(), // so Rollup can convert commonJS to an ES module
-    buble()
   ]
 }];

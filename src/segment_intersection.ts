@@ -1,4 +1,4 @@
-//const EPS = 1e-9;
+const EPS = 1e-9;
 import { Point } from './types';
 
 /**
@@ -74,14 +74,14 @@ export default function (
   let kross    = crossProduct(va, vb);
   let sqrKross = kross * kross;
   const sqrLenA  = dotProduct(va, va);
-  //const sqrLenB  = dotProduct(vb, vb);
+  const sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
   // cross product is the 0 vector. The full calculation involves relative error
   // to account for possible very small line segments. See Schneider & Eberly
   // for details.
-  if (sqrKross > 0/* EPS * sqrLenB * sqLenA */) {
+  if (sqrKross >  EPS * sqrLenB * sqrLenA) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
@@ -112,11 +112,11 @@ export default function (
   // the (vector) difference between the two initial points. If this is parallel
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
-  //const sqrLenE = dotProduct(e, e);
+  const sqrLenE = dotProduct(e, e);
   kross = crossProduct(e, va);
   sqrKross = kross * kross;
 
-  if (sqrKross > 0 /* EPS * sqLenB * sqLenE */) {
+  if (sqrKross > EPS * sqrLenB * sqrLenE) {
   // Lines are just parallel, not the same. No overlap.
     return null;
   }

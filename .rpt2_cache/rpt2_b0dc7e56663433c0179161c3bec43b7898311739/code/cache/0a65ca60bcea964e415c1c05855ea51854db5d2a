@@ -1,0 +1,1 @@
+{"code":"export const NORMAL = 0;\r\nexport const NON_CONTRIBUTING = 1;\r\nexport const SAME_TRANSITION = 2;\r\nexport const DIFFERENT_TRANSITION = 3;\r\n"}

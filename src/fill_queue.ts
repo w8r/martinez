@@ -62,7 +62,7 @@ export default function fillQueue(
   cbbox:BoundingBox,
   operation:OperationType
 ) {
-  const eventQueue = new Queue(null, compareEvents);
+  const eventQueue = new Queue(undefined, compareEvents);
   let polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {

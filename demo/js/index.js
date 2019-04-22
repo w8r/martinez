@@ -1,7 +1,7 @@
 import './coordinates';
 import './polygoncontrol';
 import './booleanopcontrol';
-import * as martinez from '../../index';
+import martinez from '../../dist/martinez.umd';
 //var martinez = require('../../dist/martinez.min');
 
 let mode = window.location.hash.substring(1);
@@ -132,11 +132,16 @@ function loadData(path) {
   console.log(path);
   fetch(path)
     .then((r) => r.json())
-    .then((json) => {
-        drawnItems.addData(json);
-        map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
-    });
+    .then(setData);
 }
+
+function setData(json) {
+  clear();
+  drawnItems.addData(json);
+  map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
+}
+
+window.setData = setData;
 
 function clear() {
   drawnItems.clearLayers();
