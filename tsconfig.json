@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "noImplicitAny": true,
+    "declaration": false,
+    "declarationDir": "./typings/",
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "importHelpers": true,
+    "sourceMap": true,
+    "lib": ["es5", "es6", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "esnext"
+  },
+  "target": "ESNext",
+  "module": "ES6",
+  "include": [
+    "./**/*",
+  ]
+}
