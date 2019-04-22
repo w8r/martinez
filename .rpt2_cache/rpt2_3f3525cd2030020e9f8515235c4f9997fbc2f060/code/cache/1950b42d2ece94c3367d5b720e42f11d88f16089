@@ -1,1 +1,0 @@
-{"code":"export const INTERSECTION = 0;\r\nexport const UNION = 1;\r\nexport const DIFFERENCE = 2;\r\nexport const XOR = 3;\r\n"}

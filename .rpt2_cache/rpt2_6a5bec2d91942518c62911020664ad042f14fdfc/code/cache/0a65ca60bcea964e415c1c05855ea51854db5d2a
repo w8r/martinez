@@ -1,1 +1,0 @@
-{"code":"export var NORMAL = 0;\r\nexport var NON_CONTRIBUTING = 1;\r\nexport var SAME_TRANSITION = 2;\r\nexport var DIFFERENT_TRANSITION = 3;\r\n"}

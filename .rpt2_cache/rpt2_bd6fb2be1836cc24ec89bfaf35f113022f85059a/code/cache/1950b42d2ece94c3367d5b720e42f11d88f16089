@@ -1,1 +1,0 @@
-{"code":"export var INTERSECTION = 0;\r\nexport var UNION = 1;\r\nexport var DIFFERENCE = 2;\r\nexport var XOR = 3;\r\n"}
