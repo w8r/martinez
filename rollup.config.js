@@ -1,5 +1,8 @@
 
 import typescript from 'rollup-plugin-typescript2';
+import commonjs from 'rollup-plugin-commonjs';
+import noderesolve from 'rollup-plugin-node-resolve';
+import buble from 'rollup-plugin-buble';
 
 import {
   version, author,
@@ -10,7 +13,7 @@ import {
 
 const banner = `\
 /**
- * ${moduleName} v${version}
+ * ${name} v${version}
  * ${description}
  *
  * @author ${author}
@@ -27,7 +30,17 @@ export default [{
     file: esmBundle,
     sourcemap: true
   },
-  plugins: [typescript({ outDir: "dist" })]
+  plugins: [
+    noderesolve(),
+    typescript({ 
+    outDir: "dist",
+    tsconfigOverride: {
+      compilerOptions: {
+        module: "ES2015"
+      }
+    }}),
+    buble({ exclude: ["**/*.ts"] })
+  ]
 }, {
   input: './src/index.ts',
   output: {
@@ -36,18 +49,29 @@ export default [{
     file: umdBundle,
     sourcemap: true
   },
-  plugins: [typescript({
-    tsconfigOverride: {
-      compilerOptions: { outDir: "dist", target: 'es5' }
-    }
-  })]
+  plugins: [
+    noderesolve(),
+    typescript({
+      tsconfigOverride: {
+        compilerOptions: { 
+          target: 'es5',
+          module: 'ES2015'
+        }
+      }
+    }),
+    buble({ exclude: ["**/*.ts"] })
+  ]
 }, {
   input: './demo/js/index.js',
   output: {
     name, banner,
     format: 'umd',
-    file: umdBundle,
-    sourcemap: true
+    file: './demo/js/bundle.js',
+    sourcemap: true,
+    globals: {
+      leaflet: 'L'
+    }
   },
-  plugins: [])
+  plugins: [commonjs()],
+  external: ["leaflet"],
 }];

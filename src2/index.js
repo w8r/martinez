@@ -46,6 +46,8 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 }
 
 
+
+
 export default function boolean(subject, clipping, operation) {
   if (typeof subject[0][0][0] === 'number') {
     subject = [subject];

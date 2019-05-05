@@ -1,9 +1,9 @@
 {
   "name": "martinez-polygon-clipping",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
-  "main": "dist/splay.js",
-  "module": "dist/splay.esm.js",
+  "main": "dist/martinez.umd.js",
+  "module": "dist/martinez.esm.js",
   "types": "typings/index.d.ts",
   "files": [
     "dist",
@@ -17,11 +17,11 @@
   "scripts": {
     "lint": "tslint --project tsconfig.json ./src/*.ts",
     "build": "rollup -c && npm run types",
-    "types": "tsc --declaration --emitDeclarationOnly",
+    "types": "tsc --declaration --emitDeclarationOnly --declarationDir './typings/'",
     "prebenchmark": "npm run build",
-    "baseUrl": "./node_modules",
     "benchmark": "node -r reify bench/benchmark.js",
-    "start": "npm run test:watch",
+    "start": "run-p dev test:watch",
+    "dev": "rollup -cw & serve",
     "test:watch": "nodemon --watch src/*.ts --watch tests/*.ts --exec 'npm test'",
     "test": "mocha tests/**/*.test.ts",
     "posttest": "nyc report --reporter=json",
@@ -56,12 +56,15 @@
     "nyc": "^14.0.0",
     "reify": "^0.18.1",
     "rollup": "^1.10.1",
-    "rollup-plugin-typescript2": "^0.20.1",
+    "rollup-plugin-buble": "^0.19.6",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-typescript2": "^0.21.0",
     "serve": "^11.0.0",
     "ts-node": "^8.1.0",
     "tslib": "1.9.3",
     "tslint": "^5.14.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.4.5"
   },
   "dependencies": {
     "splaytree": "^3.0.0",

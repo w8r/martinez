@@ -7,6 +7,8 @@ export default class SweepEvent {
   public point:Point;
   public otherEvent:SweepEvent;
   public type:number;
+  /** @internal */
+  public pos?:number;
 
   // transition flags
   public inOut:boolean = false;
@@ -41,21 +43,6 @@ export default class SweepEvent {
   }
 
 
-  isBelow (p:Point):boolean {
-    const p0 = this.point, p1 = this.otherEvent.point;
-    return this.left
-      ? (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0
-      // signedArea(this.point, this.otherEvent.point, p) > 0 :
-      : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
-      //signedArea(this.otherEvent.point, this.point, p) > 0;
-  }
-
-
-  isAbove (p:Point):boolean {
-    return !this.isBelow(p);
-  }
-
-
   isVertical ():boolean {
     return this.point[0] === this.otherEvent.point[0];
   }
@@ -73,4 +60,13 @@ export default class SweepEvent {
 
     return copy;
   }
+}
+
+export function isBelow(e:SweepEvent, p:Point):boolean {
+  const p0 = e.point, p1 = e.otherEvent.point;
+  return e.left
+    ? (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0
+    // signedArea(this.point, this.otherEvent.point, p) > 0 :
+    : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
+    //signedArea(this.otherEvent.point, this.point, p) > 0;
 }

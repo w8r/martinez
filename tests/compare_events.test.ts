@@ -2,7 +2,6 @@ import { describe, it } from 'mocha';
 import { assert }       from 'chai';
 
 import Queue           from 'tinyqueue';
-console.log(Queue);
 import sweepEventsComp from '../src/compare_events';
 import SweepEvent      from '../src/sweep_event';
 import { Point }       from '../src/types';
@@ -13,7 +12,7 @@ describe('compare events', () => {
   describe('in queue', () => {
 
     it('queue should process lest(by x) sweep event first', () => {
-      const queue = new Queue<{point:Point}>(null, sweepEventsComp);
+      const queue = new Queue<{point:Point}>(undefined, sweepEventsComp);
       const e1 = {point: <Point>[0.0, 0.0]};
       const e2 = {point: <Point>[0.5, 0.5]};
 
@@ -25,7 +24,7 @@ describe('compare events', () => {
     });
 
     it('queue should process lest(by y) sweep event first', () => {
-      const queue = new Queue<{point:Point}>(null, sweepEventsComp);
+      const queue = new Queue<{point:Point}>(undefined, sweepEventsComp);
       const e1 = {point: <Point>[0.0, 0.0]};
       const e2 = {point: <Point>[0.0, 0.5]};
 
@@ -38,7 +37,7 @@ describe('compare events', () => {
 
 
     it('queue should pop least(by left prop) sweep event first', () => {
-      const queue = new Queue<{point:Point, left:boolean}>(null, sweepEventsComp);
+      const queue = new Queue<{point:Point, left:boolean}>(undefined, sweepEventsComp);
       const e1 = {point: <Point>[0.0, 0.0], left: true};
       const e2 = {point: <Point>[0.0, 0.0], left: false};
 

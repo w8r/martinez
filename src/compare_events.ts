@@ -1,5 +1,5 @@
 import signedArea from './signed_area';
-import SweepEvent from './sweep_event';
+import SweepEvent, { isBelow } from './sweep_event';
 
 /**
  * @param  {SweepEvent} e1
@@ -30,7 +30,7 @@ export default function compareEvents(e1:SweepEvent, e2:SweepEvent):(-1|0|1) {
   // not collinear
   if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
-    return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
+    return (!isBelow(e1, e2.otherEvent.point)) ? 1 : -1;
   }
 
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;

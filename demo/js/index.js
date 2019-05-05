@@ -1,8 +1,7 @@
 import './coordinates';
 import './polygoncontrol';
 import './booleanopcontrol';
-import * as martinez from '../../index';
-//var martinez = require('../../dist/martinez.min');
+import martinez from '../../dist/martinez.umd';
 
 let mode = window.location.hash.substring(1);
 let path = '../test/fixtures/';

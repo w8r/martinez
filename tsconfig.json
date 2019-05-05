@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
+    "allowJs": true,
     "noImplicitAny": true,
-    "declaration": false,
-    "declarationDir": "./typings/",
     "noImplicitThis": true,
     "noEmitOnError": true,
     "importHelpers": true,
@@ -11,11 +9,10 @@
     "lib": ["es5", "es6", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "esnext"
+    "target": "es5",
+    "esModuleInterop": true
   },
-  "target": "ESNext",
-  "module": "ES6",
   "include": [
-    "./**/*",
+    "src/**/*.ts",
   ]
 }

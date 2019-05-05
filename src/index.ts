@@ -23,7 +23,4 @@ export function intersection (subject:MultiPolygon, clipping:MultiPolygon) {
   return boolean(subject, clipping, INTERSECTION);
 }
 
-/**
- * @enum {Number}
- */
 export const operations = { UNION, DIFFERENCE, INTERSECTION, XOR };

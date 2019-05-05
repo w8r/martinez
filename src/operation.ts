@@ -10,4 +10,6 @@ enum Operation {
   XOR,
 };
 
+export declare type OperationType = 0 | 1 | 2 | 3;
+
 export default Operation;

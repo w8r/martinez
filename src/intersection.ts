@@ -1,5 +1,5 @@
 import { Point } from './types';
-import { EPS } from './constants';
+import { EPS, E_LIMIT } from './constants';
 
 export default function intersection(
   a0x:number, a0y:number, a1x:number, a1y:number,
@@ -19,17 +19,25 @@ export default function intersection(
   let sqrKross = kross * kross;
 
   const sqrLen0 = vax * vax + vay * vay;
-  const sqrLen1 = vbx * vbx + vby * vby;
+  // const sqrLen1 = vbx * vbx + vby * vby;
 
-  if (sqrKross > EPS * sqrLen0 * sqrLen1) {
+  if (sqrKross > 0) {
     // lines of the segments are not parallel
-    const s = (ex * vby - ey * vbx) / kross;
-    // intersection of lines is not a point on segment a0 + s * a1
+    let s = Math.round((ex * vby - ey * vbx) / kross * E_LIMIT) / E_LIMIT;
+    // intersection is outside the segment [a0, a1]
     if (s < 0 || s > 1) return 0;
 
-    const t = (ex * vay - ey * vax) / kross;
-    // intersection of lines is not a point on segment b0 + t * b1
+    // precision issues
+    // else if (s < EPS)     s = 0; 
+    // else if (1 - s < EPS) s = 1;
+
+    let t = Math.round((ex * vay - ey * vax) / kross * E_LIMIT) / E_LIMIT;
+    // intersection is outside the segment [b0, b1]
     if (t < 0 || t > 1) return 0;
+
+    // precision issues
+    // else if (t < EPS)     t = 0; 
+    // else if (1 - t < EPS) t = 1;
 
     if (s === 0 || s === 1) {
       // on an endpoint of line segment a
@@ -39,14 +47,14 @@ export default function intersection(
     }
     if (t === 0 || t === 1) {
       // on an endpoint of line segment b
-      I[0][0] = b0x + s * vbx;
-      I[0][1] = b0y + s * vby;
+      I[0][0] = b0x + t * vbx;
+      I[0][1] = b0y + t * vby;
       return 1;
     }
     
     // intersection of lines is a point on each segment
-    I[0][0] = a0x + s * a1x;
-    I[0][1] = a0y + s * a1y;
+    I[0][0] = a0x + s * vax;
+    I[0][1] = a0y + s * vay;
     return 1;
   }
 

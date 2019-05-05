@@ -59,7 +59,7 @@ export default function fillQueue(
   cbbox:BoundingBox, 
   operation:Operation
 ):Queue<SweepEvent> {
-  const Q = new Queue<SweepEvent>(null, compareEvents);
+  const Q = new Queue(undefined, compareEvents);
   let polygonSet:Polygon, isExteriorRing:boolean, i, ii, j, jj; 
 
   for (i = 0, ii = subject.length; i < ii; i++) {
