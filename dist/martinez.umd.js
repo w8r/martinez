@@ -272,7 +272,6 @@
       }
       return Q;
   }
-  //# sourceMappingURL=fill_queue.js.map
 
   /**
    * splaytree v3.0.0
@@ -1386,6 +1385,7 @@
       // if (result.length === 1) result = result[0];
       return result;
   }
+  //# sourceMappingURL=connect_edges.js.map
 
   function trivialOperation(subject, clipping, operation) {
       var result = null;

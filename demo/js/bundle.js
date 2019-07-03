@@ -396,7 +396,6 @@
         }
         return Q;
     }
-    
 
     /**
      * splaytree v3.0.0
@@ -1510,6 +1509,7 @@
         // if (result.length === 1) result = result[0];
         return result;
     }
+    
 
     function trivialOperation(subject, clipping, operation) {
         var result = null;

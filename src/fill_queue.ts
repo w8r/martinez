@@ -2,19 +2,19 @@ import Queue           from 'tinyqueue';
 import SweepEvent      from './sweep_event';
 import compareEvents   from './compare_events';
 import Operation, { DIFFERENCE }  from './operation';
-import { 
-  MultiPolygon, BoundingBox, 
+import {
+  MultiPolygon, BoundingBox,
   Polygon, Contour
 } from './types';
 
 let contourId = 0;
 
 function processPolygon(
-  contourOrHole:Contour, 
-  isSubject:boolean, 
-  depth:number, 
-  Q:Queue<SweepEvent>, 
-  bbox:BoundingBox, 
+  contourOrHole:Contour,
+  isSubject:boolean,
+  depth:number,
+  Q:Queue<SweepEvent>,
+  bbox:BoundingBox,
   isExteriorRing:boolean
 ) {
   let i, len, s1, s2, e1, e2;
@@ -53,14 +53,14 @@ function processPolygon(
 
 
 export default function fillQueue(
-  subject:MultiPolygon, 
-  clipping:MultiPolygon, 
-  sbbox:BoundingBox, 
-  cbbox:BoundingBox, 
+  subject:MultiPolygon,
+  clipping:MultiPolygon,
+  sbbox:BoundingBox,
+  cbbox:BoundingBox,
   operation:Operation
 ):Queue<SweepEvent> {
-  const Q = new Queue(undefined, compareEvents);
-  let polygonSet:Polygon, isExteriorRing:boolean, i, ii, j, jj; 
+  const Q = new Queue<SweepEvent>(undefined, compareEvents);
+  let polygonSet:Polygon, isExteriorRing:boolean, i, ii, j, jj;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
