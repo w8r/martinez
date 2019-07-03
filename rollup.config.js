@@ -1,9 +1,15 @@
-import resolve  from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import buble    from 'rollup-plugin-buble';
-import { version, author, license, description } from './package.json';
 
-const name = 'martinez';
+import typescript from 'rollup-plugin-typescript2';
+import commonjs from 'rollup-plugin-commonjs';
+import noderesolve from 'rollup-plugin-node-resolve';
+import buble from 'rollup-plugin-buble';
+
+import {
+  version, author,
+  module as esmBundle,
+  main as umdBundle,
+  name, license, description
+} from './package.json';
 
 const banner = `\
 /**
@@ -16,34 +22,56 @@ const banner = `\
  */
 `;
 
-module.exports = [{
-  input: './index.js',
+export default [{
+  input: './src/index.ts',
   output: {
-    file: `dist/${name}.umd.js`,
-    name: 'martinez',
-    sourcemap: true,
-    format: 'umd',
-    banner
+    name, banner,
+    format: 'es',
+    file: esmBundle,
+    sourcemap: true
   },
   plugins: [
-    resolve(),  // so Rollup can find external libs
-    commonjs(), // so Rollup can convert commonJS to an ES module
-    buble()
+    noderesolve(),
+    typescript({ 
+    outDir: "dist",
+    tsconfigOverride: {
+      compilerOptions: {
+        module: "ES2015"
+      }
+    }}),
+    buble({ exclude: ["**/*.ts"] })
   ]
 }, {
-  input: 'demo/js/index.js',
+  input: './src/index.ts',
   output: {
-    file: 'demo/js/bundle.js',
-    format: 'iife',
+    name, banner,
+    format: 'umd',
+    file: umdBundle,
+    sourcemap: true
+  },
+  plugins: [
+    noderesolve(),
+    typescript({
+      tsconfigOverride: {
+        compilerOptions: { 
+          target: 'es5',
+          module: 'ES2015'
+        }
+      }
+    }),
+    buble({ exclude: ["**/*.ts"] })
+  ]
+}, {
+  input: './demo/js/index.js',
+  output: {
+    name, banner,
+    format: 'umd',
+    file: './demo/js/bundle.js',
+    sourcemap: true,
     globals: {
-      leaflet: 'L',
-      jsts: 'jsts'
+      leaflet: 'L'
     }
   },
-  external: ['jsts', 'leaflet'],
-  plugins: [
-    resolve(),  // so Rollup can find external libs
-    commonjs(), // so Rollup can convert commonJS to an ES module
-    buble()
-  ]
+  plugins: [commonjs()],
+  external: ["leaflet"],
 }];

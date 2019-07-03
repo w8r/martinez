@@ -1,4 +1,10 @@
+build/*bundle.js*
 node_modules
-.DS_Store
-.reify-cache
 npm-debug.log
+tests/types.js
+.reify-cache
+.rpt2_cache
+dist
+coverage
+.nyc_output/
+typings

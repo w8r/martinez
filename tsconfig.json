@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "importHelpers": true,
+    "sourceMap": true,
+    "lib": ["es5", "es6", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*.ts",
+  ]
+}
