@@ -4,19 +4,6 @@
 ![screenshot 2016-07-25 18 53 44](https://cloud.githubusercontent.com/assets/26884/17131805/64b74134-531f-11e6-913b-81c0cbd1a618.png)
 
 
-## Live support
-
-### Get help
-
-If you have an urgent problem, hire a mentor for a 1:1 live session on Git-Start:
-[![Get 1:1 live support for your issue.](https://git-start.com/assets/git-start-mentee-banner-medium.svg?sanitize=true)](https://git-start.com/help-request/create/w8r%2Fmartinez)
-
-### Provide help
-
-Help others in paid 1:1 live sessions to get started.
-[![Give paid 1:1 live support.](https://git-start.com/assets/git-start-mentor-banner-medium.svg?sanitize=true)](https://git-start.com/help-request/overview/w8r%2Fmartinez)
-
-
 ## Details
 
 The algorithm is specifically *fast* and *capable* of working with polygons of all types: multipolygons (without cascading),
