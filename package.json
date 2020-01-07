@@ -69,6 +69,7 @@
     "uglify-js": "^3.3.21"
   },
   "dependencies": {
+    "robust-predicates": "^2.0.4",
     "splaytree": "^0.1.4",
     "tinyqueue": "^1.2.0"
   }
