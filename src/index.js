@@ -74,6 +74,9 @@ export default function boolean(subject, clipping, operation) {
 
   //console.time('connect vertices');
   const result = connectEdges(sortedEvents, operation);
+  console.log(result)
   //console.timeEnd('connect vertices');
-  return result;
+  return [result.map(function (c) {
+    return c.points;
+  })];
 }

@@ -1,5 +1,5 @@
 import compareEvents from './compare_events';
-import { DIFFERENCE } from './operation';
+import Contour from './contour';
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -91,7 +91,7 @@ function nextPos(pos, resultEvents, processed, origIndex) {
  * @param  {Array.<SweepEvent>} sortedEvents
  * @return {Array.<*>} polygons
  */
-export default function connectEdges(sortedEvents, operation) {
+export default function connectEdges(sortedEvents) {
   let i, len;
   const resultEvents = orderEvents(sortedEvents);
 
@@ -99,46 +99,52 @@ export default function connectEdges(sortedEvents, operation) {
   const processed = {};
   const result = [];
   let event;
+  let depth = [];
+  let holeOf = [];
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     if (processed[i]) continue;
-    const contour = [[]];
-
-    if (!resultEvents[i].isExteriorRing) {
-      if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
-        result.push(contour);
-      } else if (result.length === 0) {
-        result.push([[contour]]);
-      } else {
-        result[result.length - 1].push(contour[0]);
+    const contour = new Contour();
+    result.push(contour);
+    let contourId = result.length - 1;
+    depth.push(0);
+    holeOf.push(-1);
+    if (resultEvents[i].prevInResult) {
+      const lowerContourId = resultEvents[i].prevInResult.contourId;
+      if (!resultEvents[i].prevInResult.resultInOut) {
+        result[lowerContourId].holes.push(contourId);
+        holeOf[contourId] = lowerContourId;
+        depth[contourId] = depth[lowerContourId] + 1;
+        contour.external = false;
+      } else if (!result[lowerContourId].external) {
+        result[holeOf[lowerContourId]].holes.push(contourId);
+        holeOf[contourId] = holeOf[lowerContourId];
+        depth[contourId] = depth[lowerContourId];
+        contour.external = false;
       }
-    } else if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
-      result[result.length - 1].push(contour[0]);
-    } else {
-      result.push(contour);
     }
 
-    const ringId = result.length - 1;
+    // const ringId = result.length - 1;
     let pos = i;
 
     const initial = resultEvents[i].point;
-    contour[0].push(initial);
+    contour.points.push(initial);
 
-    while (pos >= i) {
+    while (resultEvents[pos].otherEvent.point !== initial) {
       event = resultEvents[pos];
       processed[pos] = true;
 
       if (event.left) {
         event.resultInOut = false;
-        event.contourId   = ringId;
+        event.contourId   = contourId;
       } else {
         event.otherEvent.resultInOut = true;
-        event.otherEvent.contourId   = ringId;
+        event.otherEvent.contourId  = contourId;
       }
 
       pos = event.pos;
       processed[pos] = true;
-      contour[0].push(resultEvents[pos].point);
+      contour.points.push(resultEvents[pos].point);
       pos = nextPos(pos, resultEvents, processed, i);
     }
 
@@ -147,7 +153,9 @@ export default function connectEdges(sortedEvents, operation) {
     event = resultEvents[pos];
     processed[pos] = processed[event.pos] = true;
     event.otherEvent.resultInOut = true;
-    event.otherEvent.contourId   = ringId;
+    event.otherEvent.contourId   = contourId;
+
+    contour.points.push(contour.points[0]);
   }
 
   // Handle if the result is a polygon (eg not multipoly)
