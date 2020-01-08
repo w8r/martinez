@@ -1,8 +1,6 @@
-import path      from 'path';
 import load      from 'load-json-file';
 import Benchmark from 'benchmark';
 import jstsUnion from '@turf/union';
-import fs        from 'fs';
 import martinez  from './dist/martinez.umd';
 
 
@@ -24,7 +22,7 @@ const options = {
   }
 };
 
-const hole_hole = load.sync('./test/fixtures/hole_hole.geojson')
+const hole_hole = load.sync('./test/fixtures/hole_hole.geojson');
 new Benchmark.Suite('Hole_Hole', options)
   .add('Martinez', () => {
     martinez.union(
