@@ -41,6 +41,8 @@ function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing
 
     // Pushing it so the queue is sorted from left to right,
     // with object on the left having the highest priority.
+    // console.log("Pushing sweep events e1: ", e1);
+    // console.log("Pushing sweep events e2: ", e2);
     Q.push(e1);
     Q.push(e2);
   }
@@ -51,6 +53,7 @@ export default function fillQueue(subject, clipping, sbbox, cbbox, operation) {
   const eventQueue = new Queue(null, compareEvents);
   let polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
 
+  console.log("Processing 1. polygon")
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
@@ -60,6 +63,7 @@ export default function fillQueue(subject, clipping, sbbox, cbbox, operation) {
     }
   }
 
+  console.log("Processing 2. polygon")
   for (i = 0, ii = clipping.length; i < ii; i++) {
     polygonSet = clipping[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
