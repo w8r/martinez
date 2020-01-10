@@ -180,7 +180,7 @@ function run (op) {
 
   //if (op === OPERATIONS.UNION) result = result[0];
   console.log('result', result);
-  // console.log(JSON.stringify(result))
+  console.log(JSON.stringify(result))
   results.clearLayers();
 
   if (result !== null) {

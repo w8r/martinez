@@ -57,12 +57,12 @@ function orderEvents(sortedEvents) {
  * @param  {Object>}    processed
  * @return {Number}
  */
-function nextPos(pos, resultEvents, processed, origIndex) {
-  let p, p1;
-  let newPos = pos + 1;
+function nextPos(pos, resultEvents, processed) {
+  let newPos = pos + 1,
+      p = resultEvents[pos].point,
+      p1;
   const length = resultEvents.length;
 
-  p  = resultEvents[pos].point;
 
   if (newPos < length)
     p1 = resultEvents[newPos].point;
@@ -70,6 +70,10 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 
   // while in range and not the current one by value
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
+
+    // if (newPos === -1) {
+    //   throw `Problem with pos, ${pos}, ${newPos}`;
+    // }
     if (!processed[newPos]) {
       return newPos;
     } else   {
@@ -80,9 +84,10 @@ function nextPos(pos, resultEvents, processed, origIndex) {
 
   newPos = pos - 1;
 
-  while (processed[newPos] && newPos >= origIndex) {
+  while (processed[newPos]) {
     newPos--;
   }
+
   return newPos;
 }
 
@@ -103,12 +108,13 @@ export default function connectEdges(sortedEvents) {
   let holeOf = [];
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
+
     if (processed[i]) continue;
     const contour = new Contour();
-    result.push(contour);
     let contourId = result.length - 1;
     depth.push(0);
     holeOf.push(-1);
+
     if (resultEvents[i].prevInResult) {
       const lowerContourId = resultEvents[i].prevInResult.contourId;
       if (!resultEvents[i].prevInResult.resultInOut) {
@@ -124,30 +130,29 @@ export default function connectEdges(sortedEvents) {
       }
     }
 
-    // const ringId = result.length - 1;
     let pos = i;
 
     const initial = resultEvents[i].point;
     contour.points.push(initial);
 
-    while (resultEvents[pos].otherEvent.point !== initial) {
-      event = resultEvents[pos];
-      processed[pos] = true;
 
-      if (event.left) {
-        event.resultInOut = false;
-        event.contourId   = contourId;
-      } else {
-        event.otherEvent.resultInOut = true;
-        event.otherEvent.contourId  = contourId;
-      }
+    while (resultEvents[pos] && resultEvents[pos].otherEvent.point !== initial) {
+        event = resultEvents[pos];
+        processed[pos] = true;
 
-      pos = event.pos;
-      processed[pos] = true;
-      contour.points.push(resultEvents[pos].point);
-      pos = nextPos(pos, resultEvents, processed, i);
+        if (event.left) {
+          event.resultInOut = false;
+          event.contourId   = contourId;
+        } else {
+          event.otherEvent.resultInOut = true;
+          event.otherEvent.contourId  = contourId;
+        }
+
+        pos = event.pos;
+        processed[pos] = true;
+        contour.points.push(resultEvents[pos].point);
+        pos = nextPos(pos, resultEvents, processed);
     }
-
     pos = pos === -1 ? i : pos;
 
     event = resultEvents[pos];
@@ -156,10 +161,9 @@ export default function connectEdges(sortedEvents) {
     event.otherEvent.contourId   = contourId;
 
     contour.points.push(contour.points[0]);
+    result.push(contour);
+
   }
 
-  // Handle if the result is a polygon (eg not multipoly)
-  // Commented it again, let's see what do we mean by that
-  // if (result.length === 1) result = result[0];
   return result;
 }

@@ -935,6 +935,274 @@
   //   return abs(p1[0] - p2[0]) <= EPSILON && abs(p1[1] - p2[1]) <= EPSILON;
   // };
 
+  var epsilon = 1.1102230246251565e-16;
+  var splitter = 134217729;
+  var resulterrbound = (3 + 8 * epsilon) * epsilon;
+
+  // fast_expansion_sum_zeroelim routine from oritinal code
+  function sum(elen, e, flen, f, h) {
+      var Q, Qnew, hh, bvirt;
+      var enow = e[0];
+      var fnow = f[0];
+      var eindex = 0;
+      var findex = 0;
+      if ((fnow > enow) === (fnow > -enow)) {
+          Q = enow;
+          enow = e[++eindex];
+      } else {
+          Q = fnow;
+          fnow = f[++findex];
+      }
+      var hindex = 0;
+      if (eindex < elen && findex < flen) {
+          if ((fnow > enow) === (fnow > -enow)) {
+              Qnew = enow + Q;
+              hh = Q - (Qnew - enow);
+              enow = e[++eindex];
+          } else {
+              Qnew = fnow + Q;
+              hh = Q - (Qnew - fnow);
+              fnow = f[++findex];
+          }
+          Q = Qnew;
+          if (hh !== 0) {
+              h[hindex++] = hh;
+          }
+          while (eindex < elen && findex < flen) {
+              if ((fnow > enow) === (fnow > -enow)) {
+                  Qnew = Q + enow;
+                  bvirt = Qnew - Q;
+                  hh = Q - (Qnew - bvirt) + (enow - bvirt);
+                  enow = e[++eindex];
+              } else {
+                  Qnew = Q + fnow;
+                  bvirt = Qnew - Q;
+                  hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+                  fnow = f[++findex];
+              }
+              Q = Qnew;
+              if (hh !== 0) {
+                  h[hindex++] = hh;
+              }
+          }
+      }
+      while (eindex < elen) {
+          Qnew = Q + enow;
+          bvirt = Qnew - Q;
+          hh = Q - (Qnew - bvirt) + (enow - bvirt);
+          enow = e[++eindex];
+          Q = Qnew;
+          if (hh !== 0) {
+              h[hindex++] = hh;
+          }
+      }
+      while (findex < flen) {
+          Qnew = Q + fnow;
+          bvirt = Qnew - Q;
+          hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+          fnow = f[++findex];
+          Q = Qnew;
+          if (hh !== 0) {
+              h[hindex++] = hh;
+          }
+      }
+      if (Q !== 0 || hindex === 0) {
+          h[hindex++] = Q;
+      }
+      return hindex;
+  }
+
+  function estimate(elen, e) {
+      var Q = e[0];
+      for (var i = 1; i < elen; i++) { Q += e[i]; }
+      return Q;
+  }
+
+  function vec(n) {
+      return new Float64Array(n);
+  }
+
+  var ccwerrboundA = (3 + 16 * epsilon) * epsilon;
+  var ccwerrboundB = (2 + 12 * epsilon) * epsilon;
+  var ccwerrboundC = (9 + 64 * epsilon) * epsilon * epsilon;
+
+  var B = vec(4);
+  var C1 = vec(8);
+  var C2 = vec(12);
+  var D = vec(16);
+  var u = vec(4);
+
+  function orient2dadapt(ax, ay, bx, by, cx, cy, detsum) {
+      var acxtail, acytail, bcxtail, bcytail;
+      var bvirt, c, ahi, alo, bhi, blo, _i, _j, _0, s1, s0, t1, t0, u3;
+
+      var acx = ax - cx;
+      var bcx = bx - cx;
+      var acy = ay - cy;
+      var bcy = by - cy;
+
+      s1 = acx * bcy;
+      c = splitter * acx;
+      ahi = c - (c - acx);
+      alo = acx - ahi;
+      c = splitter * bcy;
+      bhi = c - (c - bcy);
+      blo = bcy - bhi;
+      s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+      t1 = acy * bcx;
+      c = splitter * acy;
+      ahi = c - (c - acy);
+      alo = acy - ahi;
+      c = splitter * bcx;
+      bhi = c - (c - bcx);
+      blo = bcx - bhi;
+      t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+      _i = s0 - t0;
+      bvirt = s0 - _i;
+      B[0] = s0 - (_i + bvirt) + (bvirt - t0);
+      _j = s1 + _i;
+      bvirt = _j - s1;
+      _0 = s1 - (_j - bvirt) + (_i - bvirt);
+      _i = _0 - t1;
+      bvirt = _0 - _i;
+      B[1] = _0 - (_i + bvirt) + (bvirt - t1);
+      u3 = _j + _i;
+      bvirt = u3 - _j;
+      B[2] = _j - (u3 - bvirt) + (_i - bvirt);
+      B[3] = u3;
+
+      var det = estimate(4, B);
+      var errbound = ccwerrboundB * detsum;
+      if (det >= errbound || -det >= errbound) {
+          return det;
+      }
+
+      bvirt = ax - acx;
+      acxtail = ax - (acx + bvirt) + (bvirt - cx);
+      bvirt = bx - bcx;
+      bcxtail = bx - (bcx + bvirt) + (bvirt - cx);
+      bvirt = ay - acy;
+      acytail = ay - (acy + bvirt) + (bvirt - cy);
+      bvirt = by - bcy;
+      bcytail = by - (bcy + bvirt) + (bvirt - cy);
+
+      if (acxtail === 0 && acytail === 0 && bcxtail === 0 && bcytail === 0) {
+          return det;
+      }
+
+      errbound = ccwerrboundC * detsum + resulterrbound * Math.abs(det);
+      det += (acx * bcytail + bcy * acxtail) - (acy * bcxtail + bcx * acytail);
+      if (det >= errbound || -det >= errbound) { return det; }
+
+      s1 = acxtail * bcy;
+      c = splitter * acxtail;
+      ahi = c - (c - acxtail);
+      alo = acxtail - ahi;
+      c = splitter * bcy;
+      bhi = c - (c - bcy);
+      blo = bcy - bhi;
+      s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+      t1 = acytail * bcx;
+      c = splitter * acytail;
+      ahi = c - (c - acytail);
+      alo = acytail - ahi;
+      c = splitter * bcx;
+      bhi = c - (c - bcx);
+      blo = bcx - bhi;
+      t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+      _i = s0 - t0;
+      bvirt = s0 - _i;
+      u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+      _j = s1 + _i;
+      bvirt = _j - s1;
+      _0 = s1 - (_j - bvirt) + (_i - bvirt);
+      _i = _0 - t1;
+      bvirt = _0 - _i;
+      u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+      u3 = _j + _i;
+      bvirt = u3 - _j;
+      u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+      u[3] = u3;
+      var C1len = sum(4, B, 4, u, C1);
+
+      s1 = acx * bcytail;
+      c = splitter * acx;
+      ahi = c - (c - acx);
+      alo = acx - ahi;
+      c = splitter * bcytail;
+      bhi = c - (c - bcytail);
+      blo = bcytail - bhi;
+      s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+      t1 = acy * bcxtail;
+      c = splitter * acy;
+      ahi = c - (c - acy);
+      alo = acy - ahi;
+      c = splitter * bcxtail;
+      bhi = c - (c - bcxtail);
+      blo = bcxtail - bhi;
+      t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+      _i = s0 - t0;
+      bvirt = s0 - _i;
+      u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+      _j = s1 + _i;
+      bvirt = _j - s1;
+      _0 = s1 - (_j - bvirt) + (_i - bvirt);
+      _i = _0 - t1;
+      bvirt = _0 - _i;
+      u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+      u3 = _j + _i;
+      bvirt = u3 - _j;
+      u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+      u[3] = u3;
+      var C2len = sum(C1len, C1, 4, u, C2);
+
+      s1 = acxtail * bcytail;
+      c = splitter * acxtail;
+      ahi = c - (c - acxtail);
+      alo = acxtail - ahi;
+      c = splitter * bcytail;
+      bhi = c - (c - bcytail);
+      blo = bcytail - bhi;
+      s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+      t1 = acytail * bcxtail;
+      c = splitter * acytail;
+      ahi = c - (c - acytail);
+      alo = acytail - ahi;
+      c = splitter * bcxtail;
+      bhi = c - (c - bcxtail);
+      blo = bcxtail - bhi;
+      t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+      _i = s0 - t0;
+      bvirt = s0 - _i;
+      u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+      _j = s1 + _i;
+      bvirt = _j - s1;
+      _0 = s1 - (_j - bvirt) + (_i - bvirt);
+      _i = _0 - t1;
+      bvirt = _0 - _i;
+      u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+      u3 = _j + _i;
+      bvirt = u3 - _j;
+      u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+      u[3] = u3;
+      var Dlen = sum(C2len, C2, 4, u, D);
+
+      return D[Dlen - 1];
+  }
+
+  function orient2d(ax, ay, bx, by, cx, cy) {
+      var detleft = (ay - cy) * (bx - cx);
+      var detright = (ax - cx) * (by - cy);
+      var det = detleft - detright;
+
+      if (detleft === 0 || detright === 0 || (detleft > 0) !== (detright > 0)) { return det; }
+
+      var detsum = Math.abs(detleft + detright);
+      if (Math.abs(det) >= ccwerrboundA * detsum) { return det; }
+
+      return -orient2dadapt(ax, ay, bx, by, cx, cy, detsum);
+  }
+
   /**
    * Signed area of the triangle (p0, p1, p2)
    * @param  {Array.<Number>} p0
@@ -943,7 +1211,10 @@
    * @return {Number}
    */
   function signedArea(p0, p1, p2) {
-    return (p0[0] - p2[0]) * (p1[1] - p2[1]) - (p1[0] - p2[0]) * (p0[1] - p2[1]);
+    var res = orient2d(p0[0], p0[1], p1[0], p1[1], p2[0], p2[1]);
+    if (res > 0) { return -1; }
+    if (res < 0) { return 1; }
+    return 0;
   }
 
   /**
@@ -1390,6 +1661,15 @@
     return sortedEvents;
   }
 
+  var Contour = function Contour () {
+
+    this.points = [];
+    this.holes = [];
+    this.external = true;
+    this.precomputedCC = false;
+
+  };
+
   /**
    * @param  {Array.<SweepEvent>} sortedEvents
    * @return {Array.<SweepEvent>}
@@ -1446,12 +1726,12 @@
    * @param  {Object>}    processed
    * @return {Number}
    */
-  function nextPos(pos, resultEvents, processed, origIndex) {
-    var p, p1;
-    var newPos = pos + 1;
+  function nextPos(pos, resultEvents, processed) {
+    var newPos = pos + 1,
+        p = resultEvents[pos].point,
+        p1;
     var length = resultEvents.length;
 
-    p  = resultEvents[pos].point;
 
     if (newPos < length)
       { p1 = resultEvents[newPos].point; }
@@ -1459,6 +1739,10 @@
 
     // while in range and not the current one by value
     while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
+
+      // if (newPos === -1) {
+      //   throw `Problem with pos, ${pos}, ${newPos}`;
+      // }
       if (!processed[newPos]) {
         return newPos;
       } else   {
@@ -1469,9 +1753,10 @@
 
     newPos = pos - 1;
 
-    while (processed[newPos] && newPos >= origIndex) {
+    while (processed[newPos]) {
       newPos--;
     }
+
     return newPos;
   }
 
@@ -1480,7 +1765,7 @@
    * @param  {Array.<SweepEvent>} sortedEvents
    * @return {Array.<*>} polygons
    */
-  function connectEdges(sortedEvents, operation) {
+  function connectEdges(sortedEvents) {
     var i, len;
     var resultEvents = orderEvents(sortedEvents);
 
@@ -1488,60 +1773,66 @@
     var processed = {};
     var result = [];
     var event;
+    var depth = [];
+    var holeOf = [];
 
     for (i = 0, len = resultEvents.length; i < len; i++) {
-      if (processed[i]) { continue; }
-      var contour = [[]];
 
-      if (!resultEvents[i].isExteriorRing) {
-        if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length === 0) {
-          result.push(contour);
-        } else if (result.length === 0) {
-          result.push([[contour]]);
-        } else {
-          result[result.length - 1].push(contour[0]);
+      if (processed[i]) { continue; }
+      var contour = new Contour();
+      result.push(contour);
+      var contourId = result.length - 1;
+      depth.push(0);
+      holeOf.push(-1);
+
+      if (resultEvents[i].prevInResult) {
+        var lowerContourId = resultEvents[i].prevInResult.contourId;
+        if (!resultEvents[i].prevInResult.resultInOut) {
+          result[lowerContourId].holes.push(contourId);
+          holeOf[contourId] = lowerContourId;
+          depth[contourId] = depth[lowerContourId] + 1;
+          contour.external = false;
+        } else if (!result[lowerContourId].external) {
+          result[holeOf[lowerContourId]].holes.push(contourId);
+          holeOf[contourId] = holeOf[lowerContourId];
+          depth[contourId] = depth[lowerContourId];
+          contour.external = false;
         }
-      } else if (operation === DIFFERENCE && !resultEvents[i].isSubject && result.length > 1) {
-        result[result.length - 1].push(contour[0]);
-      } else {
-        result.push(contour);
       }
 
-      var ringId = result.length - 1;
       var pos = i;
 
       var initial = resultEvents[i].point;
-      contour[0].push(initial);
+      contour.points.push(initial);
 
-      while (pos >= i) {
-        event = resultEvents[pos];
-        processed[pos] = true;
 
-        if (event.left) {
-          event.resultInOut = false;
-          event.contourId   = ringId;
-        } else {
-          event.otherEvent.resultInOut = true;
-          event.otherEvent.contourId   = ringId;
-        }
+      while (resultEvents[pos] && resultEvents[pos].otherEvent.point !== initial) {
+          event = resultEvents[pos];
+          processed[pos] = true;
 
-        pos = event.pos;
-        processed[pos] = true;
-        contour[0].push(resultEvents[pos].point);
-        pos = nextPos(pos, resultEvents, processed, i);
+          if (event.left) {
+            event.resultInOut = false;
+            event.contourId   = contourId;
+          } else {
+            event.otherEvent.resultInOut = true;
+            event.otherEvent.contourId  = contourId;
+          }
+
+          pos = event.pos;
+          processed[pos] = true;
+          contour.points.push(resultEvents[pos].point);
+          pos = nextPos(pos, resultEvents, processed);
       }
-
       pos = pos === -1 ? i : pos;
 
       event = resultEvents[pos];
       processed[pos] = processed[event.pos] = true;
       event.otherEvent.resultInOut = true;
-      event.otherEvent.contourId   = ringId;
+      event.otherEvent.contourId   = contourId;
+
+      contour.points.push(contour.points[0]);
     }
 
-    // Handle if the result is a polygon (eg not multipoly)
-    // Commented it again, let's see what do we mean by that
-    // if (result.length === 1) result = result[0];
     return result;
   }
 
@@ -1759,7 +2050,7 @@
     var sbbox = [Infinity, Infinity, -Infinity, -Infinity];
     var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
-    //console.time('fill queue');
+    // console.time('fill queue');
     var eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
     //console.timeEnd('fill queue');
 
@@ -1767,14 +2058,28 @@
     if (trivial) {
       return trivial === EMPTY ? null : trivial;
     }
-    //console.time('subdivide edges');
+    // console.time('subdivide edges');
     var sortedEvents = subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation);
     //console.timeEnd('subdivide edges');
 
-    //console.time('connect vertices');
+    // console.time('connect vertices');
     var result = connectEdges(sortedEvents, operation);
+    // console.log(result)
     //console.timeEnd('connect vertices');
-    return result;
+
+    var out = [];
+    for (var i = 0; i < result.length; i++) {
+      var contour = result[i];
+      if (contour.external) {
+        var outCoords = [contour.points];
+        for (var ii = 0; ii < contour.holes.length; ii++) {
+          contour.holes[ii];
+          outCoords.push(result[contour.holes[ii]].points);
+        }
+        out.push(outCoords);
+      }
+    }
+    return out;
   }
 
   function union (subject, clipping) {
@@ -1964,7 +2269,7 @@
 
     //if (op === OPERATIONS.UNION) result = result[0];
     console.log('result', result);
-    // console.log(JSON.stringify(result))
+    console.log(JSON.stringify(result));
     results.clearLayers();
 
     if (result !== null) {

@@ -60,7 +60,7 @@ export default function boolean(subject, clipping, operation) {
   const sbbox = [Infinity, Infinity, -Infinity, -Infinity];
   const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
-  //console.time('fill queue');
+  // console.time('fill queue');
   const eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('fill queue');
 
@@ -68,15 +68,26 @@ export default function boolean(subject, clipping, operation) {
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  //console.time('subdivide edges');
+  // console.time('subdivide edges');
   const sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('subdivide edges');
 
-  //console.time('connect vertices');
+  // console.time('connect vertices');
   const result = connectEdges(sortedEvents, operation);
-  console.log(result)
+  // console.log(result)
   //console.timeEnd('connect vertices');
-  return [result.map(function (c) {
-    return c.points;
-  })];
+
+  const out = [];
+  for (var i = 0; i < result.length; i++) {
+    const contour = result[i];
+    if (contour.external) {
+      const outCoords = [contour.points];
+      for (var ii = 0; ii < contour.holes.length; ii++) {
+        contour.holes[ii];
+        outCoords.push(result[contour.holes[ii]].points);
+      }
+      out.push(outCoords);
+    }
+  }
+  return out;
 }
