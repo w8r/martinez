@@ -74,34 +74,40 @@ export default function boolean(subject, clipping, operation) {
 
   // console.time('connect vertices');
   const result = connectEdges(sortedEvents, operation);
-  // console.log(result)
+  console.log(result)
   //console.timeEnd('connect vertices');
 
   const out = [];
   for (var i = 0; i < result.length; i++) {
     const contour = result[i];
+    const points = contour.points;
     if (contour.external) {
-      if (contour.points[0][0] !== contour.points[contour.points.length - 1][0] ||
-          contour.points[0][1] !== contour.points[contour.points.length - 1][1]
+      if (points[0][0] !== points[points.length - 1][0] ||
+          points[0][1] !== points[points.length - 1][1]
       ) {
-        contour.points.push([contour.points[0][0], contour.points[0][1]]);
+        points.push([points[0][0], points[0][1]]);
       }
 
       const outCoords = [];
-      outCoords.push(contour.points);
-      for (var ii = 0; ii < contour.holes.length; ii++) {
-        const requiredContour = contour.holes;
-        if (result[requiredContour].points[0][0] !==
-            result[requiredContour].points[result[requiredContour].points.length - 1][0] ||
-            result[requiredContour].points[0][1] !==
-            result[requiredContour].points[result[requiredContour].points.length - 1][1]
-        ) {
-           result[requiredContour].points([result[requiredContour].points[0], result[requiredContour].points[1]]);
-        }
 
-        outCoords.push(result[requiredContour].points);
+      if (points.length > 2) {
+        outCoords.push(contour.points);
+        for (var ii = 0; ii < contour.holes.length; ii++) {
+          const hole = result[contour.holes[ii]].points;
+          if (hole[0][0] !==
+              hole[hole.length - 1][0] ||
+              hole[0][1] !==
+              hole[hole.length - 1][1]
+          ) {
+             hole.push([hole[0][0], hole[0][1]]);
+          }
+          if (hole.length > 2) {
+            outCoords.push(hole);
+          }
+        }
+        out.push(outCoords);
       }
-      out.push(outCoords);
+
     }
   }
   return out;
