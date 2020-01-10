@@ -63,17 +63,10 @@ function nextPos(pos, resultEvents, processed) {
       p1;
   const length = resultEvents.length;
 
-
   if (newPos < length)
     p1 = resultEvents[newPos].point;
 
-
-  // while in range and not the current one by value
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
-
-    // if (newPos === -1) {
-    //   throw `Problem with pos, ${pos}, ${newPos}`;
-    // }
     if (!processed[newPos]) {
       return newPos;
     } else   {
