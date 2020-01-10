@@ -117,5 +117,20 @@ tap.test('compare segments', (main) => {
     t.end();
   });
 
+  main.test('T-shape cases', (t) => {
+    // shape: \/
+    //         \
+    const se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 0], false));
+    const se2 = new SweepEvent([0.5, 0.5], true, new SweepEvent([1, 1], false));
+
+    //const se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 1], false));
+    //const se2 = new SweepEvent([0, 2], true, new SweepEvent([1, 2], false));
+
+    t.equal(compareSegments(se1, se2), -1);
+    t.equal(compareSegments(se2, se1), +1);
+
+    t.end();
+  });
+
   main.end();
 });

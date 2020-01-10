@@ -87,6 +87,11 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
           computeFields(event,     prevEvent,     operation);
         }
       }
+
+      console.log(`event.inOut = ${event.inOut}`);
+      console.log(`event.otherInOut = ${event.otherInOut}`);
+      console.log(`event.inResult = ${event.inResult}`);
+
     } else {
       event = event.otherEvent;
       next = prev = sweepLine.find(event);
