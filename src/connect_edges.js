@@ -111,11 +111,13 @@ export default function connectEdges(sortedEvents) {
 
     if (processed[i]) continue;
     const contour = new Contour();
+    result.push(contour);
+
     let contourId = result.length - 1;
     depth.push(0);
     holeOf.push(-1);
 
-    if (resultEvents[i].prevInResult) {
+    if (resultEvents[i].prevInResult !== null) {
       const lowerContourId = resultEvents[i].prevInResult.contourId;
       if (!resultEvents[i].prevInResult.resultInOut) {
         result[lowerContourId].holes.push(contourId);
@@ -159,10 +161,6 @@ export default function connectEdges(sortedEvents) {
     processed[pos] = processed[event.pos] = true;
     event.otherEvent.resultInOut = true;
     event.otherEvent.contourId   = contourId;
-
-    contour.points.push(contour.points[0]);
-    result.push(contour);
-
   }
 
   return result;

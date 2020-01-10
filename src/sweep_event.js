@@ -117,6 +117,7 @@ export default class SweepEvent {
     const copy = new SweepEvent(
       this.point, this.left, this.otherEvent, this.isSubject, this.type);
 
+    copy.contourId      = this.contourId;
     copy.inResult       = this.inResult;
     copy.prevInResult   = this.prevInResult;
     copy.isExteriorRing = this.isExteriorRing;

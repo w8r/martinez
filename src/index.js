@@ -81,10 +81,25 @@ export default function boolean(subject, clipping, operation) {
   for (var i = 0; i < result.length; i++) {
     const contour = result[i];
     if (contour.external) {
-      const outCoords = [contour.points];
+      if (contour.points[0][0] !== contour.points[contour.points.length - 1][0] ||
+          contour.points[0][1] !== contour.points[contour.points.length - 1][1]
+      ) {
+        contour.points.push([contour.points[0][0], contour.points[0][1]]);
+      }
+
+      const outCoords = [];
+      outCoords.push(contour.points);
       for (var ii = 0; ii < contour.holes.length; ii++) {
-        contour.holes[ii];
-        outCoords.push(result[contour.holes[ii]].points);
+        const requiredContour = contour.holes;
+        if (result[requiredContour].points[0][0] !==
+            result[requiredContour].points[result[requiredContour].points.length - 1][0] ||
+            result[requiredContour].points[0][1] !==
+            result[requiredContour].points[result[requiredContour].points.length - 1][1]
+        ) {
+           result[requiredContour].points([result[requiredContour].points[0], result[requiredContour].points[1]]);
+        }
+
+        outCoords.push(result[requiredContour].points);
       }
       out.push(outCoords);
     }
