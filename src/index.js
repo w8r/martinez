@@ -89,7 +89,7 @@ export default function boolean(subject, clipping, operation) {
 
       const outCoords = [];
 
-      if (points.length > 2) {
+      if (points.length > 3) {
         outCoords.push(contour.points);
         for (var ii = 0; ii < contour.holes.length; ii++) {
           const hole = result[contour.holes[ii]].points;
@@ -100,7 +100,7 @@ export default function boolean(subject, clipping, operation) {
           ) {
              hole.push([hole[0][0], hole[0][1]]);
           }
-          if (hole.length > 2) {
+          if (hole.length > 3) {
             outCoords.push(hole);
           }
         }
