@@ -35,27 +35,6 @@ export default function compareSegments(le1, le2) {
     // into S after the line segment associated to e1
     //return le1.isBelow(le2.point) ? -1 : 1;
 
-    // le2 before le1
-    /*
-    if (compareEvents(le1, le2) === 1) {
-      //return le2.isAbove(le1.point) ? -1 : 1;
-      let signedAreaLe1 = signedArea(le1.point, le2.point, le2.otherEvent.point);
-      if (signedAreaLe1 !== 0) {
-        return signedAreaLe1;
-      } else {
-        return signedArea(le1.otherEvent.point, le2.point, le2.otherEvent.point);
-      }
-    } else {
-      let signedAreaLe2 = -signedArea(le2.point, le1.point, le1.otherEvent.point);
-      if (signedAreaLe2 !== 0) {
-        return signedAreaLe2;
-      } else {
-        return -signedArea(le2.otherEvent.point, le1.point, le1.otherEvent.point);
-      }
-
-    }
-    */
-
     if (compareEvents(le1, le2) === -1) {
       var evt_older = le1;
       var evt_newer = le2;
@@ -88,43 +67,3 @@ export default function compareSegments(le1, le2) {
 
   return compareEvents(le1, le2) === 1 ? 1 : -1;
 }
-
-
-/*
-export default function compareSegments(le1, le2) {
-  if (le1 === le2) return 0;
-
-  if (compareEvents(le1, le2) === 1) {
-    var a1 = le1.point;
-    var a2 = le1.otherEvent.point;
-    var b1 = le2.point;
-    var b2 = le2.otherEvent.point;
-  } else {
-    var a1 = le2.point;
-    var a2 = le2.otherEvent.point;
-    var b1 = le1.point;
-    var b2 = le1.otherEvent.point;
-  }
-
-  if (signedArea(a1, b1, b2) === 0){
-    if (signedArea(a2, b1, b2) === 0) {
-      if (le1.isSubject === le2.isSubject) { // same polygon
-        let p1 = le1.point, p2 = le2.point;
-        if (p1[0] === p2[0] && p1[1] === p2[1]/ *equals(le1.point, le2.point)* /) {
-          p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
-          if (p1[0] === p2[0] && p1[1] === p2[1]) return 0;
-          else return le1.contourId > le2.contourId ? 1 : -1;
-        } else {
-          return compareEvents(le1, le2) === 1 ? 1 : -1;
-        }
-      } else { // Segments are collinear, but belong to separate polygons
-        return le1.isSubject ? -1 : 1;
-      }
-
-    }
-    return signedArea(a2, b1, b2) ? 1 : -1;
-  }
-  return signedArea(a1, b1, b2) ? 1 : -1;
-
-}
-*/

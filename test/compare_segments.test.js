@@ -117,15 +117,33 @@ tap.test('compare segments', (main) => {
     t.end();
   });
 
-  main.test('T-shape cases', (t) => {
+  main.test('T-shaped cases', (t) => {
+    // Ensures that segments touching at endpoints are ordered correctly
+    let se1, se2;
+
     // shape: \/
     //         \
-    const se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 0], false));
-    const se2 = new SweepEvent([0.5, 0.5], true, new SweepEvent([1, 1], false));
+    se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 0], false));
+    se2 = new SweepEvent([0.5, 0.5], true, new SweepEvent([1, 1], false));
+    t.equal(compareSegments(se1, se2), -1);
+    t.equal(compareSegments(se2, se1), +1);
 
-    //const se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 1], false));
-    //const se2 = new SweepEvent([0, 2], true, new SweepEvent([1, 2], false));
+    // shape:  /
+    //        /\
+    se1 = new SweepEvent([0, 0],  true, new SweepEvent([1, 1], false));
+    se2 = new SweepEvent([0.5, 0.5], true, new SweepEvent([1, 0], false));
+    t.equal(compareSegments(se1, se2), +1);
+    t.equal(compareSegments(se2, se1), -1);
 
+    // shape: T
+    se1 = new SweepEvent([0, 1],  true, new SweepEvent([1, 1], false));
+    se2 = new SweepEvent([0.5, 1], true, new SweepEvent([0.5, 0], false));
+    t.equal(compareSegments(se1, se2), +1);
+    t.equal(compareSegments(se2, se1), -1);
+
+    // shape: T upside down
+    se1 = new SweepEvent([0, 0],  true, new SweepEvent([1, 0], false));
+    se2 = new SweepEvent([0.5, 1], true, new SweepEvent([0.5, 0], false));
     t.equal(compareSegments(se1, se2), -1);
     t.equal(compareSegments(se2, se1), +1);
 
