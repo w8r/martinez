@@ -118,7 +118,7 @@ tap.test('compare segments', (main) => {
   });
 
   main.test('T-shaped cases', (t) => {
-    // Ensures that segments touching at endpoints are ordered correctly
+    // Ensures that segments touching at endpoints are ordered correctly.
     let se1, se2;
 
     // shape: \/

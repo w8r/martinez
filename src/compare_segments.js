@@ -11,47 +11,37 @@ import equals        from './equals';
 export default function compareSegments(le1, le2) {
   if (le1 === le2) return 0;
 
-  // Get orientation of left enpoints w.r.t. other segment
-  let signedAreaLe1 = signedArea(le1.point, le2.point, le2.otherEvent.point);
-  let signedAreaLe2 = signedArea(le2.point, le1.point, le1.otherEvent.point);
-
   // Segments are not collinear
-  //if (signedAreaLe1 !== 0 || signedAreaLe2 !== 0) {
    if (signedArea(le1.point, le1.otherEvent.point, le2.point) !== 0 ||
        signedArea(le1.point, le1.otherEvent.point, le2.otherEvent.point) !== 0) {
 
-
-    // If they share their left endpoint use the right endpoint to sort
+    // Left endpoints exactly identical? Use the right endpoint to sort
     if (equals(le1.point, le2.point)) return le1.isBelow(le2.otherEvent.point) ? -1 : 1;
 
-    // Different left endpoint: use the left endpoint to sort
+    // Left endpoints identical in x, but different in y? Sort by y
     if (le1.point[0] === le2.point[0]) return le1.point[1] < le2.point[1] ? -1 : 1;
 
-    // has the line segment associated to e1 been inserted
-    // into S after the line segment associated to e2 ?
-    //if (compareEvents(le1, le2) === 1) return le2.isAbove(le1.point) ? -1 : 1;
-
-    // The line segment associated to e2 has been inserted
-    // into S after the line segment associated to e1
-    //return le1.isBelow(le2.point) ? -1 : 1;
-
+    // Default case:
+    // - Determine which segment is older, i.e., has been inserted before in the sweep line.
+    // - Project the left/start point of the new segment onto the existing segment.
+    // - If this point falls exactly onto the existing segment, use the right point to sort.
+    var oldEvt, newEvt, invertSignedArea;
     if (compareEvents(le1, le2) === -1) {
-      var evt_older = le1;
-      var evt_newer = le2;
-      var signed_area_factor = -1;
+      oldEvt = le1;
+      newEvt = le2;
+      invertSignedArea = -1;
     } else {
-      var evt_older = le2;
-      var evt_newer = le1;
-      var signed_area_factor = 1;
+      oldEvt = le2;
+      newEvt = le1;
+      invertSignedArea = 1;
     }
 
-    let isLeftPointBelow = signed_area_factor * signedArea(evt_newer.point, evt_older.point, evt_older.otherEvent.point);
-    if (isLeftPointBelow !== 0) {
-      return isLeftPointBelow;
+    let cmpNewLeftPoint = invertSignedArea * signedArea(newEvt.point, oldEvt.point, oldEvt.otherEvent.point);
+    if (cmpNewLeftPoint !== 0) {
+      return cmpNewLeftPoint;
     } else {
-      return signed_area_factor * signedArea(evt_newer.otherEvent.point, evt_older.point, evt_older.otherEvent.point);
+      return invertSignedArea * signedArea(newEvt.otherEvent.point, oldEvt.point, oldEvt.otherEvent.point);
     }
-
   }
 
   if (le1.isSubject === le2.isSubject) { // same polygon
@@ -60,10 +50,11 @@ export default function compareSegments(le1, le2) {
       p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
       if (p1[0] === p2[0] && p1[1] === p2[1]) return 0;
       else return le1.contourId > le2.contourId ? 1 : -1;
+    } else {
+      return compareEvents(le1, le2) === 1 ? 1 : -1;
     }
   } else { // Segments are collinear, but belong to separate polygons
     return le1.isSubject ? -1 : 1;
   }
 
-  return compareEvents(le1, le2) === 1 ? 1 : -1;
 }
