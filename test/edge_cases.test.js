@@ -217,6 +217,9 @@ tap.test('Edge cases', (main) => {
   });
 
   main.test('infinite loop crash', (t) => {
+    // This test case currently only ensures that there is no infinite loop.
+    // The specified result is still invalid. See discussion at:
+    // https://github.com/w8r/martinez/issues/114
     const p1 = [[
       [180.60987101280907, 22.943242898435663],
       [280.6098710128091, 22.943242898435663],
@@ -247,7 +250,6 @@ tap.test('Edge cases', (main) => {
       [280.6098710128091, 62.94324289843566],
       [280.6098710128091, 22.943242898435663],
     ]]];
-    console.log(JSON.stringify(r));
 
     t.deepEqual(martinez.intersection(p1, p2), r);
     t.end();

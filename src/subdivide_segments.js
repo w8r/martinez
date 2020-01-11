@@ -8,29 +8,7 @@ import {
 } from './operation';
 
 
-function evt_to_str(e) {
-  if (e == null) {
-    return "null";
-  } else if (e.left) {
-    return `L ${e.point} => ${e.otherEvent.point}`
-  } else {
-    return `E ${e.otherEvent.point} <= ${e.point}`
-  }
-}
-function printSweepLine(sweepLine) {
-  console.log("Sweepline:");
-  var lines = [];
-  sweepLine.forEach(node => {
-    lines.push(`${evt_to_str(node.key)} => ${node.data}`)
-  })
-  lines = lines.reverse();
-  for (let line of lines) {
-    console.log(line);
-  }
-}
-
 export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
-  console.log("Entering 'subdivide'");
   const sweepLine = new Tree(compareSegments);
   const sortedEvents = [];
 
@@ -41,10 +19,6 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
   while (eventQueue.length !== 0) {
     let event = eventQueue.pop();
     sortedEvents.push(event);
-
-    //console.log("Handling event: ", event);
-    console.log("\n *** Processing Event: " + evt_to_str(event))
-    printSweepLine(sweepLine);
 
     // optimization by bboxes for intersection and difference goes here
     if ((operation === INTERSECTION && event.point[0] > rightbound) ||
@@ -61,15 +35,11 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
 
       next = sweepLine.next(next);
 
-      console.log("next: " + evt_to_str(next ? next.key : null))
-      console.log("prev: " + evt_to_str(prev ? prev.key : null))
-
       const prevEvent = prev ? prev.key : null;
       let prevprevEvent;
       computeFields(event, prevEvent, operation);
       if (next) {
         if (possibleIntersection(event, next.key, eventQueue) === 2) {
-          console.log("Intersects with next");
           computeFields(event, prevEvent, operation);
           computeFields(event, next.key, operation);
         }
@@ -77,7 +47,6 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
 
       if (prev) {
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
-          console.log("Intersects with prev");
           let prevprev = prev;
           if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
           else                    prevprev = null;
@@ -87,11 +56,6 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
           computeFields(event,     prevEvent,     operation);
         }
       }
-
-      console.log(`event.inOut = ${event.inOut}`);
-      console.log(`event.otherInOut = ${event.otherInOut}`);
-      console.log(`event.inResult = ${event.inResult}`);
-
     } else {
       event = event.otherEvent;
       next = prev = sweepLine.find(event);
@@ -105,12 +69,10 @@ export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, o
         sweepLine.remove(event);
 
         if (next && prev) {
-          console.log("Checking for intersection between adjacent segments after removal");
           possibleIntersection(prev.key, next.key, eventQueue);
         }
       }
     }
-    printSweepLine(sweepLine);
   }
   return sortedEvents;
 }
