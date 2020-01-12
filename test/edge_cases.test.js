@@ -5,54 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('touching hourglasses', (t) => {
-    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'hourglasses.geojson'));
-    const subject  = shapes.features[0];
-    const clipping = shapes.features[1];
-
-    t.test('intersection', (t) => {
-      const result = martinez.intersection(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0.5],[0.25,0.75],[0,1],[0,0.5]]],[[[0.75,0.75],[1,0.5],[1,1],[0.75,0.75]]]]);
-
-      t.end();
-    });
-
-    t.test('union', (t) => {
-      const result = martinez.union(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[0.5,0.5],[0.25,0.75],[0.5,1],[0,1.5],[0,1],[0,0.5],[0,0]]],[[[0.5,0.5],[1,0],[1,0.5],[1,1],[1,1.5],[0.5,1],[0.75,0.75],[0.5,0.5]]]]);
-
-      t.end();
-    });
-
-    t.test('difference', (t) => {
-      const result = martinez.diff(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[0.5,0.5],[0.25,0.75],[0,0.5],[0,0]]],[[[0.5,0.5],[1,0],[1,0.5],[0.75,0.75],[0.5,0.5]]]]);
-
-      t.end();
-    });
-
-    t.test('difference 2', (t) => {
-      const result = martinez.diff(
-        clipping.geometry.coordinates,
-        subject.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,1],[0.25,0.75],[0.5,1],[0,1.5],[0,1]]],[[[0.5,1],[0.75,0.75],[1,1],[1,1.5],[0.5,1]]]]);
-
-      t.end();
-    });
-
-    t.end();
-  });
-
   main.test('polygon + trapezoid', (t) => {
     const shapes   = load.sync(path.join(__dirname, 'fixtures', 'polygon_trapezoid_edge_overlap.geojson'));
     const subject  = shapes.features[0];
