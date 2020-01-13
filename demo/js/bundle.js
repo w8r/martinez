@@ -79,14 +79,12 @@
       var form = container.querySelector('form');
       L$1.DomEvent
         .on(form, 'submit', function (evt) {
-          var this$1 = this;
-
           L$1.DomEvent.stop(evt);
           var radios = Array.prototype.slice.call(
             form.querySelectorAll('input[type=radio]'));
           for (var i = 0, len = radios.length; i < len; i++) {
             if (radios[i].checked) {
-              this$1.options.callback(parseInt(radios[i].value));
+              this.options.callback(parseInt(radios[i].value));
               break;
             }
           }
@@ -152,33 +150,29 @@
 
 
   SplayTree.prototype._splay = function _splay (x) {
-      var this$1 = this;
-
     while (x.parent) {
       var p = x.parent;
       if (!p.parent) {
-        if (p.left === x) { this$1.rotateRight(p); }
-        else            { this$1.rotateLeft(p); }
+        if (p.left === x) { this.rotateRight(p); }
+        else            { this.rotateLeft(p); }
       } else if (p.left === x && p.parent.left === p) {
-        this$1.rotateRight(p.parent);
-        this$1.rotateRight(p);
+        this.rotateRight(p.parent);
+        this.rotateRight(p);
       } else if (p.right === x && p.parent.right === p) {
-        this$1.rotateLeft(p.parent);
-        this$1.rotateLeft(p);
+        this.rotateLeft(p.parent);
+        this.rotateLeft(p);
       } else if (p.left === x && p.parent.right === p) {
-        this$1.rotateRight(p);
-        this$1.rotateLeft(p);
+        this.rotateRight(p);
+        this.rotateLeft(p);
       } else {
-        this$1.rotateLeft(p);
-        this$1.rotateRight(p);
+        this.rotateLeft(p);
+        this.rotateRight(p);
       }
     }
   };
 
 
   SplayTree.prototype.splay = function splay (x) {
-      var this$1 = this;
-
     var p, gp, ggp, l, r;
 
     while (x.parent) {
@@ -192,7 +186,7 @@
         x.parent = ggp;
       } else {
         x.parent = null;
-        this$1._root = x;
+        this._root = x;
       }
 
       l = x.left; r = x.right;
@@ -529,8 +523,6 @@
    * @return {SplayTree}
    */
   SplayTree.prototype.range = function range (low, high, fn, ctx) {
-      var this$1 = this;
-
     var Q = [];
     var compare = this._compare;
     var node = this._root, cmp;
@@ -545,7 +537,7 @@
         if (cmp > 0) {
           break;
         } else if (compare(node.key, low) >= 0) {
-          if (fn.call(ctx, node)) { return this$1; } // stop if smth is returned
+          if (fn.call(ctx, node)) { return this; } // stop if smth is returned
         }
         node = node.right;
       }
@@ -1234,7 +1226,7 @@
     // Event with lower y-coordinate is processed first
     if (p1[1] !== p2[1]) { return p1[1] > p2[1] ? 1 : -1; }
 
-    return specialCases(e1, e2, p1, p2);
+    return specialCases(e1, e2, p1);
   }
 
 
@@ -1840,8 +1832,6 @@
   var default_1 = TinyQueue;
 
   function TinyQueue(data, compare) {
-      var this$1 = this;
-
       if (!(this instanceof TinyQueue)) { return new TinyQueue(data, compare); }
 
       this.data = data || [];
@@ -1849,7 +1839,7 @@
       this.compare = compare || defaultCompare;
 
       if (this.length > 0) {
-          for (var i = (this.length >> 1) - 1; i >= 0; i--) { this$1._down(i); }
+          for (var i = (this.length >> 1) - 1; i >= 0; i--) { this._down(i); }
       }
   }
 
@@ -1901,8 +1891,6 @@
       },
 
       _down: function (pos) {
-          var this$1 = this;
-
           var data = this.data;
           var compare = this.compare;
           var halfLength = this.length >> 1;
@@ -1913,7 +1901,7 @@
               var right = left + 1;
               var best = data[left];
 
-              if (right < this$1.length && compare(data[right], best) < 0) {
+              if (right < this.length && compare(data[right], best) < 0) {
                   left = right;
                   best = data[right];
               }
