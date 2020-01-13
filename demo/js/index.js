@@ -111,7 +111,9 @@ var map = window.map = L.map('image-map', {
   maxZoom: 20,
   center: [0, 0],
   zoom: 2,
-  crs: L.CRS.Simple,
+  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
+    transformation: new L.Transformation(1/8, 0, -1/8, 0)
+  }),
   editable: true
 });
 
