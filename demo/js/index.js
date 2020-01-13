@@ -149,7 +149,7 @@ var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
 function getClippingPoly (layers) {
-  if (rawData.features.length > 1) return rawData.features[1];
+  if (rawData !== null && rawData.features.length > 1) return rawData.features[1];
   return layers[1].toGeoJSON();
 }
 
