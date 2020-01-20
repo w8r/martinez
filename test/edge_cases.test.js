@@ -5,44 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('polygon + trapezoid', (t) => {
-    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'polygon_trapezoid_edge_overlap.geojson'));
-    const subject  = shapes.features[0];
-    const clipping = shapes.features[1];
-
-    t.test('intersection', function(t) {
-      const result = martinez.intersection(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[3.5,3.5],[7,0],[14,0],[17.5,3.5],[3.5,3.5]]]]);
-
-      t.end();
-    });
-
-    t.test('union', (t) => {
-      const result = martinez.union(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[7,0],[14,0],[21,0],[21,3.5],[17.5,3.5],[21,7],[0,7],[3.5,3.5],[0,3.5],[0,0]]]]);
-
-      t.end();
-    });
-
-    t.test('difference', (t) => {
-      const result = martinez.diff(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[7,0],[3.5,3.5],[0,3.5],[0,0]]],[[[14,0],[21,0],[21,3.5],[17.5,3.5],[14,0]]]]);
-
-      t.end();
-    });
-
-    t.end();
-  });
-
   main.test('overlapping edge + one inside', (t) => {
     const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_loop.geojson'));
     const subject  = shapes.features[0];
