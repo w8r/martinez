@@ -5,32 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('collapsed edges removed', (t) => {
-    const p1 = [[
-      [355,139],
-      [420,202],
-      [384,237],
-      [353,205],
-      [330,230],
-      [330,230],
-      [291,197]
-    ]];
-    const p2 =[[
-      [355,139],
-      [420,202],
-      [384,237],
-      [353,205],
-
-      [330,230],
-      [330,230],
-      [291,197]
-    ]];
-
-    t.deepEqual(martinez.intersection(p1, p2), [[[[291,197],[330,230],[353,205],[384,237],[420,202],[355,139]]]]);
-    t.end();
-  });
-
-
   main.test('issue #76', (t) => {
     const shapes   = load.sync(path.join(__dirname, 'fixtures', 'rectangles.geojson'));
     const subject  = shapes.features[0];
