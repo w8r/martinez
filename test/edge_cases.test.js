@@ -5,44 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('overlapping edge + one inside', (t) => {
-    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_loop.geojson'));
-    const subject  = shapes.features[0];
-    const clipping = shapes.features[1];
-
-    t.test('intersection', (t) => {
-      const result = martinez.intersection(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[57.8,-49.1],[177.8,-49.1],[177.8,-37.1],[57.8,-37.1],[57.8,-49.1]]]]);
-
-      t.end();
-    });
-
-    t.test('union', (t) => {
-      const result = martinez.union(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[57.8,-97.1],[196.4,-97.1],[196.4,-11.5],[57.8,-11.5],[57.8,-37.1],[57.8,-49.1],[57.8,-97.1]]]]);
-
-      t.end();
-    });
-
-    t.test('difference', (t) => {
-      const result = martinez.diff(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, []);
-
-      t.end();
-    });
-
-    t.end();
-  });
-
   main.test('overlapping Y shift', (t) => {
     const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_y.geojson'));
     const subject  = shapes.features[0];
