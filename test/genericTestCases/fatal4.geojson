@@ -45,7 +45,10 @@
     },
     {
       "type": "Feature",
-      "properties": {"operation": "union"},
+      "properties": {
+        "operation": "union",
+        "comment": "This test case currently has a wrong result, but will most likely be fixed by #115"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -82,7 +85,10 @@
     },
     {
       "type": "Feature",
-      "properties": {"operation": "intersection"},
+      "properties": {
+        "operation": "intersection",
+        "comment": "This test case currently has a wrong result, but will most likely be fixed by #115"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
