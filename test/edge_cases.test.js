@@ -5,44 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('touching boxes', (t) => {
-    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'touching_boxes.geojson'));
-    const subject  = shapes.features[0];
-    const clipping = shapes.features[1];
-
-    t.test('intersection', (t) => {
-      const result = martinez.intersection(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, []);
-
-      t.end();
-    });
-
-    t.test('union', (t) => {
-      const result = martinez.union(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[3,0],[3,1],[4,1],[4,2],[3,2],[3,3],[0,3],[0,0]]]]);
-
-      t.end();
-    });
-
-    t.test('difference', (t) => {
-      const result = martinez.diff(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[0,0],[3,0],[3,1],[3,2],[3,3],[0,3],[0,0]]]]);
-
-      t.end();
-    });
-
-    t.end();
-  });
-
   main.test('disjoint union nesting', (t) => { // issue #47
     const p1 = [[[12.91,6.09],[12.91,6.91],[12.09,6.91],[12.09,6.09],[12.91,6.09]]
     ];
