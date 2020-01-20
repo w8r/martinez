@@ -5,44 +5,6 @@ import path     from 'path';
 
 tap.test('Edge cases', (main) => {
 
-  main.test('overlapping Y shift', (t) => {
-    const shapes   = load.sync(path.join(__dirname, 'fixtures', 'overlap_y.geojson'));
-    const subject  = shapes.features[0];
-    const clipping = shapes.features[1];
-
-    t.test('intersection', function(t) {
-      const result = martinez.intersection(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[-1883,-8.5],[-1783,-8.5],[-1783,-3],[-1883,-3],[-1883,-8.5]]]]);
-
-      t.end();
-    });
-
-    t.test('union', (t) => {
-      const result = martinez.union(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, [[[[-1883,-25],[-1783,-25],[-1783,-8.5],[-1783,-3],[-1783,75],[-1883,75],[-1883,-3],[-1883,-8.5],[-1883,-25]]]]);
-
-      t.end();
-    });
-
-    t.test('difference', (t) => {
-      const result = martinez.diff(
-        subject.geometry.coordinates,
-        clipping.geometry.coordinates
-      );
-      t.deepEqual(result, []);
-
-      t.end();
-    });
-
-    t.end();
-  });
-
   main.test('touching boxes', (t) => {
     const shapes   = load.sync(path.join(__dirname, 'fixtures', 'touching_boxes.geojson'));
     const subject  = shapes.features[0];
