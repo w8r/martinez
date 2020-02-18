@@ -1,6 +1,6 @@
 {
   "name": "martinez-polygon-clipping",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
   "main": "dist/martinez.umd.js",
   "browser": "dist/martinez.umd.js",
@@ -8,6 +8,7 @@
   "jsnext:main": "index.js",
   "files": [
     "index.d.ts",
+    "index.js",
     "src/",
     "dist/"
   ],
@@ -50,7 +51,7 @@
     "eslint-plugin-jsdoc": "^20.0.2",
     "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",
-    "http-server": "^0.10.0",
+    "http-server": "^0.12.1",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
     "load-json-file": "^2.0.0",
