@@ -2,12 +2,14 @@
   "type": "FeatureCollection",
   "features": [{
     "type": "Feature",
+    "properties": {},
     "geometry": {
       "type": "Polygon",
       "coordinates": [[[578,-371], [578,-491], [1778,-491], [1778,-371], [578,-371]]]
     }
   },{
     "type": "Feature",
+    "properties": {},
     "geometry": {
       "type": "Polygon",
       "coordinates": [[[578,-971], [1964,-971], [1964,-115], [578,-115], [578,-971]]]
