@@ -1,19 +1,19 @@
 export default class Contour {
 
-
   /**
    * Contour
    *
    * @class {Contour}
-
    */
-  constructor () {
-
+  constructor() {
     this.points = [];
-    this.holes = [];
-    this.external = true;
-    this.precomputedCC = false;
+    this.holeIds = [];
+    this.holeOf = null;
+    this.depth = null;
+  }
 
+  isExterior() {
+    return this.holeOf == null;
   }
 
 }

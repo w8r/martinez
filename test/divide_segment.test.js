@@ -227,7 +227,7 @@ tap.test('divide segments', (main) => {
            equals(seg.otherEvent.point, data.r) &&
            seg.inOut      === data.inOut &&
            seg.otherInOut === data.otherInOut &&
-           seg.inResult   === data.inResult &&
+           seg.inResult() === data.inResult &&
            ((seg.prevInResult === null && data.prevInResult === null) ||
             (equals(seg.prevInResult.point, data.prevInResult.l) &&
             equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))) {
