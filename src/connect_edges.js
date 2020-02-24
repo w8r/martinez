@@ -10,8 +10,8 @@ function orderEvents(sortedEvents) {
   const resultEvents = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
-    if ((event.left && event.inResult()) ||
-      (!event.left && event.otherEvent.inResult())) {
+    if ((event.left && event.inResult) ||
+      (!event.left && event.otherEvent.inResult)) {
       resultEvents.push(event);
     }
   }
@@ -148,10 +148,10 @@ export default function connectEdges(sortedEvents) {
     const contour = initializeContourFromContext(resultEvents[i], contours, contourId);
 
     // Helper function that combines marking an event as processed with assigning its output contour ID
-    function markAsProcessed(pos) {
+    const markAsProcessed = (pos) => {
       processed[pos] = true;
       resultEvents[pos].outputContourId = contourId;
-    }
+    };
 
     let pos = i;
     let origPos = i;
@@ -159,6 +159,7 @@ export default function connectEdges(sortedEvents) {
     const initial = resultEvents[i].point;
     contour.points.push(initial);
 
+    /* eslint no-constant-condition: "off" */
     while (true) {
       markAsProcessed(pos);
 

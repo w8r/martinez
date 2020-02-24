@@ -85,21 +85,21 @@ function determineResultTransition(event, operation) {
   let thisIn = !event.inOut;
   let thatIn = !event.otherInOut;
 
-  let is_in;
+  let isIn;
   switch (operation) {
     case INTERSECTION:
-      is_in = thisIn && thatIn; break;
+      isIn = thisIn && thatIn; break;
     case UNION:
-      is_in = thisIn || thatIn; break;
+      isIn = thisIn || thatIn; break;
     case XOR:
-      is_in = thisIn ^ thatIn; break;
+      isIn = thisIn ^ thatIn; break;
     case DIFFERENCE:
       if (event.isSubject) {
-        is_in = thisIn && !thatIn;
+        isIn = thisIn && !thatIn;
       } else {
-        is_in = thatIn && !thisIn;
+        isIn = thatIn && !thisIn;
       }
       break;
   }
-  return is_in ? +1 : -1;
+  return isIn ? +1 : -1;
 }

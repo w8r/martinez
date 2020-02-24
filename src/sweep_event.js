@@ -121,7 +121,7 @@ export default class SweepEvent {
    * Does event belong to result?
    * @return {Boolean}
    */
-  inResult() {
+  get inResult() {
     return this.resultTransition !== 0;
   }
 

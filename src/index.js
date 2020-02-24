@@ -78,12 +78,14 @@ export default function boolean(subject, clipping, operation) {
 
   // Convert contours to polygons
   const polygons = [];
-  for (let contour of contours) {
+  for (let i = 0; i < contours.length; i++) {
+    let contour = contours[i];
     if (contour.isExterior()) {
       // The exterior ring goes first
       let rings = [contour.points];
       // Followed by holes if any
-      for (let holeId of contour.holeIds) {
+      for (let j = 0; j < contour.holeIds.length; j++) {
+        let holeId = contour.holeIds[j];
         rings.push(contours[holeId].points);
       }
       polygons.push(rings);
