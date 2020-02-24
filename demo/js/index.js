@@ -2,7 +2,7 @@ import './coordinates';
 import './polygoncontrol';
 import './booleanopcontrol';
 import * as martinez from '../../index';
-//var martinez = require('../../dist/martinez.min');
+// import * as martinez from '../../dist/martinez.min';
 
 let mode = window.location.hash.substring(1);
 let path = '../test/fixtures/';
@@ -127,13 +127,14 @@ map.addControl(new L.BooleanControl({
 }));
 
 var drawnItems = window.drawnItems = L.geoJson().addTo(map);
-
+var rawData = null;
 function loadData(path) {
   console.log(path);
   fetch(path)
     .then((r) => r.json())
     .then((json) => {
         drawnItems.addData(json);
+        rawData = json;
         map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
     });
 }
@@ -141,21 +142,27 @@ function loadData(path) {
 function clear() {
   drawnItems.clearLayers();
   results.clearLayers();
+  rawData = null;
 }
 
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
+function getClippingPoly (layers) {
+  if (rawData !== null && rawData.features.length > 1) return rawData.features[1];
+  return layers[1].toGeoJSON();
+}
+
 function run (op) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
-  var subject = layers[0].toGeoJSON();
-  var clipping = layers[1].toGeoJSON();
+  var subject = rawData !== null ? rawData.features[0] : layers[0].toGeoJSON();
+  var clipping = getClippingPoly(layers);
 
   //console.log('input', subject, clipping, op);
 
-  subject  = JSON.parse(JSON.stringify(subject));
-  clipping = JSON.parse(JSON.stringify(clipping));
+  // subject  = JSON.parse(JSON.stringify(subject));
+  // clipping = JSON.parse(JSON.stringify(clipping));
 
   var operation;
   if (op === OPERATIONS.INTERSECTION) {
@@ -178,9 +185,8 @@ function run (op) {
   var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd('martinez');
 
-  //if (op === OPERATIONS.UNION) result = result[0];
   console.log('result', result);
-  console.log(JSON.stringify(result))
+  // console.log(JSON.stringify(result));
   results.clearLayers();
 
   if (result !== null) {
@@ -208,16 +214,10 @@ function run (op) {
       }
       res = writer.write(res);
       console.timeEnd('jsts');
-      console.log(res);
+      // console.log('JSTS result', res);
     }, 500);
   }
 }
-
-//drawnItems.addData(oneInside);
-//drawnItems.addData(twoPointedTriangles);
-//drawnItems.addData(selfIntersecting);
-//drawnItems.addData(holes);
-//drawnItems.addData(data);
 
 map.on('editable:created', function(evt) {
   drawnItems.addLayer(evt.layer);
