@@ -14,7 +14,6 @@ export default function divideSegment(se, p, queue)  {
 
   /* eslint-disable no-console */
   if (equals(se.point, se.otherEvent.point)) {
-
     console.warn('what is that, a collapsed segment?', se);
   }
   /* eslint-enable no-console */

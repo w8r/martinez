@@ -42,7 +42,12 @@ export default function computeFields (event, prev, operation) {
   }
 
   // check if the line segment belongs to the Boolean operation
-  event.inResult = inResult(event, operation);
+  let isInResult = inResult(event, operation);
+  if (isInResult) {
+    event.resultTransition = determineResultTransition(event, operation);
+  } else {
+    event.resultTransition = 0;
+  }
 }
 
 
@@ -74,3 +79,27 @@ function inResult(event, operation) {
   return false;
 }
 /* eslint-enable indent */
+
+
+function determineResultTransition(event, operation) {
+  let thisIn = !event.inOut;
+  let thatIn = !event.otherInOut;
+
+  let isIn;
+  switch (operation) {
+    case INTERSECTION:
+      isIn = thisIn && thatIn; break;
+    case UNION:
+      isIn = thisIn || thatIn; break;
+    case XOR:
+      isIn = thisIn ^ thatIn; break;
+    case DIFFERENCE:
+      if (event.isSubject) {
+        isIn = thisIn && !thatIn;
+      } else {
+        isIn = thatIn && !thisIn;
+      }
+      break;
+  }
+  return isIn ? +1 : -1;
+}

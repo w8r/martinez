@@ -73,41 +73,24 @@ export default function boolean(subject, clipping, operation) {
   //console.timeEnd('subdivide edges');
 
   // console.time('connect vertices');
-  const result = connectEdges(sortedEvents, operation);
+  const contours = connectEdges(sortedEvents, operation);
   //console.timeEnd('connect vertices');
 
-  const out = [];
-  for (var i = 0; i < result.length; i++) {
-    const contour = result[i];
-    const points = contour.points;
-    if (contour.external) {
-      if (points[0][0] !== points[points.length - 1][0] ||
-          points[0][1] !== points[points.length - 1][1]
-      ) {
-        points.push([points[0][0], points[0][1]]);
+  // Convert contours to polygons
+  const polygons = [];
+  for (let i = 0; i < contours.length; i++) {
+    let contour = contours[i];
+    if (contour.isExterior()) {
+      // The exterior ring goes first
+      let rings = [contour.points];
+      // Followed by holes if any
+      for (let j = 0; j < contour.holeIds.length; j++) {
+        let holeId = contour.holeIds[j];
+        rings.push(contours[holeId].points);
       }
-
-      const outCoords = [];
-
-      if (points.length > 3) {
-        outCoords.push(contour.points);
-        for (var ii = 0; ii < contour.holes.length; ii++) {
-          const hole = result[contour.holes[ii]].points;
-          if (hole[0][0] !==
-              hole[hole.length - 1][0] ||
-              hole[0][1] !==
-              hole[hole.length - 1][1]
-          ) {
-             hole.push([hole[0][0], hole[0][1]]);
-          }
-          if (hole.length > 3) {
-            outCoords.push(hole);
-          }
-        }
-        out.push(outCoords);
-      }
-
+      polygons.push(rings);
     }
   }
-  return out;
+
+  return polygons;
 }

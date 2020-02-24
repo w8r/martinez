@@ -65,20 +65,24 @@ export default class SweepEvent {
     this.prevInResult = null;
 
     /**
-     * Does event belong to result?
-     * @type {Boolean}
+     * Type of result transition (0 = not in result, +1 = out-in, -1, in-out)
+     * @type {Number}
      */
-    this.inResult = false;
-
+    this.resultTransition = 0;
 
     // connection step
 
     /**
-     * @type {Boolean}
+     * @type {Number}
      */
-    this.resultInOut = false;
+    this.otherPos = -1;
 
-    this.isExteriorRing = true;
+    /**
+     * @type {Number}
+     */
+    this.outputContourId = -1;
+
+    this.isExteriorRing = true;   // TODO: Looks unused, remove?
   }
 
 
@@ -113,16 +117,25 @@ export default class SweepEvent {
   }
 
 
+  /**
+   * Does event belong to result?
+   * @return {Boolean}
+   */
+  get inResult() {
+    return this.resultTransition !== 0;
+  }
+
+
   clone () {
     const copy = new SweepEvent(
       this.point, this.left, this.otherEvent, this.isSubject, this.type);
 
-    copy.contourId      = this.contourId;
-    copy.inResult       = this.inResult;
-    copy.prevInResult   = this.prevInResult;
-    copy.isExteriorRing = this.isExteriorRing;
-    copy.inOut          = this.inOut;
-    copy.otherInOut     = this.otherInOut;
+    copy.contourId        = this.contourId;
+    copy.resultTransition = this.resultTransition;
+    copy.prevInResult     = this.prevInResult;
+    copy.isExteriorRing   = this.isExteriorRing;
+    copy.inOut            = this.inOut;
+    copy.otherInOut       = this.otherInOut;
 
     return copy;
   }

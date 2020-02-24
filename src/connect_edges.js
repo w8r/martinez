@@ -33,7 +33,7 @@ function orderEvents(sortedEvents) {
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
-    event.pos = i;
+    event.otherPos = i;
   }
 
   // imagine, the right event is found in the beginning of the queue,
@@ -41,9 +41,9 @@ function orderEvents(sortedEvents) {
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
     if (!event.left) {
-      tmp = event.pos;
-      event.pos = event.otherEvent.pos;
-      event.otherEvent.pos = tmp;
+      tmp = event.otherPos;
+      event.otherPos = event.otherEvent.otherPos;
+      event.otherEvent.otherPos = tmp;
     }
   }
 
@@ -57,7 +57,7 @@ function orderEvents(sortedEvents) {
  * @param  {Object>}    processed
  * @return {Number}
  */
-function nextPos(pos, resultEvents, processed) {
+function nextPos(pos, resultEvents, processed, origPos) {
   let newPos = pos + 1,
       p = resultEvents[pos].point,
       p1;
@@ -77,13 +77,54 @@ function nextPos(pos, resultEvents, processed) {
 
   newPos = pos - 1;
 
-  while (processed[newPos]) {
+  while (processed[newPos] && newPos > origPos) {
     newPos--;
   }
 
   return newPos;
 }
 
+
+function initializeContourFromContext(event, contours, contourId) {
+  const contour = new Contour();
+  if (event.prevInResult != null) {
+    const prevInResult = event.prevInResult;
+    // Note that it is valid to query the "previous in result" for its output contour id,
+    // because we must have already processed it (i.e., assigned an output contour id)
+    // in an earlier iteration, otherwise it wouldn't be possible that it is "previous in
+    // result".
+    const lowerContourId = prevInResult.outputContourId;
+    const lowerResultTransition = prevInResult.resultTransition;
+    if (lowerResultTransition > 0) {
+      // We are inside. Now we have to check if the thing below us is another hole or
+      // an exterior contour.
+      const lowerContour = contours[lowerContourId];
+      if (lowerContour.holeOf != null) {
+        // The lower contour is a hole => Connect the new contour as a hole to its parent,
+        // and use same depth.
+        const parentContourId = lowerContour.holeOf;
+        contours[parentContourId].holeIds.push(contourId);
+        contour.holeOf = parentContourId;
+        contour.depth = contours[lowerContourId].depth;
+      } else {
+        // The lower contour is an exterior contour => Connect the new contour as a hole,
+        // and increment depth.
+        contours[lowerContourId].holeIds.push(contourId);
+        contour.holeOf = lowerContourId;
+        contour.depth = contours[lowerContourId].depth + 1;
+      }
+    } else {
+      // We are outside => this contour is an exterior contour of same depth.
+      contour.holeOf = null;
+      contour.depth = contours[lowerContourId].depth;
+    }
+  } else {
+    // There is no lower/previous contour => this contour is an exterior contour of depth 0.
+    contour.holeOf = null;
+    contour.depth = 0;
+  }
+  return contour;
+}
 
 /**
  * @param  {Array.<SweepEvent>} sortedEvents
@@ -95,66 +136,47 @@ export default function connectEdges(sortedEvents) {
 
   // "false"-filled array
   const processed = {};
-  const result = [];
-  let event;
-  let depth = [];
-  let holeOf = [];
+  const contours = [];
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
 
-    if (processed[i]) continue;
-    const contour = new Contour();
-    result.push(contour);
-
-    let contourId = result.length - 1;
-    depth.push(0);
-    holeOf.push(-1);
-
-    if (resultEvents[i].prevInResult !== null) {
-      const lowerContourId = resultEvents[i].prevInResult.contourId;
-      if (!resultEvents[i].prevInResult.resultInOut) {
-        result[lowerContourId].holes.push(contourId);
-        holeOf[contourId] = lowerContourId;
-        depth[contourId] = depth[lowerContourId] + 1;
-        contour.external = false;
-      } else if (!result[lowerContourId].external) {
-        result[holeOf[lowerContourId]].holes.push(contourId);
-        holeOf[contourId] = holeOf[lowerContourId];
-        depth[contourId] = depth[lowerContourId];
-        contour.external = false;
-      }
+    if (processed[i]) {
+      continue;
     }
 
+    const contourId = contours.length;
+    const contour = initializeContourFromContext(resultEvents[i], contours, contourId);
+
+    // Helper function that combines marking an event as processed with assigning its output contour ID
+    const markAsProcessed = (pos) => {
+      processed[pos] = true;
+      resultEvents[pos].outputContourId = contourId;
+    };
+
     let pos = i;
+    let origPos = i;
 
     const initial = resultEvents[i].point;
     contour.points.push(initial);
 
+    /* eslint no-constant-condition: "off" */
+    while (true) {
+      markAsProcessed(pos);
 
-    while (resultEvents[pos] && resultEvents[pos].otherEvent.point !== initial) {
-        event = resultEvents[pos];
-        processed[pos] = true;
+      pos = resultEvents[pos].otherPos;
 
-        if (event.left) {
-          event.resultInOut = false;
-          event.contourId   = contourId;
-        } else {
-          event.otherEvent.resultInOut = true;
-          event.otherEvent.contourId  = contourId;
-        }
+      markAsProcessed(pos);
+      contour.points.push(resultEvents[pos].point);
 
-        pos = event.pos;
-        processed[pos] = true;
-        contour.points.push(resultEvents[pos].point);
-        pos = nextPos(pos, resultEvents, processed);
+      pos = nextPos(pos, resultEvents, processed, origPos);
+
+      if (pos == origPos) {
+        break;
+      }
     }
-    pos = pos === -1 ? i : pos;
 
-    event = resultEvents[pos];
-    processed[pos] = processed[event.pos] = true;
-    event.otherEvent.resultInOut = true;
-    event.otherEvent.contourId   = contourId;
+    contours.push(contour);
   }
 
-  return result;
+  return contours;
 }
