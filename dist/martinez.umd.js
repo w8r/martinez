@@ -673,7 +673,12 @@
     }
 
     // check if the line segment belongs to the Boolean operation
-    event.inResult = inResult(event, operation);
+    var isInResult = inResult(event, operation);
+    if (isInResult) {
+      event.resultTransition = determineResultTransition(event, operation);
+    } else {
+      event.resultTransition = 0;
+    }
   }
 
 
@@ -705,6 +710,30 @@
     return false;
   }
   /* eslint-enable indent */
+
+
+  function determineResultTransition(event, operation) {
+    var thisIn = !event.inOut;
+    var thatIn = !event.otherInOut;
+
+    var isIn;
+    switch (operation) {
+      case INTERSECTION:
+        isIn = thisIn && thatIn; break;
+      case UNION:
+        isIn = thisIn || thatIn; break;
+      case XOR:
+        isIn = thisIn ^ thatIn; break;
+      case DIFFERENCE:
+        if (event.isSubject) {
+          isIn = thisIn && !thatIn;
+        } else {
+          isIn = thatIn && !thisIn;
+        }
+        break;
+    }
+    return isIn ? +1 : -1;
+  }
 
   var SweepEvent = function SweepEvent (point, left, otherEvent, isSubject, edgeType) {
 
@@ -757,21 +786,27 @@
     this.prevInResult = null;
 
     /**
-     * Does event belong to result?
-     * @type {Boolean}
+     * Type of result transition (0 = not in result, +1 = out-in, -1, in-out)
+     * @type {Number}
      */
-    this.inResult = false;
-
+    this.resultTransition = 0;
 
     // connection step
 
     /**
-     * @type {Boolean}
+     * @type {Number}
      */
-    this.resultInOut = false;
+    this.otherPos = -1;
 
-    this.isExteriorRing = true;
+    /**
+     * @type {Number}
+     */
+    this.outputContourId = -1;
+
+    this.isExteriorRing = true; // TODO: Looks unused, remove?
   };
+
+  var prototypeAccessors$1 = { inResult: { configurable: true } };
 
 
   /**
@@ -805,18 +840,30 @@
   };
 
 
+  /**
+   * Does event belong to result?
+   * @return {Boolean}
+   */
+  prototypeAccessors$1.inResult.get = function () {
+    return this.resultTransition !== 0;
+  };
+
+
   SweepEvent.prototype.clone = function clone () {
     var copy = new SweepEvent(
       this.point, this.left, this.otherEvent, this.isSubject, this.type);
 
-    copy.inResult     = this.inResult;
-    copy.prevInResult = this.prevInResult;
+    copy.contourId      = this.contourId;
+    copy.resultTransition = this.resultTransition;
+    copy.prevInResult   = this.prevInResult;
     copy.isExteriorRing = this.isExteriorRing;
-    copy.inOut        = this.inOut;
-    copy.otherInOut   = this.otherInOut;
+    copy.inOut          = this.inOut;
+    copy.otherInOut     = this.otherInOut;
 
     return copy;
   };
+
+  Object.defineProperties( SweepEvent.prototype, prototypeAccessors$1 );
 
   function equals(p1, p2) {
     if (p1[0] === p2[0]) {
@@ -1174,7 +1221,6 @@
 
     /* eslint-disable no-console */
     if (equals(se.point, se.otherEvent.point)) {
-
       console.warn('what is that, a collapsed segment?', se);
     }
     /* eslint-enable no-console */
@@ -1564,13 +1610,15 @@
     return sortedEvents;
   }
 
-  var Contour = function Contour () {
-
+  var Contour = function Contour() {
     this.points = [];
-    this.holes = [];
-    this.external = true;
-    this.precomputedCC = false;
+    this.holeIds = [];
+    this.holeOf = null;
+    this.depth = null;
+  };
 
+  Contour.prototype.isExterior = function isExterior () {
+    return this.holeOf == null;
   };
 
   /**
@@ -1605,7 +1653,7 @@
 
     for (i = 0, len = resultEvents.length; i < len; i++) {
       event = resultEvents[i];
-      event.pos = i;
+      event.otherPos = i;
     }
 
     // imagine, the right event is found in the beginning of the queue,
@@ -1613,9 +1661,9 @@
     for (i = 0, len = resultEvents.length; i < len; i++) {
       event = resultEvents[i];
       if (!event.left) {
-        tmp = event.pos;
-        event.pos = event.otherEvent.pos;
-        event.otherEvent.pos = tmp;
+        tmp = event.otherPos;
+        event.otherPos = event.otherEvent.otherPos;
+        event.otherEvent.otherPos = tmp;
       }
     }
 
@@ -1629,23 +1677,16 @@
    * @param  {Object>}    processed
    * @return {Number}
    */
-  function nextPos(pos, resultEvents, processed) {
+  function nextPos(pos, resultEvents, processed, origPos) {
     var newPos = pos + 1,
         p = resultEvents[pos].point,
         p1;
     var length = resultEvents.length;
 
-
     if (newPos < length)
       { p1 = resultEvents[newPos].point; }
 
-
-    // while in range and not the current one by value
     while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
-
-      // if (newPos === -1) {
-      //   throw `Problem with pos, ${pos}, ${newPos}`;
-      // }
       if (!processed[newPos]) {
         return newPos;
       } else   {
@@ -1656,13 +1697,54 @@
 
     newPos = pos - 1;
 
-    while (processed[newPos]) {
+    while (processed[newPos] && newPos > origPos) {
       newPos--;
     }
 
     return newPos;
   }
 
+
+  function initializeContourFromContext(event, contours, contourId) {
+    var contour = new Contour();
+    if (event.prevInResult != null) {
+      var prevInResult = event.prevInResult;
+      // Note that it is valid to query the "previous in result" for its output contour id,
+      // because we must have already processed it (i.e., assigned an output contour id)
+      // in an earlier iteration, otherwise it wouldn't be possible that it is "previous in
+      // result".
+      var lowerContourId = prevInResult.outputContourId;
+      var lowerResultTransition = prevInResult.resultTransition;
+      if (lowerResultTransition > 0) {
+        // We are inside. Now we have to check if the thing below us is another hole or
+        // an exterior contour.
+        var lowerContour = contours[lowerContourId];
+        if (lowerContour.holeOf != null) {
+          // The lower contour is a hole => Connect the new contour as a hole to its parent,
+          // and use same depth.
+          var parentContourId = lowerContour.holeOf;
+          contours[parentContourId].holeIds.push(contourId);
+          contour.holeOf = parentContourId;
+          contour.depth = contours[lowerContourId].depth;
+        } else {
+          // The lower contour is an exterior contour => Connect the new contour as a hole,
+          // and increment depth.
+          contours[lowerContourId].holeIds.push(contourId);
+          contour.holeOf = lowerContourId;
+          contour.depth = contours[lowerContourId].depth + 1;
+        }
+      } else {
+        // We are outside => this contour is an exterior contour of same depth.
+        contour.holeOf = null;
+        contour.depth = contours[lowerContourId].depth;
+      }
+    } else {
+      // There is no lower/previous contour => this contour is an exterior contour of depth 0.
+      contour.holeOf = null;
+      contour.depth = 0;
+    }
+    return contour;
+  }
 
   /**
    * @param  {Array.<SweepEvent>} sortedEvents
@@ -1674,69 +1756,51 @@
 
     // "false"-filled array
     var processed = {};
-    var result = [];
-    var event;
-    var depth = [];
-    var holeOf = [];
+    var contours = [];
 
-    for (i = 0, len = resultEvents.length; i < len; i++) {
+    var loop = function (  ) {
 
-      if (processed[i]) { continue; }
-      var contour = new Contour();
-      result.push(contour);
-      var contourId = result.length - 1;
-      depth.push(0);
-      holeOf.push(-1);
-
-      if (resultEvents[i].prevInResult) {
-        var lowerContourId = resultEvents[i].prevInResult.contourId;
-        if (!resultEvents[i].prevInResult.resultInOut) {
-          result[lowerContourId].holes.push(contourId);
-          holeOf[contourId] = lowerContourId;
-          depth[contourId] = depth[lowerContourId] + 1;
-          contour.external = false;
-        } else if (!result[lowerContourId].external) {
-          result[holeOf[lowerContourId]].holes.push(contourId);
-          holeOf[contourId] = holeOf[lowerContourId];
-          depth[contourId] = depth[lowerContourId];
-          contour.external = false;
-        }
+      if (processed[i]) {
+        return;
       }
 
+      var contourId = contours.length;
+      var contour = initializeContourFromContext(resultEvents[i], contours, contourId);
+
+      // Helper function that combines marking an event as processed with assigning its output contour ID
+      var markAsProcessed = function (pos) {
+        processed[pos] = true;
+        resultEvents[pos].outputContourId = contourId;
+      };
+
       var pos = i;
+      var origPos = i;
 
       var initial = resultEvents[i].point;
       contour.points.push(initial);
 
+      /* eslint no-constant-condition: "off" */
+      while (true) {
+        markAsProcessed(pos);
 
-      while (resultEvents[pos] && resultEvents[pos].otherEvent.point !== initial) {
-          event = resultEvents[pos];
-          processed[pos] = true;
+        pos = resultEvents[pos].otherPos;
 
-          if (event.left) {
-            event.resultInOut = false;
-            event.contourId   = contourId;
-          } else {
-            event.otherEvent.resultInOut = true;
-            event.otherEvent.contourId  = contourId;
-          }
+        markAsProcessed(pos);
+        contour.points.push(resultEvents[pos].point);
 
-          pos = event.pos;
-          processed[pos] = true;
-          contour.points.push(resultEvents[pos].point);
-          pos = nextPos(pos, resultEvents, processed);
+        pos = nextPos(pos, resultEvents, processed, origPos);
+
+        if (pos == origPos) {
+          break;
+        }
       }
-      pos = pos === -1 ? i : pos;
 
-      event = resultEvents[pos];
-      processed[pos] = processed[event.pos] = true;
-      event.otherEvent.resultInOut = true;
-      event.otherEvent.contourId   = contourId;
+      contours.push(contour);
+    };
 
-      contour.points.push(contour.points[0]);
-    }
+    for (i = 0, len = resultEvents.length; i < len; i++) loop(  );
 
-    return result;
+    return contours;
   }
 
   var tinyqueue = TinyQueue;
@@ -1962,23 +2026,26 @@
     //console.timeEnd('subdivide edges');
 
     // console.time('connect vertices');
-    var result = connectEdges(sortedEvents, operation);
-    // console.log(result)
+    var contours = connectEdges(sortedEvents);
     //console.timeEnd('connect vertices');
 
-    var out = [];
-    for (var i = 0; i < result.length; i++) {
-      var contour = result[i];
-      if (contour.external) {
-        var outCoords = [contour.points];
-        for (var ii = 0; ii < contour.holes.length; ii++) {
-          contour.holes[ii];
-          outCoords.push(result[contour.holes[ii]].points);
+    // Convert contours to polygons
+    var polygons = [];
+    for (var i = 0; i < contours.length; i++) {
+      var contour = contours[i];
+      if (contour.isExterior()) {
+        // The exterior ring goes first
+        var rings = [contour.points];
+        // Followed by holes if any
+        for (var j = 0; j < contour.holeIds.length; j++) {
+          var holeId = contour.holeIds[j];
+          rings.push(contours[holeId].points);
         }
-        out.push(outCoords);
+        polygons.push(rings);
       }
     }
-    return out;
+
+    return polygons;
   }
 
   function union (subject, clipping) {
@@ -1989,7 +2056,7 @@
     return boolean(subject, clipping, DIFFERENCE);
   }
 
-  function xor (subject, clipping){
+  function xor (subject, clipping) {
     return boolean(subject, clipping, XOR);
   }
 
