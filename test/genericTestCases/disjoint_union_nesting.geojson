@@ -50,15 +50,11 @@
         "coordinates": [
           [
             [
-              [
-                [
-                  [4.25, 2.25],
-                  [4.75, 2.25],
-                  [4.75, 2.75],
-                  [4.25, 2.75],
-                  [4.25, 2.25]
-                ]
-              ]
+              [4.25, 2.25],
+              [4.75, 2.25],
+              [4.75, 2.75],
+              [4.25, 2.75],
+              [4.25, 2.25]
             ]
           ],
           [
@@ -91,7 +87,7 @@
       },
       "properties": {
         "operation": "union",
-        "comment": "This case is wrong, because the first result ring has too many levels of array nesting. Related to #47 and #61. May be fixed by #113."
+        "comment": "This case has invalid input (hole lies outside parent contour), but algorithm seems to handle it reasonably. Related to #47 #61 #113."
       },
       "type": "Feature"
     }

@@ -14,7 +14,7 @@ export function diff (subject, clipping) {
   return boolean(subject, clipping, DIFFERENCE);
 }
 
-export function xor (subject, clipping){
+export function xor (subject, clipping) {
   return boolean(subject, clipping, XOR);
 }
 

@@ -60,7 +60,7 @@ export default function boolean(subject, clipping, operation) {
   const sbbox = [Infinity, Infinity, -Infinity, -Infinity];
   const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
-  //console.time('fill queue');
+  // console.time('fill queue');
   const eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('fill queue');
 
@@ -68,12 +68,29 @@ export default function boolean(subject, clipping, operation) {
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  //console.time('subdivide edges');
+  // console.time('subdivide edges');
   const sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
   //console.timeEnd('subdivide edges');
 
-  //console.time('connect vertices');
-  const result = connectEdges(sortedEvents, operation);
+  // console.time('connect vertices');
+  const contours = connectEdges(sortedEvents, operation);
   //console.timeEnd('connect vertices');
-  return result;
+
+  // Convert contours to polygons
+  const polygons = [];
+  for (let i = 0; i < contours.length; i++) {
+    let contour = contours[i];
+    if (contour.isExterior()) {
+      // The exterior ring goes first
+      let rings = [contour.points];
+      // Followed by holes if any
+      for (let j = 0; j < contour.holeIds.length; j++) {
+        let holeId = contour.holeIds[j];
+        rings.push(contours[holeId].points);
+      }
+      polygons.push(rings);
+    }
+  }
+
+  return polygons;
 }
