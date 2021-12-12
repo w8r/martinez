@@ -16,7 +16,7 @@
     "test": "tape -r reify buble/register test/*.test.js | tap-spec && npm run ts",
     "ts": "tsc index.d.ts",
     "bench": "node --require reify bench.js",
-    "lint": "eslint ./src/",
+    "lint": "standard 'src/**/*.js' 'test/**/*.js'",
     "watch": "rollup -c -w",
     "serve": "http-server -p 3000",
     "start": "run-p watch serve",
@@ -41,36 +41,38 @@
   "homepage": "https://github.com/w8r/martinez",
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
+  "dependencies": {
+    "robust-predicates": "^2.0.4",
+    "splaytree": "^0.1.4",
+    "tinyqueue": "^1.2.0"
+  },
   "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.0",
+    "@rollup/plugin-commonjs": "^21.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
     "@turf/union": "^4.6.0",
     "@types/geojson": "^1.0.2",
     "benchmark": "^2.1.4",
     "buble": "^0.19.3",
-    "eslint": "^6.8.0",
-    "eslint-plugin-import-order": "^2.1.4",
-    "eslint-plugin-jsdoc": "^20.0.2",
-    "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",
-    "json-stringify-pretty-compact": "^2.0.0",
     "http-server": "^0.12.1",
+    "json-stringify-pretty-compact": "^2.0.0",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
     "load-json-file": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "reify": "^0.20.12",
-    "rollup": "^1.28.0",
-    "rollup-plugin-buble": "^0.19.8",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup": "^2.61.0",
+    "standard": "^16.0.4",
     "tap-spec": "^5.0.0",
     "tap-status": "^1.0.1",
     "tape": "^4.12.1",
     "typescript": "^3.7.4",
     "uglify-js": "^3.3.21"
   },
-  "dependencies": {
-    "robust-predicates": "^2.0.4",
-    "splaytree": "^0.1.4",
-    "tinyqueue": "^1.2.0"
+  "standard": {
+    "ignore": [
+      "/src/debug_utils.js"
+    ]
   }
 }
