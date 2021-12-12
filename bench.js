@@ -1,7 +1,7 @@
 import load      from 'load-json-file';
 import Benchmark from 'benchmark';
 import jstsUnion from '@turf/union';
-import martinez  from './dist/martinez.umd';
+import martinez  from './dist/martinez.umd.js';
 
 
 /**
