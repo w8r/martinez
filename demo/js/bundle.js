@@ -1,15 +1,17 @@
 (function (L$1) {
   'use strict';
 
-  L$1 = L$1 && L$1.hasOwnProperty('default') ? L$1['default'] : L$1;
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-  L$1.Coordinates = L$1.Control.extend({
+  var L__default = /*#__PURE__*/_interopDefaultLegacy(L$1);
+
+  L__default["default"].Coordinates = L__default["default"].Control.extend({
     options: {
       position: 'bottomright'
     },
 
     onAdd: function(map) {
-      this._container = L$1.DomUtil.create('div', 'leaflet-bar');
+      this._container = L__default["default"].DomUtil.create('div', 'leaflet-bar');
       this._container.style.background = '#ffffff';
       map.on('mousemove', this._onMouseMove, this);
       return this._container;
@@ -22,7 +24,7 @@
 
   });
 
-  L$1.EditControl = L$1.Control.extend({
+  L__default["default"].EditControl = L__default["default"].Control.extend({
 
     options: {
       position: 'topleft',
@@ -32,13 +34,13 @@
     },
 
     onAdd: function (map) {
-      var container = L$1.DomUtil.create('div', 'leaflet-control leaflet-bar'),
-          link = L$1.DomUtil.create('a', '', container);
+      var container = L__default["default"].DomUtil.create('div', 'leaflet-control leaflet-bar'),
+          link = L__default["default"].DomUtil.create('a', '', container);
 
       link.href = '#';
       link.title = 'Create a new ' + this.options.kind;
       link.innerHTML = this.options.html;
-      L$1.DomEvent.on(link, 'click', L$1.DomEvent.stop)
+      L__default["default"].DomEvent.on(link, 'click', L__default["default"].DomEvent.stop)
                 .on(link, 'click', function () {
                   window.LAYER = this.options.callback.call(map.editTools);
                 }, this);
@@ -48,7 +50,7 @@
 
   });
 
-  L$1.NewPolygonControl = L$1.EditControl.extend({
+  L__default["default"].NewPolygonControl = L__default["default"].EditControl.extend({
     options: {
       position: 'topleft',
       kind: 'polygon',
@@ -56,13 +58,13 @@
     }
   });
 
-  L$1.BooleanControl = L$1.Control.extend({
+  L__default["default"].BooleanControl = L__default["default"].Control.extend({
     options: {
       position: 'topright'
     },
 
     onAdd: function(map) {
-      var container = this._container = L$1.DomUtil.create('div', 'leaflet-bar');
+      var container = this._container = L__default["default"].DomUtil.create('div', 'leaflet-bar');
       this._container.style.background = '#ffffff';
       this._container.style.padding = '10px';
       container.innerHTML = [
@@ -77,9 +79,9 @@
           '<input type="submit" value="Run">', '<input name="clear" type="button" value="Clear layers">',
         '</form>'].join('');
       var form = container.querySelector('form');
-      L$1.DomEvent
+      L__default["default"].DomEvent
         .on(form, 'submit', function (evt) {
-          L$1.DomEvent.stop(evt);
+          L__default["default"].DomEvent.stop(evt);
           var radios = Array.prototype.slice.call(
             form.querySelectorAll('input[type=radio]'));
           for (var i = 0, len = radios.length; i < len; i++) {
@@ -90,11 +92,11 @@
           }
         }, this)
         .on(form['clear'], 'click', function(evt) {
-          L$1.DomEvent.stop(evt);
+          L__default["default"].DomEvent.stop(evt);
           this.options.clear();
         }, this);
 
-      L$1.DomEvent
+      L__default["default"].DomEvent
         .disableClickPropagation(this._container)
         .disableScrollPropagation(this._container);
       return this._container;
@@ -114,7 +116,7 @@
     this._noDuplicates = !!noDuplicates;
   };
 
-  var prototypeAccessors = { size: { configurable: true } };
+  var prototypeAccessors$1 = { size: { configurable: true } };
 
 
   SplayTree.prototype.rotateLeft = function rotateLeft (x) {
@@ -659,7 +661,7 @@
   };
 
   SplayTree.prototype.isEmpty = function isEmpty () { return this._root === null; };
-  prototypeAccessors.size.get = function () { return this._size; };
+  prototypeAccessors$1.size.get = function () { return this._size; };
 
 
   /**
@@ -678,7 +680,7 @@
     return new SplayTree(comparator, noDuplicates).load(keys, values, presort);
   };
 
-  Object.defineProperties( SplayTree.prototype, prototypeAccessors );
+  Object.defineProperties( SplayTree.prototype, prototypeAccessors$1 );
 
 
   function loadRecursive (parent, keys, values, start, end) {
@@ -721,43 +723,42 @@
     sort(keys, values, j + 1, right, compare);
   }
 
-  var NORMAL               = 0;
-  var NON_CONTRIBUTING     = 1;
-  var SAME_TRANSITION      = 2;
+  var NORMAL = 0;
+  var NON_CONTRIBUTING = 1;
+  var SAME_TRANSITION = 2;
   var DIFFERENT_TRANSITION = 3;
 
   var INTERSECTION = 0;
-  var UNION        = 1;
-  var DIFFERENCE   = 2;
-  var XOR          = 3;
+  var UNION = 1;
+  var DIFFERENCE = 2;
+  var XOR = 3;
 
   /**
    * @param  {SweepEvent} event
    * @param  {SweepEvent} prev
    * @param  {Operation} operation
    */
-  function computeFields (event, prev, operation) {
+  var computeFields = function (event, prev, operation) {
     // compute inOut and otherInOut fields
     if (prev === null) {
-      event.inOut      = false;
+      event.inOut = false;
       event.otherInOut = true;
 
     // previous line segment in sweepline belongs to the same polygon
     } else {
       if (event.isSubject === prev.isSubject) {
-        event.inOut      = !prev.inOut;
+        event.inOut = !prev.inOut;
         event.otherInOut = prev.otherInOut;
 
       // previous line segment in sweepline belongs to the clipping polygon
       } else {
-        event.inOut      = !prev.otherInOut;
+        event.inOut = !prev.otherInOut;
         event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
       }
 
       // compute prevInResult field
       if (prev) {
-        event.prevInResult = (!inResult(prev, operation) || prev.isVertical())
-          ? prev.prevInResult : prev;
+        event.prevInResult = (!inResult(prev, operation) || prev.isVertical()) ? prev.prevInResult : prev;
       }
     }
 
@@ -768,64 +769,62 @@
     } else {
       event.resultTransition = 0;
     }
-  }
+  };
 
-
-  /* eslint-disable indent */
-  function inResult(event, operation) {
+  var inResult = function (event, operation) {
     switch (event.type) {
       case NORMAL:
         switch (operation) {
           case INTERSECTION:
-            return !event.otherInOut;
+            return !event.otherInOut
           case UNION:
-            return event.otherInOut;
+            return event.otherInOut
           case DIFFERENCE:
             // return (event.isSubject && !event.otherInOut) ||
-            //         (!event.isSubject && event.otherInOut);
+            //         (!event.isSubject && event.otherInOut)
             return (event.isSubject && event.otherInOut) ||
-                    (!event.isSubject && !event.otherInOut);
+                    (!event.isSubject && !event.otherInOut)
           case XOR:
-            return true;
+            return true
         }
-        break;
+        break
       case SAME_TRANSITION:
-        return operation === INTERSECTION || operation === UNION;
+        return operation === INTERSECTION || operation === UNION
       case DIFFERENT_TRANSITION:
-        return operation === DIFFERENCE;
+        return operation === DIFFERENCE
       case NON_CONTRIBUTING:
-        return false;
+        return false
     }
-    return false;
-  }
-  /* eslint-enable indent */
+    return false
+  };
 
-
-  function determineResultTransition(event, operation) {
+  var determineResultTransition = function (event, operation) {
     var thisIn = !event.inOut;
     var thatIn = !event.otherInOut;
 
     var isIn;
     switch (operation) {
       case INTERSECTION:
-        isIn = thisIn && thatIn; break;
+        isIn = thisIn && thatIn;
+        break
       case UNION:
-        isIn = thisIn || thatIn; break;
+        isIn = thisIn || thatIn;
+        break
       case XOR:
-        isIn = thisIn ^ thatIn; break;
+        isIn = thisIn ^ thatIn;
+        break
       case DIFFERENCE:
         if (event.isSubject) {
           isIn = thisIn && !thatIn;
         } else {
           isIn = thatIn && !thisIn;
         }
-        break;
+        break
     }
-    return isIn ? +1 : -1;
-  }
+    return isIn ? +1 : -1
+  };
 
   var SweepEvent = function SweepEvent (point, left, otherEvent, isSubject, edgeType) {
-
     /**
      * Is left endpoint?
      * @type {Boolean}
@@ -855,13 +854,11 @@
      */
     this.type = edgeType || NORMAL;
 
-
     /**
      * In-out transition for the sweepline crossing polygon
      * @type {Boolean}
      */
     this.inOut = false;
-
 
     /**
      * @type {Boolean}
@@ -895,84 +892,71 @@
     this.isExteriorRing = true; // TODO: Looks unused, remove?
   };
 
-  var prototypeAccessors$1 = { inResult: { configurable: true } };
-
+  var prototypeAccessors = { inResult: { configurable: true } };
 
   /**
    * @param{Array.<Number>}p
    * @return {Boolean}
    */
   SweepEvent.prototype.isBelow = function isBelow (p) {
-    var p0 = this.point, p1 = this.otherEvent.point;
+    var p0 = this.point;
+    var p1 = this.otherEvent.point;
     return this.left
       ? (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0
       // signedArea(this.point, this.otherEvent.point, p) > 0 :
-      : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
-      //signedArea(this.otherEvent.point, this.point, p) > 0;
+      : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0
+        // signedArea(this.otherEvent.point, this.point, p) > 0
   };
-
 
   /**
    * @param{Array.<Number>}p
    * @return {Boolean}
    */
   SweepEvent.prototype.isAbove = function isAbove (p) {
-    return !this.isBelow(p);
+    return !this.isBelow(p)
   };
-
 
   /**
    * @return {Boolean}
    */
   SweepEvent.prototype.isVertical = function isVertical () {
-    return this.point[0] === this.otherEvent.point[0];
+    return this.point[0] === this.otherEvent.point[0]
   };
-
 
   /**
    * Does event belong to result?
    * @return {Boolean}
    */
-  prototypeAccessors$1.inResult.get = function () {
-    return this.resultTransition !== 0;
+  prototypeAccessors.inResult.get = function () {
+    return this.resultTransition !== 0
   };
-
 
   SweepEvent.prototype.clone = function clone () {
     var copy = new SweepEvent(
       this.point, this.left, this.otherEvent, this.isSubject, this.type);
 
-    copy.contourId      = this.contourId;
+    copy.contourId = this.contourId;
     copy.resultTransition = this.resultTransition;
-    copy.prevInResult   = this.prevInResult;
+    copy.prevInResult = this.prevInResult;
     copy.isExteriorRing = this.isExteriorRing;
-    copy.inOut          = this.inOut;
-    copy.otherInOut     = this.otherInOut;
+    copy.inOut = this.inOut;
+    copy.otherInOut = this.otherInOut;
 
-    return copy;
+    return copy
   };
 
-  Object.defineProperties( SweepEvent.prototype, prototypeAccessors$1 );
+  Object.defineProperties( SweepEvent.prototype, prototypeAccessors );
 
-  function equals(p1, p2) {
+  var equals = function (p1, p2) {
     if (p1[0] === p2[0]) {
       if (p1[1] === p2[1]) {
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     }
-    return false;
-  }
-
-  // const EPSILON = 1e-9;
-  // const abs = Math.abs;
-  // TODO https://github.com/w8r/martinez/issues/6#issuecomment-262847164
-  // Precision problem.
-  //
-  // module.exports = function equals(p1, p2) {
-  //   return abs(p1[0] - p2[0]) <= EPSILON && abs(p1[1] - p2[1]) <= EPSILON;
-  // };
+    return false
+  };
 
   var epsilon = 1.1102230246251565e-16;
   var splitter = 134217729;
@@ -1249,54 +1233,47 @@
    * @param  {Array.<Number>} p2
    * @return {Number}
    */
-  function signedArea(p0, p1, p2) {
+  var signedArea = function (p0, p1, p2) {
     var res = orient2d(p0[0], p0[1], p1[0], p1[1], p2[0], p2[1]);
-    if (res > 0) { return -1; }
-    if (res < 0) { return 1; }
-    return 0;
-  }
+    if (res > 0) { return -1 }
+    if (res < 0) { return 1 }
+    return 0
+  };
 
   /**
    * @param  {SweepEvent} e1
    * @param  {SweepEvent} e2
    * @return {Number}
    */
-  function compareEvents(e1, e2) {
+  var compareEvents = function (e1, e2) {
     var p1 = e1.point;
     var p2 = e2.point;
 
     // Different x-coordinate
-    if (p1[0] > p2[0]) { return 1; }
-    if (p1[0] < p2[0]) { return -1; }
+    if (p1[0] > p2[0]) { return 1 }
+    if (p1[0] < p2[0]) { return -1 }
 
     // Different points, but same x-coordinate
     // Event with lower y-coordinate is processed first
-    if (p1[1] !== p2[1]) { return p1[1] > p2[1] ? 1 : -1; }
+    if (p1[1] !== p2[1]) { return p1[1] > p2[1] ? 1 : -1 }
 
-    return specialCases(e1, e2, p1);
-  }
+    return specialCases(e1, e2, p1)
+  };
 
-
-  /* eslint-disable no-unused-vars */
-  function specialCases(e1, e2, p1, p2) {
+  var specialCases = function (e1, e2, p1, p2) {
     // Same coordinates, but one is a left endpoint and the other is
     // a right endpoint. The right endpoint is processed first
-    if (e1.left !== e2.left)
-      { return e1.left ? 1 : -1; }
+    if (e1.left !== e2.left) { return e1.left ? 1 : -1 }
 
-    // const p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
-    // const sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
-    // Same coordinates, both events
-    // are left endpoints or right endpoints.
+    // Same coordinates, both events are left endpoints or right endpoints.
     // not collinear
     if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
       // the event associate to the bottom segment is processed first
-      return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
+      return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1
     }
 
-    return (!e1.isSubject && e2.isSubject) ? 1 : -1;
-  }
-  /* eslint-enable no-unused-vars */
+    return (!e1.isSubject && e2.isSubject) ? 1 : -1
+  };
 
   /**
    * @param  {SweepEvent} se
@@ -1304,15 +1281,13 @@
    * @param  {Queue} queue
    * @return {Queue}
    */
-  function divideSegment(se, p, queue)  {
-    var r = new SweepEvent(p, false, se,            se.isSubject);
-    var l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
+  var divideSegment = function (se, p, queue) {
+    var r = new SweepEvent(p, false, se, se.isSubject);
+    var l = new SweepEvent(p, true, se.otherEvent, se.isSubject);
 
-    /* eslint-disable no-console */
     if (equals(se.point, se.otherEvent.point)) {
       console.warn('what is that, a collapsed segment?', se);
     }
-    /* eslint-enable no-console */
 
     r.contourId = l.contourId = se.contourId;
 
@@ -1331,10 +1306,8 @@
     queue.push(l);
     queue.push(r);
 
-    return queue;
-  }
-
-  //const EPS = 1e-9;
+    return queue
+  };
 
   /**
    * Finds the magnitude of the cross product of two vectors (if we pretend
@@ -1345,9 +1318,7 @@
    * @private
    * @returns {Number} The magnitude of the cross product
    */
-  function crossProduct(a, b) {
-    return (a[0] * b[1]) - (a[1] * b[0]);
-  }
+  var crossProduct = function (a, b) { return (a[0] * b[1]) - (a[1] * b[0]); };
 
   /**
    * Finds the dot product of two vectors.
@@ -1357,9 +1328,7 @@
    * @private
    * @returns {Number} The dot product
    */
-  function dotProduct(a, b) {
-    return (a[0] * b[0]) + (a[1] * b[1]);
-  }
+  var dotProduct = function (a, b) { return (a[0] * b[0]) + (a[1] * b[1]); };
 
   /**
    * Finds the intersection (if any) between two line segments a and b, given the
@@ -1380,7 +1349,7 @@
    * intersection. If they overlap, the two end points of the overlapping segment.
    * Otherwise, null.
    */
-  function intersection (a1, a2, b1, b2, noEndpointTouch) {
+  var intersection$1 = function (a1, a2, b1, b2, noEndpointTouch) {
     // The algorithm expects our lines in the form P + sd, where P is a point,
     // s is on the interval [0, 1], and d is a vector.
     // We are passed two points. P can be the first point of each pair. The
@@ -1391,23 +1360,13 @@
     var vb = [b2[0] - b1[0], b2[1] - b1[1]];
     // We also define a function to convert back to regular point form:
 
-    /* eslint-disable arrow-body-style */
-
-    function toPoint(p, s, d) {
-      return [
-        p[0] + s * d[0],
-        p[1] + s * d[1]
-      ];
-    }
-
-    /* eslint-enable arrow-body-style */
+    var toPoint = function (p, s, d) { return [p[0] + s * d[0], p[1] + s * d[1]]; };
 
     // The rest is pretty much a straight port of the algorithm.
     var e = [b1[0] - a1[0], b1[1] - a1[1]];
-    var kross    = crossProduct(va, vb);
+    var kross = crossProduct(va, vb);
     var sqrKross = kross * kross;
-    var sqrLenA  = dotProduct(va, va);
-    //const sqrLenB  = dotProduct(vb, vb);
+    var sqrLenA = dotProduct(va, va);
 
     // Check for line intersection. This works because of the properties of the
     // cross product -- specifically, two vectors are parallel if and only if the
@@ -1421,22 +1380,22 @@
       var s = crossProduct(e, vb) / kross;
       if (s < 0 || s > 1) {
         // not on line segment a
-        return null;
+        return null
       }
       var t = crossProduct(e, va) / kross;
       if (t < 0 || t > 1) {
         // not on line segment b
-        return null;
+        return null
       }
       if (s === 0 || s === 1) {
         // on an endpoint of line segment a
-        return noEndpointTouch ? null : [toPoint(a1, s, va)];
+        return noEndpointTouch ? null : [toPoint(a1, s, va)]
       }
       if (t === 0 || t === 1) {
         // on an endpoint of line segment b
-        return noEndpointTouch ? null : [toPoint(b1, t, vb)];
+        return noEndpointTouch ? null : [toPoint(b1, t, vb)]
       }
-      return [toPoint(a1, s, va)];
+      return [toPoint(a1, s, va)]
     }
 
     // If we've reached this point, then the lines are either parallel or the
@@ -1445,13 +1404,12 @@
     // the (vector) difference between the two initial points. If this is parallel
     // with the line itself, then the two lines are the same line, and there will
     // be overlap.
-    //const sqrLenE = dotProduct(e, e);
     kross = crossProduct(e, va);
     sqrKross = kross * kross;
 
     if (sqrKross > 0 /* EPS * sqLenB * sqLenE */) {
     // Lines are just parallel, not the same. No overlap.
-      return null;
+      return null
     }
 
     var sa = dotProduct(va, e) / sqrLenA;
@@ -1462,27 +1420,26 @@
     // this is, essentially, the FindIntersection acting on floats from
     // Schneider & Eberly, just inlined into this function.
     if (smin <= 1 && smax >= 0) {
-
       // overlap on an end point
       if (smin === 1) {
-        return noEndpointTouch ? null : [toPoint(a1, smin > 0 ? smin : 0, va)];
+        return noEndpointTouch ? null : [toPoint(a1, smin > 0 ? smin : 0, va)]
       }
 
       if (smax === 0) {
-        return noEndpointTouch ? null : [toPoint(a1, smax < 1 ? smax : 1, va)];
+        return noEndpointTouch ? null : [toPoint(a1, smax < 1 ? smax : 1, va)]
       }
 
-      if (noEndpointTouch && smin === 0 && smax === 1) { return null; }
+      if (noEndpointTouch && smin === 0 && smax === 1) { return null }
 
       // There's overlap on a segment -- two points of intersection. Return both.
       return [
         toPoint(a1, smin > 0 ? smin : 0, va),
         toPoint(a1, smax < 1 ? smax : 1, va)
-      ];
+      ]
     }
 
-    return null;
-  }
+    return null
+  };
 
   /**
    * @param  {SweepEvent} se1
@@ -1490,38 +1447,32 @@
    * @param  {Queue}      queue
    * @return {Number}
    */
-  function possibleIntersection (se1, se2, queue) {
+  var possibleIntersection = function (se1, se2, queue) {
     // that disallows self-intersecting polygons,
     // did cost us half a day, so I'll leave it
     // out of respect
-    // if (se1.isSubject === se2.isSubject) return;
-    var inter = intersection(
+    // if (se1.isSubject === se2.isSubject) return
+    var inter = intersection$1(
       se1.point, se1.otherEvent.point,
       se2.point, se2.otherEvent.point
     );
 
     var nintersections = inter ? inter.length : 0;
-    if (nintersections === 0) { return 0; } // no intersection
+    if (nintersections === 0) { return 0 } // no intersection
 
     // the line segments intersect at an endpoint of both line segments
     if ((nintersections === 1) &&
         (equals(se1.point, se2.point) ||
          equals(se1.otherEvent.point, se2.otherEvent.point))) {
-      return 0;
+      return 0
     }
 
     if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-      // if(se1.contourId === se2.contourId){
-      // console.warn('Edges of the same polygon overlap',
-      //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-      // }
-      //throw new Error('Edges of the same polygon overlap');
-      return 0;
+      return 0
     }
 
     // The line segments associated to se1 and se2 intersect
     if (nintersections === 1) {
-
       // if the intersection point is not an endpoint of se1
       if (!equals(se1.point, inter[0]) && !equals(se1.otherEvent.point, inter[0])) {
         divideSegment(se1, inter[0], queue);
@@ -1531,12 +1482,12 @@
       if (!equals(se2.point, inter[0]) && !equals(se2.otherEvent.point, inter[0])) {
         divideSegment(se2, inter[0], queue);
       }
-      return 1;
+      return 1
     }
 
     // The line segments associated to se1 and se2 overlap
-    var events        = [];
-    var leftCoincide  = false;
+    var events = [];
+    var leftCoincide = false;
     var rightCoincide = false;
 
     if (equals(se1.point, se2.point)) {
@@ -1558,79 +1509,79 @@
     if ((leftCoincide && rightCoincide) || leftCoincide) {
       // both line segments are equal or share the left endpoint
       se2.type = NON_CONTRIBUTING;
-      se1.type = (se2.inOut === se1.inOut)
-        ? SAME_TRANSITION : DIFFERENT_TRANSITION;
+      se1.type = (se2.inOut === se1.inOut) ? SAME_TRANSITION : DIFFERENT_TRANSITION;
 
       if (leftCoincide && !rightCoincide) {
         // honestly no idea, but changing events selection from [2, 1]
         // to [0, 1] fixes the overlapping self-intersecting polygons issue
         divideSegment(events[1].otherEvent, events[0].point, queue);
       }
-      return 2;
+      return 2
     }
 
     // the line segments share the right endpoint
     if (rightCoincide) {
       divideSegment(events[0], events[1].point, queue);
-      return 3;
+      return 3
     }
 
     // no line segment includes totally the other one
     if (events[0] !== events[3].otherEvent) {
       divideSegment(events[0], events[1].point, queue);
       divideSegment(events[1], events[2].point, queue);
-      return 3;
+      return 3
     }
 
     // one line segment includes the other one
     divideSegment(events[0], events[1].point, queue);
     divideSegment(events[3].otherEvent, events[2].point, queue);
 
-    return 3;
-  }
+    return 3
+  };
 
   /**
    * @param  {SweepEvent} le1
    * @param  {SweepEvent} le2
    * @return {Number}
    */
-  function compareSegments(le1, le2) {
-    if (le1 === le2) { return 0; }
+  var compareSegments = function (le1, le2) {
+    if (le1 === le2) { return 0 }
 
     // Segments are not collinear
     if (signedArea(le1.point, le1.otherEvent.point, le2.point) !== 0 ||
       signedArea(le1.point, le1.otherEvent.point, le2.otherEvent.point) !== 0) {
-
       // If they share their left endpoint use the right endpoint to sort
-      if (equals(le1.point, le2.point)) { return le1.isBelow(le2.otherEvent.point) ? -1 : 1; }
+      if (equals(le1.point, le2.point)) { return le1.isBelow(le2.otherEvent.point) ? -1 : 1 }
 
       // Different left endpoint: use the left endpoint to sort
-      if (le1.point[0] === le2.point[0]) { return le1.point[1] < le2.point[1] ? -1 : 1; }
+      if (le1.point[0] === le2.point[0]) { return le1.point[1] < le2.point[1] ? -1 : 1 }
 
       // has the line segment associated to e1 been inserted
       // into S after the line segment associated to e2 ?
-      if (compareEvents(le1, le2) === 1) { return le2.isAbove(le1.point) ? -1 : 1; }
+      if (compareEvents(le1, le2) === 1) { return le2.isAbove(le1.point) ? -1 : 1 }
 
       // The line segment associated to e2 has been inserted
       // into S after the line segment associated to e1
-      return le1.isBelow(le2.point) ? -1 : 1;
+      return le1.isBelow(le2.point) ? -1 : 1
     }
 
     if (le1.isSubject === le2.isSubject) { // same polygon
-      var p1 = le1.point, p2 = le2.point;
-      if (p1[0] === p2[0] && p1[1] === p2[1]/*equals(le1.point, le2.point)*/) {
-        p1 = le1.otherEvent.point; p2 = le2.otherEvent.point;
-        if (p1[0] === p2[0] && p1[1] === p2[1]) { return 0; }
-        else { return le1.contourId > le2.contourId ? 1 : -1; }
+      var p1 = le1.point;
+      var p2 = le2.point;
+      if (p1[0] === p2[0] && p1[1] === p2[1] /* equals(le1.point, le2.point) */) {
+        p1 = le1.otherEvent.point;
+        p2 = le2.otherEvent.point;
+        if (p1[0] === p2[0] && p1[1] === p2[1]) { return 0 }
+        else { return le1.contourId > le2.contourId ? 1 : -1 }
       }
     } else { // Segments are collinear, but belong to separate polygons
-      return le1.isSubject ? -1 : 1;
+      return le1.isSubject ? -1 : 1
     }
 
-    return compareEvents(le1, le2) === 1 ? 1 : -1;
-  }
+    return compareEvents(le1, le2) === 1 ? 1 : -1
+  };
 
-  function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
+  var subdivide = function (eventQueue, subject, clipping, sbbox, cbbox, operation) {
     var sweepLine = new SplayTree(compareSegments);
     var sortedEvents = [];
 
@@ -1644,16 +1595,16 @@
 
       // optimization by bboxes for intersection and difference goes here
       if ((operation === INTERSECTION && event.point[0] > rightbound) ||
-          (operation === DIFFERENCE   && event.point[0] > sbbox[2])) {
-        break;
+          (operation === DIFFERENCE && event.point[0] > sbbox[2])) {
+        break
       }
 
       if (event.left) {
-        next  = prev = sweepLine.insert(event);
+        next = prev = sweepLine.insert(event);
         begin = sweepLine.minNode();
 
         if (prev !== begin) { prev = sweepLine.prev(prev); }
-        else                { prev = null; }
+        else { prev = null; }
 
         next = sweepLine.next(next);
 
@@ -1671,11 +1622,11 @@
           if (possibleIntersection(prev.key, event, eventQueue) === 2) {
             var prevprev = prev;
             if (prevprev !== begin) { prevprev = sweepLine.prev(prevprev); }
-            else                    { prevprev = null; }
+            else { prevprev = null; }
 
             prevprevEvent = prevprev ? prevprev.key : null;
             computeFields(prevEvent, prevprevEvent, operation);
-            computeFields(event,     prevEvent,     operation);
+            computeFields(event, prevEvent, operation);
           }
         }
       } else {
@@ -1683,9 +1634,8 @@
         next = prev = sweepLine.find(event);
 
         if (prev && next) {
-
           if (prev !== begin) { prev = sweepLine.prev(prev); }
-          else                { prev = null; }
+          else { prev = null; }
 
           next = sweepLine.next(next);
           sweepLine.remove(event);
@@ -1696,10 +1646,10 @@
         }
       }
     }
-    return sortedEvents;
-  }
+    return sortedEvents
+  };
 
-  var Contour = function Contour() {
+  var Contour = function Contour () {
     this.points = [];
     this.holeIds = [];
     this.holeOf = null;
@@ -1707,14 +1657,14 @@
   };
 
   Contour.prototype.isExterior = function isExterior () {
-    return this.holeOf == null;
+    return this.holeOf == null
   };
 
   /**
    * @param  {Array.<SweepEvent>} sortedEvents
    * @return {Array.<SweepEvent>}
    */
-  function orderEvents(sortedEvents) {
+  var orderEvents = function (sortedEvents) {
     var event, i, len, tmp;
     var resultEvents = [];
     for (i = 0, len = sortedEvents.length; i < len; i++) {
@@ -1739,7 +1689,6 @@
       }
     }
 
-
     for (i = 0, len = resultEvents.length; i < len; i++) {
       event = resultEvents[i];
       event.otherPos = i;
@@ -1756,9 +1705,8 @@
       }
     }
 
-    return resultEvents;
-  }
-
+    return resultEvents
+  };
 
   /**
    * @param  {Number} pos
@@ -1766,19 +1714,18 @@
    * @param  {Object>}    processed
    * @return {Number}
    */
-  function nextPos(pos, resultEvents, processed, origPos) {
-    var newPos = pos + 1,
-        p = resultEvents[pos].point,
-        p1;
+  var nextPos = function (pos, resultEvents, processed, origPos) {
+    var p = resultEvents[pos].point;
+    var newPos = pos + 1;
+    var p1;
     var length = resultEvents.length;
 
-    if (newPos < length)
-      { p1 = resultEvents[newPos].point; }
+    if (newPos < length) { p1 = resultEvents[newPos].point; }
 
     while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
       if (!processed[newPos]) {
-        return newPos;
-      } else   {
+        return newPos
+      } else {
         newPos++;
       }
       p1 = resultEvents[newPos].point;
@@ -1790,11 +1737,10 @@
       newPos--;
     }
 
-    return newPos;
-  }
+    return newPos
+  };
 
-
-  function initializeContourFromContext(event, contours, contourId) {
+  var initializeContourFromContext = function (event, contours, contourId) {
     var contour = new Contour();
     if (event.prevInResult != null) {
       var prevInResult = event.prevInResult;
@@ -1832,14 +1778,14 @@
       contour.holeOf = null;
       contour.depth = 0;
     }
-    return contour;
-  }
+    return contour
+  };
 
   /**
    * @param  {Array.<SweepEvent>} sortedEvents
    * @return {Array.<*>} polygons
    */
-  function connectEdges(sortedEvents) {
+  var connectEdges = function (sortedEvents) {
     var i, len;
     var resultEvents = orderEvents(sortedEvents);
 
@@ -1848,9 +1794,8 @@
     var contours = [];
 
     var loop = function (  ) {
-
       if (processed[i]) {
-        return;
+        return
       }
 
       var contourId = contours.length;
@@ -1868,7 +1813,6 @@
       var initial = resultEvents[i].point;
       contour.points.push(initial);
 
-      /* eslint no-constant-condition: "off" */
       while (true) {
         markAsProcessed(pos);
 
@@ -1879,8 +1823,8 @@
 
         pos = nextPos(pos, resultEvents, processed, origPos);
 
-        if (pos == origPos) {
-          break;
+        if (pos === origPos) {
+          break
         }
       }
 
@@ -1889,11 +1833,13 @@
 
     for (i = 0, len = resultEvents.length; i < len; i++) loop(  );
 
-    return contours;
-  }
+    return contours
+  };
 
-  var tinyqueue = TinyQueue;
-  var default_1 = TinyQueue;
+  var tinyqueue = {exports: {}};
+
+  tinyqueue.exports = TinyQueue;
+  tinyqueue.exports.default = TinyQueue;
 
   function TinyQueue(data, compare) {
       if (!(this instanceof TinyQueue)) { return new TinyQueue(data, compare); }
@@ -1978,25 +1924,25 @@
           data[pos] = item;
       }
   };
-  tinyqueue.default = default_1;
+
+  var Queue = tinyqueue.exports;
 
   var max = Math.max;
   var min = Math.min;
 
   var contourId = 0;
 
-
-  function processPolygon(contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
+  var processPolygon = function (contourOrHole, isSubject, depth, Q, bbox, isExteriorRing) {
     var i, len, s1, s2, e1, e2;
     for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
       s1 = contourOrHole[i];
       s2 = contourOrHole[i + 1];
       e1 = new SweepEvent(s1, false, undefined, isSubject);
-      e2 = new SweepEvent(s2, false, e1,        isSubject);
+      e2 = new SweepEvent(s2, false, e1, isSubject);
       e1.otherEvent = e2;
 
       if (s1[0] === s2[0] && s1[1] === s2[1]) {
-        continue; // skip collapsed edges, or it breaks
+        continue // skip collapsed edges, or it breaks
       }
 
       e1.contourId = e2.contourId = depth;
@@ -2010,7 +1956,8 @@
         e1.left = true;
       }
 
-      var x = s1[0], y = s1[1];
+      var x = s1[0];
+      var y = s1[1];
       bbox[0] = min(bbox[0], x);
       bbox[1] = min(bbox[1], y);
       bbox[2] = max(bbox[2], x);
@@ -2021,12 +1968,11 @@
       Q.push(e1);
       Q.push(e2);
     }
-  }
+  };
 
-
-  function fillQueue(subject, clipping, sbbox, cbbox, operation) {
-    var eventQueue = new tinyqueue(null, compareEvents);
-    var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk;
+  var fillQueue = function (subject, clipping, sbbox, cbbox, operation) {
+    var eventQueue = new Queue(null, compareEvents);
+    var polygonSet, isExteriorRing, i, ii, j, jj; //, k, kk
 
     for (i = 0, ii = subject.length; i < ii; i++) {
       polygonSet = subject[i];
@@ -2047,16 +1993,15 @@
       }
     }
 
-    return eventQueue;
-  }
+    return eventQueue
+  };
 
   var EMPTY = [];
 
-
-  function trivialOperation(subject, clipping, operation) {
+  var trivialOperation = function (subject, clipping, operation) {
     var result = null;
     if (subject.length * clipping.length === 0) {
-      if        (operation === INTERSECTION) {
+      if (operation === INTERSECTION) {
         result = EMPTY;
       } else if (operation === DIFFERENCE) {
         result = subject;
@@ -2065,17 +2010,16 @@
         result = (subject.length === 0) ? clipping : subject;
       }
     }
-    return result;
-  }
+    return result
+  };
 
-
-  function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
+  var compareBBoxes = function (subject, clipping, sbbox, cbbox, operation) {
     var result = null;
     if (sbbox[0] > cbbox[2] ||
         cbbox[0] > sbbox[2] ||
         sbbox[1] > cbbox[3] ||
         cbbox[1] > sbbox[3]) {
-      if        (operation === INTERSECTION) {
+      if (operation === INTERSECTION) {
         result = EMPTY;
       } else if (operation === DIFFERENCE) {
         result = subject;
@@ -2084,11 +2028,10 @@
         result = subject.concat(clipping);
       }
     }
-    return result;
-  }
+    return result
+  };
 
-
-  function boolean(subject, clipping, operation) {
+  var boolean = function (subject, clipping, operation) {
     if (typeof subject[0][0][0] === 'number') {
       subject = [subject];
     }
@@ -2097,26 +2040,26 @@
     }
     var trivial = trivialOperation(subject, clipping, operation);
     if (trivial) {
-      return trivial === EMPTY ? null : trivial;
+      return trivial === EMPTY ? null : trivial
     }
     var sbbox = [Infinity, Infinity, -Infinity, -Infinity];
     var cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
-    // console.time('fill queue');
+    // console.time('fill queue')
     var eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
-    //console.timeEnd('fill queue');
+    // console.timeEnd('fill queue')
 
     trivial = compareBBoxes(subject, clipping, sbbox, cbbox, operation);
     if (trivial) {
-      return trivial === EMPTY ? null : trivial;
+      return trivial === EMPTY ? null : trivial
     }
-    // console.time('subdivide edges');
+    // console.time('subdivide edges')
     var sortedEvents = subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation);
-    //console.timeEnd('subdivide edges');
+    // console.timeEnd('subdivide edges')
 
-    // console.time('connect vertices');
+    // console.time('connect vertices')
     var contours = connectEdges(sortedEvents);
-    //console.timeEnd('connect vertices');
+    // console.timeEnd('connect vertices')
 
     // Convert contours to polygons
     var polygons = [];
@@ -2134,8 +2077,8 @@
       }
     }
 
-    return polygons;
-  }
+    return polygons
+  };
 
   function union (subject, clipping) {
     return boolean(subject, clipping, UNION);
@@ -2149,7 +2092,7 @@
     return boolean(subject, clipping, XOR);
   }
 
-  function intersection$1 (subject, clipping) {
+  function intersection (subject, clipping) {
     return boolean(subject, clipping, INTERSECTION);
   }
 
@@ -2310,7 +2253,7 @@
 
     var operation;
     if (op === OPERATIONS.INTERSECTION) {
-      operation = intersection$1;
+      operation = intersection;
     } else if (op === OPERATIONS.UNION) {
       operation = union;
     } else if (op === OPERATIONS.DIFFERENCE) {
@@ -2383,4 +2326,4 @@
 
   loadData(path + file);
 
-}(L));
+})(L);
