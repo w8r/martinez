@@ -4,9 +4,7 @@
     "node": true,
     "mocha": true
   },
-  "extends": [
-    "eslint:recommended"
-  ],
+  "extends": ["eslint:recommended"],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
@@ -23,11 +21,7 @@
     "Worker": true,
     "URL": true
   },
-  "plugins": [
-    "promise",
-    "import-order",
-    "jsdoc"
-  ],
+  "plugins": ["promise", "import-order", "jsdoc"],
   "rules": {
     "indent": 0,
     //    "prefer-const": "error",
@@ -45,9 +39,7 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "no-constant-condition": [
-      "error"
-    ],
+    "no-constant-condition": ["error"],
     "no-multi-spaces": 0,
     "semi": [
       // semicolons are required
@@ -95,15 +87,9 @@
       // no multi line strings using \
       "error"
     ],
-    "no-multiple-empty-lines": [
-      "error"
-    ],
-    "no-trailing-spaces": [
-      "error"
-    ],
-    "no-mixed-spaces-and-tabs": [
-      "error"
-    ],
+    "no-multiple-empty-lines": ["error"],
+    "no-trailing-spaces": ["error"],
+    "no-mixed-spaces-and-tabs": ["error"],
     "curly": 0,
     "brace-style": 0,
     "keyword-spacing": [
@@ -203,9 +189,7 @@
       "error",
       "except-parens"
     ],
-    "no-inner-declarations": [
-      "error"
-    ],
+    "no-inner-declarations": ["error"],
     "no-console": 2,
     // `console.log(...)` is allowed
     "import-order/import-order": 0,

@@ -1,30 +1,29 @@
-import tap      from 'tape';
-import path     from 'path';
-import glob     from 'glob';
-import load     from 'load-json-file';
-import fs       from 'fs';
+import tap from 'tape';
+import path from 'path';
+import glob from 'glob';
+import load from 'load-json-file';
+import fs from 'fs';
 import stringify from 'json-stringify-pretty-compact';
-import * as martinez from '../index';
-
+import * as martinez from '..';
 
 function extractExpectedResults(features) {
-  return features.map(feature => {
+  return features.map((feature) => {
     let mode = feature.properties.operation;
     var op;
     switch (mode) {
-      case "union":
+      case 'union':
         op = martinez.union;
         break;
-      case "intersection":
+      case 'intersection':
         op = martinez.intersection;
         break;
-      case "xor":
+      case 'xor':
         op = martinez.xor;
         break;
-      case "diff":
+      case 'diff':
         op = martinez.diff;
         break;
-      case "diff_ba":
+      case 'diff_ba':
         op = (a, b) => martinez.diff(b, a);
         break;
     }
@@ -33,11 +32,10 @@ function extractExpectedResults(features) {
     }
     return {
       op: op,
-      coordinates: feature.geometry.coordinates,
+      coordinates: feature.geometry.coordinates
     };
   });
 }
-
 
 const caseDir = path.join(__dirname, 'genericTestCases');
 const testCases = glob.sync(path.join(caseDir, '*.geojson'));
@@ -48,7 +46,6 @@ if (testCases.length === 0) {
 testCases.forEach((testCaseFile) => {
   let testName = 'Generic test case: ' + path.basename(testCaseFile);
   tap.test(testName, (t) => {
-
     const data = load.sync(testCaseFile);
     if (data.features.length < 2) {
       throw `Test case file must contain at least two features, but ${testCaseFile} doesn't.`;
@@ -57,8 +54,14 @@ testCases.forEach((testCaseFile) => {
     let p1Geometry = data.features[0].geometry;
     let p2Geometry = data.features[1].geometry;
 
-    let p1 = p1Geometry.type === 'Polygon' ? [p1Geometry.coordinates] : p1Geometry.coordinates;
-    let p2 = p2Geometry.type === 'Polygon' ? [p2Geometry.coordinates] : p2Geometry.coordinates;
+    let p1 =
+      p1Geometry.type === 'Polygon'
+        ? [p1Geometry.coordinates]
+        : p1Geometry.coordinates;
+    let p2 =
+      p2Geometry.type === 'Polygon'
+        ? [p2Geometry.coordinates]
+        : p2Geometry.coordinates;
 
     let expectedResults = extractExpectedResults(data.features.slice(2));
 
@@ -79,6 +82,4 @@ testCases.forEach((testCaseFile) => {
 
     t.end();
   });
-
 });
-

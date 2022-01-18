@@ -1,16 +1,11 @@
-import SweepEvent    from './sweep_event';
-import equals        from './equals';
+import SweepEvent from './sweep_event';
+import equals from './equals';
 import compareEvents from './compare_events';
+import { Point, Queue } from './types';
 
-/**
- * @param  {SweepEvent} se
- * @param  {Array.<Number>} p
- * @param  {Queue} queue
- * @return {Queue}
- */
-export default function divideSegment(se, p, queue)  {
-  const r = new SweepEvent(p, false, se,            se.isSubject);
-  const l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
+export default function divideSegment(se: SweepEvent, p: Point, queue: Queue) {
+  const r = new SweepEvent(p, false, se, se.isSubject);
+  const l = new SweepEvent(p, true, se.otherEvent, se.isSubject);
 
   /* eslint-disable no-console */
   if (equals(se.point, se.otherEvent.point)) {

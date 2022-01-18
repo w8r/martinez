@@ -1,8 +1,7 @@
-import tap        from 'tape';
-import SweepEvent from '../src/sweep_event';
+import tap from 'tape';
+import SweepEvent from '../dist/sweep_event';
 
 tap.test('sweep event', (main) => {
-
   main.test('isBelow', (t) => {
     const s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
     const s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
@@ -20,9 +19,7 @@ tap.test('sweep event', (main) => {
     t.end();
   });
 
-
   main.test('isAbove', (t) => {
-
     const s1 = new SweepEvent([0, 0], true, new SweepEvent([1, 1], false));
     const s2 = new SweepEvent([0, 1], false, new SweepEvent([0, 0], false));
 
@@ -39,14 +36,20 @@ tap.test('sweep event', (main) => {
     t.end();
   });
 
-
   main.test('isVertical', (t) => {
-    t.ok(new SweepEvent([0, 0], true, new SweepEvent([0, 1], false)).isVertical());
-    t.notOk(new SweepEvent([0, 0], true, new SweepEvent([0.0001, 1], false)).isVertical());
+    t.ok(
+      new SweepEvent([0, 0], true, new SweepEvent([0, 1], false)).isVertical()
+    );
+    t.notOk(
+      new SweepEvent(
+        [0, 0],
+        true,
+        new SweepEvent([0.0001, 1], false)
+      ).isVertical()
+    );
 
     t.end();
   });
-
 
   main.end();
 });

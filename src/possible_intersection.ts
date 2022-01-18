@@ -1,12 +1,14 @@
 import divideSegment from './divide_segment';
-import intersection  from './segment_intersection';
-import equals        from './equals';
+import intersection from './segment_intersection';
+import equals from './equals';
 import compareEvents from './compare_events';
 import {
   NON_CONTRIBUTING,
   SAME_TRANSITION,
   DIFFERENT_TRANSITION
 } from './edge_type';
+import SweepEvent from './sweep_event';
+import { Point, Queue } from './types';
 
 /**
  * @param  {SweepEvent} se1
@@ -14,25 +16,34 @@ import {
  * @param  {Queue}      queue
  * @return {Number}
  */
-export default function possibleIntersection (se1, se2, queue) {
+export default function possibleIntersection(
+  se1: SweepEvent,
+  se2: SweepEvent,
+  queue: Queue
+) {
   // that disallows self-intersecting polygons,
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
   const inter = intersection(
-    se1.point, se1.otherEvent.point,
-    se2.point, se2.otherEvent.point
+    se1.point,
+    se1.otherEvent.point,
+    se2.point,
+    se2.otherEvent.point,
+    false
   );
 
+  // simplify intersection result type
   const nintersections = inter ? inter.length : 0;
   if (nintersections === 0) return 0; // no intersection
 
   // the line segments intersect at an endpoint of both line segments
-  if ((nintersections === 1) &&
-      (equals(se1.point, se2.point) ||
-       equals(se1.otherEvent.point, se2.otherEvent.point))) {
+  if (
+    nintersections === 1 &&
+    (equals(se1.point, se2.point) ||
+      equals(se1.otherEvent.point, se2.otherEvent.point))
+  )
     return 0;
-  }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
     // if(se1.contourId === se2.contourId){
@@ -45,35 +56,32 @@ export default function possibleIntersection (se1, se2, queue) {
 
   // The line segments associated to se1 and se2 intersect
   if (nintersections === 1) {
-
+    // @ts-ignore;
+    const i0 = inter[0] as Point;
     // if the intersection point is not an endpoint of se1
-    if (!equals(se1.point, inter[0]) && !equals(se1.otherEvent.point, inter[0])) {
-      divideSegment(se1, inter[0], queue);
+    if (!equals(se1.point, i0) && !equals(se1.otherEvent.point, i0)) {
+      divideSegment(se1, i0, queue);
     }
 
     // if the intersection point is not an endpoint of se2
-    if (!equals(se2.point, inter[0]) && !equals(se2.otherEvent.point, inter[0])) {
-      divideSegment(se2, inter[0], queue);
+    if (!equals(se2.point, i0) && !equals(se2.otherEvent.point, i0)) {
+      divideSegment(se2, i0, queue);
     }
     return 1;
   }
 
   // The line segments associated to se1 and se2 overlap
-  const events        = [];
-  let leftCoincide  = false;
+  const events: SweepEvent[] = [];
+  let leftCoincide = false;
   let rightCoincide = false;
 
-  if (equals(se1.point, se2.point)) {
-    leftCoincide = true; // linked
-  } else if (compareEvents(se1, se2) === 1) {
-    events.push(se2, se1);
-  } else {
-    events.push(se1, se2);
-  }
+  // linked
+  if (equals(se1.point, se2.point)) leftCoincide = true;
+  else if (compareEvents(se1, se2) === 1) events.push(se2, se1);
+  else events.push(se1, se2);
 
-  if (equals(se1.otherEvent.point, se2.otherEvent.point)) {
-    rightCoincide = true;
-  } else if (compareEvents(se1.otherEvent, se2.otherEvent) === 1) {
+  if (equals(se1.otherEvent.point, se2.otherEvent.point)) rightCoincide = true;
+  else if (compareEvents(se1.otherEvent, se2.otherEvent) === 1) {
     events.push(se2.otherEvent, se1.otherEvent);
   } else {
     events.push(se1.otherEvent, se2.otherEvent);
@@ -82,8 +90,7 @@ export default function possibleIntersection (se1, se2, queue) {
   if ((leftCoincide && rightCoincide) || leftCoincide) {
     // both line segments are equal or share the left endpoint
     se2.type = NON_CONTRIBUTING;
-    se1.type = (se2.inOut === se1.inOut)
-      ? SAME_TRANSITION : DIFFERENT_TRANSITION;
+    se1.type = se2.inOut === se1.inOut ? SAME_TRANSITION : DIFFERENT_TRANSITION;
 
     if (leftCoincide && !rightCoincide) {
       // honestly no idea, but changing events selection from [2, 1]
