@@ -1,28 +1,28 @@
 {
   "name": "martinez-polygon-clipping",
-  "version": "0.7.3",
+  "version": "0.7.2",
   "description": "Martinez polygon clipping algorithm, does boolean operation on polygons (multipolygons, polygons with holes etc): intersection, union, difference, xor",
-  "main": "dist/index.js",
-  "browser": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "jsnext:main": "dist/index.esm.js",
-  "types": "dist/types",
+  "main": "dist/martinex.esm.js",
+  "module": "dist/martinez.esm.js",
+  "types": "dist/types/index.d.ts",
+  "browser": "dist/matinez.umd.js",
+  "jsdelivr": "dist/martinex.umd.js",
+  "type": "module",
   "files": [
-    "index.d.ts",
-    "index.js",
     "src/",
     "dist/"
   ],
   "scripts": {
-    "test2": "tape -r ts-node/register test/*.test.ts | tap-spec && npm run ts",
-    "test": "tape -r esm test/*.test.js | tap-spec && npm run ts",
-    "ts": "tsc index.d.ts",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest",
+    "types": "tsc --emitDeclarationOnly --noEmit false -d --declarationDir dist/types",
     "bench": "node --require reify bench.js",
     "lint": "eslint ./src/",
-    "watch": "rollup -c -w",
     "serve": "http-server -p 3000",
-    "start": "typehead serve",
-    "build": "npm run lint && rollup -c",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
@@ -43,21 +43,17 @@
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
   "devDependencies": {
-    "@mapbox/typehead": "^1.0.3",
     "@turf/union": "^4.6.0",
     "@types/geojson": "^1.0.6",
     "@types/jsts": "^0.17.9",
     "@types/leaflet": "^1.7.8",
     "@types/leaflet-editable": "^1.2.1",
     "@types/node": "^17.0.8",
-    "@types/tape": "^4.13.2",
     "benchmark": "^2.1.4",
-    "buble": "^0.19.3",
     "eslint": "^6.8.0",
     "eslint-plugin-import-order": "^2.1.4",
     "eslint-plugin-jsdoc": "^20.0.2",
     "eslint-plugin-promise": "^3.8.0",
-    "esm": "^3.2.25",
     "geojson-project": "^1.0.0",
     "http-server": "^0.12.1",
     "json-stringify-pretty-compact": "^2.0.0",
@@ -66,19 +62,10 @@
     "load-json-file": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "reify": "^0.20.12",
-    "rollup": "^1.28.0",
-    "rollup-plugin-buble": "^0.19.8",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.31.1",
-    "tap-spec": "^5.0.0",
-    "tap-status": "^1.0.1",
-    "tape": "^5.4.1",
-    "tape-es": "^1.2.17",
-    "ts-node": "^10.4.0",
-    "tslib": "^2.3.1",
-    "typescript": "^3.9.10"
+    "@vitest/ui": "^0.18.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vitest": "^0.18.1"
   },
   "dependencies": {
     "robust-predicates": "^3.0.1",
@@ -94,8 +81,5 @@
     "endOfLine": "lf",
     "bracketSpacing": true,
     "printWidth": 80
-  },
-  "esm": {
-    "mode": "all"
   }
 }
