@@ -52,7 +52,7 @@ export default function subdivide(
           possibleIntersection(event, next.key as SweepEvent, eventQueue) === 2
         ) {
           computeFields(event, prevEvent, operation);
-          computeFields(event, next.key as SweepEvent, operation);
+          computeFields(next.key as SweepEvent, event, operation);
         }
       }
 
