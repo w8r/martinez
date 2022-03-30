@@ -1663,7 +1663,7 @@
         if (next) {
           if (possibleIntersection(event, next.key, eventQueue) === 2) {
             computeFields(event, prevEvent, operation);
-            computeFields(event, next.key, operation);
+            computeFields(next.key, event, operation);
           }
         }
 
@@ -1768,8 +1768,8 @@
    */
   function nextPos(pos, resultEvents, processed, origPos) {
     var newPos = pos + 1,
-        p = resultEvents[pos].point,
-        p1;
+      p = resultEvents[pos].point,
+      p1;
     var length = resultEvents.length;
 
     if (newPos < length)
@@ -1778,10 +1778,11 @@
     while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
       if (!processed[newPos]) {
         return newPos;
-      } else   {
+      } else {
         newPos++;
       }
-      p1 = resultEvents[newPos].point;
+      if (newPos < length)
+        { p1 = resultEvents[newPos].point; }
     }
 
     newPos = pos - 1;
