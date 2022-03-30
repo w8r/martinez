@@ -1861,7 +1861,7 @@
       // Helper function that combines marking an event as processed with assigning its output contour ID
       var markAsProcessed = function (pos) {
         processed[pos] = true;
-        if (pos < resultEvents.length) {
+        if (pos < resultEvents.length && resultEvents[pos]) {
           resultEvents[pos].outputContourId = contourId;
         }
       };
@@ -1883,7 +1883,7 @@
 
         pos = nextPos(pos, resultEvents, processed, origPos);
 
-        if (pos == origPos || pos >= resultEvents.length) {
+        if (pos == origPos || pos >= resultEvents.length || !resultEvents[pos]) {
           break;
         }
       }

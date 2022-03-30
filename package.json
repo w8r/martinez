@@ -20,6 +20,7 @@
     "watch": "rollup -c -w",
     "serve": "http-server -p 3000",
     "start": "run-p watch serve",
+    "prepare": "rollup -c && npm run min",
     "build": "npm run lint && rollup -c && npm run min",
     "min": "uglifyjs ./dist/martinez.umd.js -o ./dist/martinez.min.js -m --comments",
     "prepublishOnly": "npm run lint && npm run test && npm run build"

@@ -152,7 +152,7 @@ export default function connectEdges(sortedEvents) {
     // Helper function that combines marking an event as processed with assigning its output contour ID
     const markAsProcessed = (pos) => {
       processed[pos] = true;
-      if (pos < resultEvents.length) {
+      if (pos < resultEvents.length && resultEvents[pos]) {
         resultEvents[pos].outputContourId = contourId;
       }
     };
@@ -174,7 +174,7 @@ export default function connectEdges(sortedEvents) {
 
       pos = nextPos(pos, resultEvents, processed, origPos);
 
-      if (pos == origPos || pos >= resultEvents.length) {
+      if (pos == origPos || pos >= resultEvents.length || !resultEvents[pos]) {
         break;
       }
     }
