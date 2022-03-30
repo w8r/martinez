@@ -59,8 +59,8 @@ function orderEvents(sortedEvents) {
  */
 function nextPos(pos, resultEvents, processed, origPos) {
   let newPos = pos + 1,
-      p = resultEvents[pos].point,
-      p1;
+    p = resultEvents[pos].point,
+    p1;
   const length = resultEvents.length;
 
   if (newPos < length)
@@ -69,10 +69,12 @@ function nextPos(pos, resultEvents, processed, origPos) {
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
     if (!processed[newPos]) {
       return newPos;
-    } else   {
+    } else {
       newPos++;
     }
-    p1 = resultEvents[newPos].point;
+    if (newPos < length) {
+      p1 = resultEvents[newPos].point;
+    }
   }
 
   newPos = pos - 1;
@@ -150,7 +152,9 @@ export default function connectEdges(sortedEvents) {
     // Helper function that combines marking an event as processed with assigning its output contour ID
     const markAsProcessed = (pos) => {
       processed[pos] = true;
-      resultEvents[pos].outputContourId = contourId;
+      if (pos < resultEvents.length && resultEvents[pos]) {
+        resultEvents[pos].outputContourId = contourId;
+      }
     };
 
     let pos = i;
@@ -170,7 +174,7 @@ export default function connectEdges(sortedEvents) {
 
       pos = nextPos(pos, resultEvents, processed, origPos);
 
-      if (pos == origPos) {
+      if (pos == origPos || pos >= resultEvents.length || !resultEvents[pos]) {
         break;
       }
     }

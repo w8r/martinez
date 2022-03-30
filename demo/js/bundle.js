@@ -1,7 +1,7 @@
 (function (L$1) {
   'use strict';
 
-  L$1 = L$1 && L$1.hasOwnProperty('default') ? L$1['default'] : L$1;
+  L$1 = L$1 && Object.prototype.hasOwnProperty.call(L$1, 'default') ? L$1['default'] : L$1;
 
   L$1.Coordinates = L$1.Control.extend({
     options: {
@@ -1663,7 +1663,7 @@
         if (next) {
           if (possibleIntersection(event, next.key, eventQueue) === 2) {
             computeFields(event, prevEvent, operation);
-            computeFields(event, next.key, operation);
+            computeFields(next.key, event, operation);
           }
         }
 
@@ -1768,8 +1768,8 @@
    */
   function nextPos(pos, resultEvents, processed, origPos) {
     var newPos = pos + 1,
-        p = resultEvents[pos].point,
-        p1;
+      p = resultEvents[pos].point,
+      p1;
     var length = resultEvents.length;
 
     if (newPos < length)
@@ -1778,10 +1778,12 @@
     while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
       if (!processed[newPos]) {
         return newPos;
-      } else   {
+      } else {
         newPos++;
       }
-      p1 = resultEvents[newPos].point;
+      if (newPos < length) {
+        p1 = resultEvents[newPos].point;
+      }
     }
 
     newPos = pos - 1;
@@ -1859,7 +1861,9 @@
       // Helper function that combines marking an event as processed with assigning its output contour ID
       var markAsProcessed = function (pos) {
         processed[pos] = true;
-        resultEvents[pos].outputContourId = contourId;
+        if (pos < resultEvents.length && resultEvents[pos]) {
+          resultEvents[pos].outputContourId = contourId;
+        }
       };
 
       var pos = i;
@@ -1879,7 +1883,7 @@
 
         pos = nextPos(pos, resultEvents, processed, origPos);
 
-        if (pos == origPos) {
+        if (pos == origPos || pos >= resultEvents.length || !resultEvents[pos]) {
           break;
         }
       }
