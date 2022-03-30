@@ -51,8 +51,8 @@
     "eslint-plugin-jsdoc": "^20.0.2",
     "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",
-    "json-stringify-pretty-compact": "^2.0.0",
     "http-server": "^0.12.1",
+    "json-stringify-pretty-compact": "^2.0.0",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
     "load-json-file": "^2.0.0",
@@ -69,6 +69,7 @@
     "uglify-js": "^3.3.21"
   },
   "dependencies": {
+    "npm": "^8.5.5",
     "robust-predicates": "^2.0.4",
     "splaytree": "^0.1.4",
     "tinyqueue": "^1.2.0"
