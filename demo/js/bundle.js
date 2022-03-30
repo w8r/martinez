@@ -1,7 +1,7 @@
 (function (L$1) {
   'use strict';
 
-  L$1 = L$1 && L$1.hasOwnProperty('default') ? L$1['default'] : L$1;
+  L$1 = L$1 && Object.prototype.hasOwnProperty.call(L$1, 'default') ? L$1['default'] : L$1;
 
   L$1.Coordinates = L$1.Control.extend({
     options: {
@@ -1781,8 +1781,9 @@
       } else {
         newPos++;
       }
-      if (newPos < length)
-        { p1 = resultEvents[newPos].point; }
+      if (newPos < length) {
+        p1 = resultEvents[newPos].point;
+      }
     }
 
     newPos = pos - 1;
@@ -1880,7 +1881,7 @@
 
         pos = nextPos(pos, resultEvents, processed, origPos);
 
-        if (pos == origPos) {
+        if (pos == origPos || pos >= resultEvents.length) {
           break;
         }
       }

@@ -1692,8 +1692,9 @@
       } else {
         newPos++;
       }
-      if (newPos < length)
-        { p1 = resultEvents[newPos].point; }
+      if (newPos < length) {
+        p1 = resultEvents[newPos].point;
+      }
     }
 
     newPos = pos - 1;
@@ -1791,7 +1792,7 @@
 
         pos = nextPos(pos, resultEvents, processed, origPos);
 
-        if (pos == origPos) {
+        if (pos == origPos || pos >= resultEvents.length) {
           break;
         }
       }
