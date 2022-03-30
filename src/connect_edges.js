@@ -72,8 +72,9 @@ function nextPos(pos, resultEvents, processed, origPos) {
     } else {
       newPos++;
     }
-    if (newPos < length)
+    if (newPos < length) {
       p1 = resultEvents[newPos].point;
+    }
   }
 
   newPos = pos - 1;
@@ -171,7 +172,7 @@ export default function connectEdges(sortedEvents) {
 
       pos = nextPos(pos, resultEvents, processed, origPos);
 
-      if (pos == origPos) {
+      if (pos == origPos || pos >= resultEvents.length) {
         break;
       }
     }
