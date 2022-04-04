@@ -188,5 +188,5 @@ export default function connectEdges(sortedEvents) {
     contours.push(contour);
   }
 
-  return contours.filter(c => c.cull !== true);
+  return contours;
 }
