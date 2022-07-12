@@ -1,47 +1,47 @@
 import tap from 'tape';
-import intersection from '../dist/segment_intersection';
+import intersection from '../src/segment_intersection';
 
-tap.test('intersection', (t) => {
+tap('intersection', (t) => {
   t.deepEqual(
-    intersection([0, 0], [1, 1], [1, 0], [2, 2]),
+    intersection([0, 0], [1, 1], [1, 0], [2, 2], false),
     null,
     'null if no intersections'
   );
   t.deepEqual(
-    intersection([0, 0], [1, 1], [1, 0], [10, 2]),
+    intersection([0, 0], [1, 1], [1, 0], [10, 2], false),
     null,
     'null if no intersections'
   );
   t.deepEqual(
-    intersection([2, 2], [3, 3], [0, 6], [2, 4]),
+    intersection([2, 2], [3, 3], [0, 6], [2, 4], false),
     null,
     'null if no intersections'
   );
 
   t.deepEqual(
-    intersection([0, 0], [1, 1], [1, 0], [0, 1]),
+    intersection([0, 0], [1, 1], [1, 0], [0, 1], false),
     [[0.5, 0.5]],
     '1 intersection'
   );
   t.deepEqual(
-    intersection([0, 0], [1, 1], [0, 1], [0, 0]),
+    intersection([0, 0], [1, 1], [0, 1], [0, 0], false),
     [[0, 0]],
     'shared point 1'
   );
   t.deepEqual(
-    intersection([0, 0], [1, 1], [0, 1], [1, 1]),
+    intersection([0, 0], [1, 1], [0, 1], [1, 1], false),
     [[1, 1]],
     'shared point 2'
   );
 
   t.deepEqual(
-    intersection([0, 0], [1, 1], [0.5, 0.5], [1, 0]),
+    intersection([0, 0], [1, 1], [0.5, 0.5], [1, 0], false),
     [[0.5, 0.5]],
     'T-crossing'
   );
 
   t.deepEqual(
-    intersection([0, 0], [10, 10], [1, 1], [5, 5]),
+    intersection([0, 0], [10, 10], [1, 1], [5, 5], false),
     [
       [1, 1],
       [5, 5]
@@ -49,7 +49,7 @@ tap.test('intersection', (t) => {
     'full overlap'
   );
   t.deepEqual(
-    intersection([1, 1], [10, 10], [1, 1], [5, 5]),
+    intersection([1, 1], [10, 10], [1, 1], [5, 5], false),
     [
       [1, 1],
       [5, 5]
@@ -57,7 +57,7 @@ tap.test('intersection', (t) => {
     'shared point + overlap'
   );
   t.deepEqual(
-    intersection([3, 3], [10, 10], [0, 0], [5, 5]),
+    intersection([3, 3], [10, 10], [0, 0], [5, 5], false),
     [
       [3, 3],
       [5, 5]
@@ -65,7 +65,7 @@ tap.test('intersection', (t) => {
     'mutual overlap'
   );
   t.deepEqual(
-    intersection([0, 0], [1, 1], [0, 0], [1, 1]),
+    intersection([0, 0], [1, 1], [0, 0], [1, 1], false),
     [
       [0, 0],
       [1, 1]
@@ -73,7 +73,7 @@ tap.test('intersection', (t) => {
     'full overlap'
   );
   t.deepEqual(
-    intersection([1, 1], [0, 0], [0, 0], [1, 1]),
+    intersection([1, 1], [0, 0], [0, 0], [1, 1], false),
     [
       [1, 1],
       [0, 0]
@@ -82,28 +82,32 @@ tap.test('intersection', (t) => {
   );
 
   t.deepEqual(
-    intersection([0, 0], [1, 1], [1, 1], [2, 2]),
+    intersection([0, 0], [1, 1], [1, 1], [2, 2], false),
     [[1, 1]],
     'collinear, shared point'
   );
   t.deepEqual(
-    intersection([1, 1], [0, 0], [1, 1], [2, 2]),
+    intersection([1, 1], [0, 0], [1, 1], [2, 2], false),
     [[1, 1]],
     'collinear, shared other point'
   );
   t.deepEqual(
-    intersection([0, 0], [1, 1], [2, 2], [4, 4]),
+    intersection([0, 0], [1, 1], [2, 2], [4, 4], false),
     null,
     'collinear, no overlap'
   );
-  t.deepEqual(intersection([0, 0], [1, 1], [0, -1], [1, 0]), null, 'parallel');
   t.deepEqual(
-    intersection([1, 1], [0, 0], [0, -1], [1, 0]),
+    intersection([0, 0], [1, 1], [0, -1], [1, 0], false),
+    null,
+    'parallel'
+  );
+  t.deepEqual(
+    intersection([1, 1], [0, 0], [0, -1], [1, 0], false),
     null,
     'parallel, orientation'
   );
   t.deepEqual(
-    intersection([0, -1], [1, 0], [0, 0], [1, 1]),
+    intersection([0, -1], [1, 0], [0, 0], [1, 1], false),
     null,
     'parallel, position'
   );

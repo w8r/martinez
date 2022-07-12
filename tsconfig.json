@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "moduleResolution": "node",
     "allowJs": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
@@ -21,9 +22,13 @@
     "skipLibCheck": true,
 
     "outDir": "./dist/",
-    "types": ["node"],
+    "types": ["node", "mocha"],
     "lib": ["ES6", "DOM"]
   },
+  "typeRoots": ["./src/types"],
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "esm": true
+  }
 }
