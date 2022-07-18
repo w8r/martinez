@@ -1,4 +1,4 @@
-import tap from 'tape';
+import { test, assert } from 'vitest';
 import path from 'path';
 import load from 'load-json-file';
 import * as martinez from '../src';
@@ -31,9 +31,10 @@ testScenarios.forEach((ts) => {
   const subject = load.sync(
     path.join(__dirname, 'featureTypes', ts.subjectPoly + '.geojson')
   );
-  tap.test(ts.testName, (t) => {
+  const name = ts.testName;
+  test(ts.testName, () => {
     const expectedIntResult = load.sync(
-      path.join(outDir, 'intersection', t.name + '.geojson')
+      path.join(outDir, 'intersection', name + '.geojson')
     );
     if (expectedIntResult.geometry.type === 'Polygon')
       expectedIntResult.geometry.coordinates = [
@@ -43,14 +44,14 @@ testScenarios.forEach((ts) => {
       subject.geometry.coordinates,
       clipping.geometry.coordinates
     );
-    t.same(
+    assert.deepEqual(
       intResult,
       expectedIntResult.geometry.coordinates,
       ts.testName + ' - Intersect'
     );
 
     const expectedXorResult = load.sync(
-      path.join(outDir, 'xor', t.name + '.geojson')
+      path.join(outDir, 'xor', name + '.geojson')
     );
     if (expectedXorResult.geometry.type === 'Polygon')
       expectedXorResult.geometry.coordinates = [
@@ -60,14 +61,14 @@ testScenarios.forEach((ts) => {
       subject.geometry.coordinates,
       clipping.geometry.coordinates
     );
-    t.same(
+    assert.deepEqual(
       xorResult,
       expectedXorResult.geometry.coordinates,
       ts.testName + ' - XOR'
     );
 
     const expectedDiffResult = load.sync(
-      path.join(outDir, 'difference', t.name + '.geojson')
+      path.join(outDir, 'difference', name + '.geojson')
     );
     if (expectedDiffResult.geometry.type === 'Polygon')
       expectedDiffResult.geometry.coordinates = [
@@ -77,14 +78,14 @@ testScenarios.forEach((ts) => {
       subject.geometry.coordinates,
       clipping.geometry.coordinates
     );
-    t.same(
+    assert.deepEqual(
       diffResult,
       expectedDiffResult.geometry.coordinates,
       ts.testName + ' - Difference'
     );
 
     const expectedUnionResult = load.sync(
-      path.join(outDir, 'union', t.name + '.geojson')
+      path.join(outDir, 'union', name + '.geojson')
     );
     if (expectedUnionResult.geometry.type === 'Polygon')
       expectedUnionResult.geometry.coordinates = [
@@ -94,12 +95,10 @@ testScenarios.forEach((ts) => {
       subject.geometry.coordinates,
       clipping.geometry.coordinates
     );
-    t.same(
+    assert.deepEqual(
       unionResult,
       expectedUnionResult.geometry.coordinates,
       ts.testName + ' - Union'
     );
-
-    t.end();
   });
 });
