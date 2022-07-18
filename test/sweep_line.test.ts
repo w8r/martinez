@@ -1,9 +1,9 @@
-import tap from 'tape';
+import { test, assert } from 'vitest';
 import path from 'path';
 import Tree from 'splaytree';
 import load from 'load-json-file';
-import compareSegments from '../dist/compare_segments';
-import SweepEvent from '../dist/sweep_event';
+import compareSegments from '../src/compare_segments';
+import SweepEvent from '../src/sweep_event';
 
 // GeoJSON Data
 const data = load.sync(
@@ -13,51 +13,53 @@ const data = load.sync(
 const subject = data.features[0];
 const clipping = data.features[1];
 
-tap.test('sweep line', (t) => {
+test('sweep line', () => {
   const s = subject.geometry.coordinates;
   const c = clipping.geometry.coordinates;
 
   const EF = new SweepEvent(
     s[0][0],
     true,
-    new SweepEvent(s[0][2], false),
+    new SweepEvent(s[0][2], false, null, false),
     true
   );
+  // @ts-ignore
   EF.name = 'EF';
   const EG = new SweepEvent(
     s[0][0],
     true,
-    new SweepEvent(s[0][1], false),
+    new SweepEvent(s[0][1], false, null, false),
     true
   );
+  // @ts-ignore
   EG.name = 'EG';
 
   const tree = new Tree(compareSegments);
   tree.insert(EF);
   tree.insert(EG);
 
-  t.equals(tree.find(EF).key, EF, 'able to retrieve node');
-  t.equals(tree.minNode().key, EF, 'EF is at the begin');
-  t.equals(tree.maxNode().key, EG, 'EG is at the end');
+  assert.equal(tree.find(EF).key, EF, 'able to retrieve node');
+  assert.equal(tree.minNode().key, EF, 'EF is at the begin');
+  assert.equal(tree.maxNode().key, EG, 'EG is at the end');
 
-  let it = tree.find(EF);
+  let iter = tree.find(EF);
 
-  t.equals(tree.next(it).key, EG);
+  assert.equal(tree.next(iter).key, EG);
 
-  it = tree.find(EG);
+  iter = tree.find(EG);
 
-  t.equals(tree.prev(it).key, EF);
+  assert.equal(tree.prev(iter).key, EF);
 
   const DA = new SweepEvent(
     c[0][0],
     true,
-    new SweepEvent(c[0][2], false),
+    new SweepEvent(c[0][2], false, null, false),
     true
   );
   const DC = new SweepEvent(
     c[0][0],
     true,
-    new SweepEvent(c[0][1], false),
+    new SweepEvent(c[0][1], false, null, false),
     true
   );
 
@@ -66,13 +68,11 @@ tap.test('sweep line', (t) => {
 
   let begin = tree.minNode();
 
-  t.equals(begin.key, DA, 'DA');
+  assert.equal(begin.key, DA, 'DA');
   begin = tree.next(begin);
-  t.equals(begin.key, DC, 'DC');
+  assert.equal(begin.key, DC, 'DC');
   begin = tree.next(begin);
-  t.equals(begin.key, EF, 'EF');
+  assert.equal(begin.key, EF, 'EF');
   begin = tree.next(begin);
-  t.equals(begin.key, EG, 'EG');
-
-  t.end();
+  assert.equal(begin.key, EG, 'EG');
 });
