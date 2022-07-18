@@ -1,23 +1,13 @@
-// import tap from 'tape';
+import { assert, describe, expect, it } from 'vitest';
 import signedArea from '../src/signed_area';
-import { assert } from 'chai';
 
-// tap('analytical signed area', (t) => {
-//   t.equals(signedArea([0, 0], [0, 1], [1, 1]), -1, 'negative area');
-//   t.equals(signedArea([0, 1], [0, 0], [1, 0]), 1, 'positive area');
-//   t.equals(signedArea([0, 0], [1, 1], [2, 2]), 0, 'collinear, 0 area');
+describe('Signed area', () => {
+  it('analytical signed area', () => {
+    expect(signedArea([0, 0], [0, 1], [1, 1])).toEqual(-1);
+    expect(signedArea([0, 1], [0, 0], [1, 0]), 'positive area').toEqual(1);
 
-//   t.equals(signedArea([-1, 0], [2, 3], [0, 1]), 0, 'point on segment');
-//   t.equals(signedArea([2, 3], [-1, 0], [0, 1]), 0, 'point on segment');
-
-//   t.end();
-// });
-
-describe('signed area', () => {
-  console.log(signedArea);
-  //assert.equal(signedArea([0, 0], [0, 1], [1, 1]), -1, 'negative area');
-  //   t.equals(signedArea([0, 1], [0, 0], [1, 0]), 1, 'positive area');
-  //   t.equals(signedArea([0, 0], [1, 1], [2, 2]), 0, 'collinear, 0 area');
-  //   t.equals(signedArea([-1, 0], [2, 3], [0, 1]), 0, 'point on segment');
-  //   t.equals(signedArea([2, 3], [-1, 0], [0, 1]), 0, 'point on segment');
+    expect(signedArea([0, 0], [1, 1], [2, 2]), 'collinear, 0 area').toEqual(0);
+    expect(signedArea([-1, 0], [2, 3], [0, 1]), 'point on segment').toEqual(0);
+    expect(signedArea([2, 3], [-1, 0], [0, 1]), 'point on segment').toEqual(0);
+  });
 });

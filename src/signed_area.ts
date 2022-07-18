@@ -1,4 +1,4 @@
-import orient2d from 'robust-predicates/umd/orient2d';
+import { orient2d } from 'robust-predicates';
 import { Point } from './types';
 
 /**

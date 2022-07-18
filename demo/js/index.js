@@ -1,18 +1,28 @@
 import './coordinates';
 import './polygoncontrol';
 import './booleanopcontrol';
-import * as martinez from '../../index';
+import * as martinez from '../../src';
 // import * as martinez from '../../dist/martinez.min';
 
 let mode = window.location.hash.substring(1);
 let path = '../test/fixtures/';
-const ext  = '.geojson';
+const ext = '.geojson';
 let file;
 
 let files = [
-  'asia', 'trapezoid-box', 'canada', 'horseshoe', 'hourglasses', 'overlap_y',
-  'polygon_trapezoid_edge_overlap', 'touching_boxes', 'two_pointed_triangles',
-  'hole_cut', 'overlapping_segments', 'overlap_loop', 'disjoint_boxes'
+  'asia',
+  'trapezoid-box',
+  'canada',
+  'horseshoe',
+  'hourglasses',
+  'overlap_y',
+  'polygon_trapezoid_edge_overlap',
+  'touching_boxes',
+  'two_pointed_triangles',
+  'hole_cut',
+  'overlapping_segments',
+  'overlap_loop',
+  'disjoint_boxes'
 ];
 
 switch (mode) {
@@ -92,12 +102,11 @@ switch (mode) {
 
 console.log(mode);
 
-
 var OPERATIONS = {
   INTERSECTION: 0,
-  UNION:        1,
-  DIFFERENCE:   2,
-  XOR:          3
+  UNION: 1,
+  DIFFERENCE: 2,
+  XOR: 3
 };
 
 var div = document.createElement('div');
@@ -106,36 +115,43 @@ div.style.width = div.style.height = '100%';
 document.body.appendChild(div);
 
 // create the slippy map
-var map = window.map = L.map('image-map', {
+var map = (window.map = L.map('image-map', {
   minZoom: 1,
   maxZoom: 20,
   center: [0, 0],
   zoom: 2,
-  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
-    transformation: new L.Transformation(1/8, 0, -1/8, 0)
-  }),
+  crs:
+    mode === 'geo'
+      ? L.CRS.EPSG4326
+      : L.extend({}, L.CRS.Simple, {
+          transformation: new L.Transformation(1 / 8, 0, -1 / 8, 0)
+        }),
   editable: true
-});
-
-map.addControl(new L.NewPolygonControl({
-  callback: map.editTools.startPolygon
 }));
+
+map.addControl(
+  new L.NewPolygonControl({
+    callback: map.editTools.startPolygon
+  })
+);
 map.addControl(new L.Coordinates());
-map.addControl(new L.BooleanControl({
-  callback: run,
-  clear: clear
-}));
+map.addControl(
+  new L.BooleanControl({
+    callback: run,
+    clear: clear
+  })
+);
 
-var drawnItems = window.drawnItems = L.geoJson().addTo(map);
+var drawnItems = (window.drawnItems = L.geoJson().addTo(map));
 var rawData = null;
 function loadData(path) {
   console.log(path);
   fetch(path)
     .then((r) => r.json())
     .then((json) => {
-        drawnItems.addData(json);
-        rawData = json;
-        map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
+      drawnItems.addData(json);
+      rawData = json;
+      map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
     });
 }
 
@@ -148,12 +164,13 @@ function clear() {
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
-function getClippingPoly (layers) {
-  if (rawData !== null && rawData.features.length > 1) return rawData.features[1];
+function getClippingPoly(layers) {
+  if (rawData !== null && rawData.features.length > 1)
+    return rawData.features[1];
   return layers[1].toGeoJSON();
 }
 
-function run (op) {
+function run(op) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   var subject = rawData !== null ? rawData.features[0] : layers[0].toGeoJSON();
@@ -171,18 +188,22 @@ function run (op) {
     operation = martinez.union;
   } else if (op === OPERATIONS.DIFFERENCE) {
     operation = martinez.diff;
-  } else if (op === 5) { // B - A
+  } else if (op === 5) {
+    // B - A
     operation = martinez.diff;
 
     var temp = subject;
-    subject  = clipping;
+    subject = clipping;
     clipping = temp;
   } else {
     operation = martinez.xor;
   }
 
   console.time('martinez');
-  var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
+  var result = operation(
+    subject.geometry.coordinates,
+    clipping.geometry.coordinates
+  );
   console.timeEnd('martinez');
 
   console.log('result', result);
@@ -191,14 +212,14 @@ function run (op) {
 
   if (result !== null) {
     results.addData({
-      'type': 'Feature',
-      'geometry': {
-        'type': 'MultiPolygon',
-        'coordinates': result
+      type: 'Feature',
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: result
       }
     });
 
-    setTimeout(function() {
+    setTimeout(() => {
       console.time('jsts');
       var s = reader.read(subject);
       var c = reader.read(clipping);
@@ -219,22 +240,25 @@ function run (op) {
   }
 }
 
-map.on('editable:created', function(evt) {
+map.on('editable:created', (evt) => {
   drawnItems.addLayer(evt.layer);
-  evt.layer.on('click', function(e) {
-    if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+  evt.layer.on('click', function (e) {
+    if (
+      (e.originalEvent.ctrlKey || e.originalEvent.metaKey) &&
+      this.editEnabled()
+    ) {
       this.editor.newHole(e.latlng);
     }
   });
 });
 
-var results = window.results = L.geoJson(null, {
-  style: function(feature) {
+var results = (window.results = L.geoJson(null, {
+  style: function (feature) {
     return {
       color: 'red',
       weight: 1
     };
   }
-}).addTo(map);
+}).addTo(map));
 
 loadData(path + file);
