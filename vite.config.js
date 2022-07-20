@@ -16,6 +16,7 @@ export default defineConfig({
       }
     }
   },
+  root: resolve(__dirname, 'demo'),
   test: {
     include: ['test/**/*.test.ts']
   }
