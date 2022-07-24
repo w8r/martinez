@@ -11,7 +11,7 @@ polygons with holes, self-intersecting polygons and degenerate polygons with ove
 
 ### Example
 
-Play with it by [forking this Codepen](http://codepen.io/w8r/pen/rrBkER)
+Play with it by [forking this Codepen](https://codepen.io/w8r/pen/MjgqMx)
 
 ```js
 import * as martinez from 'martinez-polygon-clipping';
