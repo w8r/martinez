@@ -1,10 +1,10 @@
 import L from 'leaflet';
 import * as jsts from 'jsts';
 import 'leaflet-editable';
-import { CoordinatesControl, NewPolygonControl, BooleanControl } from './src';
+import { GUI } from 'dat.gui';
+import { CoordinatesControl, NewPolygonControl } from './src';
 import { FeatureCollection, GeometryObject } from 'geojson';
 import * as martinez from '../src/';
-// import * as martinez from '../../dist/martinez.min';
 
 let mode = globalThis.location.hash.substring(1);
 let path = '/';
@@ -13,18 +13,36 @@ let file;
 
 let files = [
   'asia',
-  'trapezoid-box',
+  //'asia_unionPoly',
   'canada',
-  'horseshoe',
-  'hourglasses',
-  'overlap_y',
-  'polygon_trapezoid_edge_overlap',
-  'touching_boxes',
-  'two_pointed_triangles',
+  'collapsed',
+  //'crash_overlap',
+  'disjoint_boxes',
   'hole_cut',
+  'hole_hole',
+  'horseshoe',
+  'indonesia',
+  'issue100',
+  'issue102',
+  'issue110',
+  'issue90',
+  'issue99',
+  'one_inside',
+  'overlap_loop_x10',
+  'overlap_self_intersect',
+  'overlap_two',
   'overlapping_segments',
-  'overlap_loop',
-  'disjoint_boxes'
+  'overlapping_segments_complex',
+  'polygons_edge_overlap',
+  'saw_rect',
+  'self_intersecting',
+  'shape_border',
+  'states_source',
+  'trapezoid-box',
+  'two_pointed_triangles',
+  'two_shapes',
+  'two_triangles'
+  //'vertical_boxes'
 ];
 
 switch (mode) {
@@ -133,22 +151,48 @@ map.addControl(
 );
 // @ts-ignore
 map.addControl(new CoordinatesControl());
-map.addControl(
-  new BooleanControl({
-    // @ts-ignore
-    callback: run,
-    clear
-  })
-);
+
+// add GUI
+const state = {
+  operations: {
+    INTERSECTION: () => run(OPERATIONS.INTERSECTION),
+    UNION: () => run(OPERATIONS.UNION),
+    'A - B': () => run(OPERATIONS.DIFFERENCE),
+    'B - A': () => run(5),
+    XOR: () => run(OPERATIONS.XOR)
+  },
+  files: files[0],
+  clear
+};
+const gui = new GUI({ name: 'martinez' });
+const operationsFolder = gui.addFolder('Operation');
+operationsFolder.open();
+Object.keys(state.operations).forEach((operation) => {
+  operationsFolder
+    .add(state.operations, operation)
+    .onChange((e) => run(e))
+    .name(operation);
+});
+gui
+  .add(state, 'files', files)
+  .name('Source')
+  .onChange((e) => {
+    clear();
+    loadData(path + e + '.geojson');
+  });
+gui.add(state, 'clear').name('Clear');
 
 // @ts-ignore
-var drawnItems = (globalThis.drawnItems = L.geoJSON().addTo(map));
-var rawData: GeometryObject | FeatureCollection<GeometryObject> | null = null;
-function loadData(path) {
-  console.log(path);
+const drawnItems = (globalThis.drawnItems = L.geoJSON().addTo(map));
+let rawData: GeometryObject | FeatureCollection<GeometryObject> | null = null;
+
+function loadData(path: string) {
+  console.log('request', path);
   fetch(path)
     .then((r) => r.json())
+    .catch((e) => console.log({ e }))
     .then((json) => {
+      console.log(json);
       drawnItems.addData(json);
       rawData = json;
       map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
@@ -177,8 +221,8 @@ function run(op: valueOf<typeof OPERATIONS>) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   // @ts-ignore
-  var subject = rawData !== null ? rawData.features[0] : layers[0].toGeoJSON();
-  var clipping = getClippingPoly(layers);
+  let subject = rawData !== null ? rawData.features[0] : layers[0].toGeoJSON();
+  let clipping = getClippingPoly(layers);
 
   //console.log('input', subject, clipping, op);
 

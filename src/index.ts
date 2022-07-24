@@ -14,4 +14,4 @@ export const xor = (subject: MultiPolygon, clipping: MultiPolygon) =>
 export const intersection = (subject: MultiPolygon, clipping: MultiPolygon) =>
   boolean(subject, clipping, INTERSECTION);
 
-export const operations = { UNION, DIFFERENCE, INTERSECTION, XOR };
+export const operations = { INTERSECTION, DIFFERENCE, UNION, XOR };
