@@ -37,7 +37,7 @@ function extractExpectedResults(features) {
   });
 }
 
-const caseDir = path.join(__dirname, 'genericTestCases');
+const caseDir = path.join(process.cwd(), 'test', 'genericTestCases');
 const testCases = glob.sync(path.join(caseDir, '*.geojson'));
 if (testCases.length === 0) {
   throw 'No test cases found, this must not happen';

@@ -16,8 +16,9 @@ export default defineConfig({
       }
     }
   },
-  root: resolve(__dirname, 'demo'),
+  root: resolve(__dirname, 'web'),
   test: {
-    include: ['test/**/*.test.ts']
+    dir: resolve(__dirname, 'test'),
+    include: ['**/*.test.ts']
   }
 });

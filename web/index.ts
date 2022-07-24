@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import jsts from 'jsts';
+import * as jsts from 'jsts';
 import 'leaflet-editable';
 import { CoordinatesControl } from './js/coordinates';
 import { NewPolygonControl } from './js/polygoncontrol';
@@ -104,14 +104,7 @@ switch (mode) {
     break;
 }
 
-console.log(mode);
-
-var OPERATIONS = {
-  INTERSECTION: 0,
-  UNION: 1,
-  DIFFERENCE: 2,
-  XOR: 3
-};
+const OPERATIONS = martinez.operations;
 
 var div = document.createElement('div');
 div.id = 'image-map';
@@ -120,7 +113,7 @@ document.body.appendChild(div);
 
 // create the slippy map
 // @ts-ignore
-var map = (globalThis.map = L.map('image-map', {
+const map = (globalThis.map = L.map('image-map', {
   minZoom: 1,
   maxZoom: 20,
   center: [0, 0],
@@ -170,8 +163,8 @@ function clear() {
   rawData = null;
 }
 
-var reader = new jsts.io.GeoJSONReader();
-var writer = new jsts.io.GeoJSONWriter();
+const reader = new jsts.io.GeoJSONReader();
+const writer = new jsts.io.GeoJSONWriter();
 
 function getClippingPoly(layers) {
   // @ts-ignore
@@ -180,7 +173,9 @@ function getClippingPoly(layers) {
   return layers[1].toGeoJSON();
 }
 
-function run(op) {
+type valueOf<T> = T[keyof T];
+
+function run(op: valueOf<typeof OPERATIONS>) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   // @ts-ignore

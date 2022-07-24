@@ -7,7 +7,7 @@ import SweepEvent from '../src/sweep_event';
 
 // GeoJSON Data
 const data = load.sync(
-  path.join(__dirname, 'fixtures', 'two_triangles.geojson')
+  path.join(process.cwd(), 'test', 'fixtures', 'two_triangles.geojson')
 );
 
 const subject = data.features[0];

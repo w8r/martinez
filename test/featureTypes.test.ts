@@ -3,10 +3,10 @@ import path from 'path';
 import load from 'load-json-file';
 import * as martinez from '../src';
 
-const clipping = load.sync(
-  path.join(__dirname, 'featureTypes', 'clippingPoly.geojson')
-);
-const outDir = path.join(__dirname, 'featureTypes', 'out');
+const rootPath = path.join(process.cwd(), 'test', 'featureTypes');
+
+const clipping = load.sync(path.join(rootPath, 'clippingPoly.geojson'));
+const outDir = path.join(rootPath, 'out');
 
 const testScenarios = [
   {
@@ -28,9 +28,7 @@ const testScenarios = [
 ];
 
 testScenarios.forEach((ts) => {
-  const subject = load.sync(
-    path.join(__dirname, 'featureTypes', ts.subjectPoly + '.geojson')
-  );
+  const subject = load.sync(path.join(rootPath, ts.subjectPoly + '.geojson'));
   const name = ts.testName;
   test(ts.testName, () => {
     const expectedIntResult = load.sync(

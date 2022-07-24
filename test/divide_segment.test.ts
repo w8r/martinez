@@ -16,7 +16,7 @@ import { BoundingBox, MultiPolygon, Point } from '../src/types';
 
 // GeoJSON Data
 const shapes = load.sync(
-  path.join(__dirname, 'fixtures', 'two_shapes.geojson')
+  path.join(process.cwd(), 'test', 'fixtures', 'two_shapes.geojson')
 );
 
 const subject = shapes.features[0];
