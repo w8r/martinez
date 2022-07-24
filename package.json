@@ -13,9 +13,10 @@
     "dist/"
   ],
   "scripts": {
-    "start": "vite",
+    "start": "vite web",
     "build": "tsc && vite build",
-    "preview": "vite preview",
+    "build:demo": "vite build web",
+    "preview": "vite preview web",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",

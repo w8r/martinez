@@ -11,12 +11,11 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'demo/index.html')
-        //orthogonal: resolve(__dirname, 'demo/orthogonal.html')
+        main: resolve(__dirname, 'web/index.html'),
+        orthogonal: resolve(__dirname, 'web/orthogonal.html')
       }
     }
   },
-  root: resolve(__dirname, 'web'),
   test: {
     dir: resolve(__dirname, 'test'),
     include: ['**/*.test.ts']

@@ -7,7 +7,10 @@ export const BooleanControl = L.Control.extend({
   },
 
   onAdd: function () {
-    var container = (this._container = L.DomUtil.create('div', 'leaflet-bar'));
+    const container = (this._container = L.DomUtil.create(
+      'div',
+      'leaflet-bar'
+    )) as HTMLDivElement;
     this._container.style.background = '#ffffff';
     this._container.style.padding = '10px';
     container.innerHTML = `
@@ -22,16 +25,16 @@ export const BooleanControl = L.Control.extend({
         <input type="submit" value="Run">
         <input name="clear" type="button" value="Clear layers">
       </form>`;
-    var form = container.querySelector('form');
+    const form = container.querySelector('form') as HTMLFormElement;
     L.DomEvent.on(
       form,
       'submit',
-      function (evt) {
+      (evt) => {
         L.DomEvent.stop(evt);
-        var radios = Array.prototype.slice.call(
+        const radios = Array.prototype.slice.call(
           form.querySelectorAll('input[type=radio]')
         );
-        for (var i = 0, len = radios.length; i < len; i++) {
+        for (let i = 0, len = radios.length; i < len; i++) {
           if (radios[i].checked) {
             this.options.callback(parseInt(radios[i].value));
             break;
@@ -42,7 +45,7 @@ export const BooleanControl = L.Control.extend({
     ).on(
       form.clear,
       'click',
-      function (evt) {
+      (evt) => {
         L.DomEvent.stop(evt);
         this.options.clear();
       },

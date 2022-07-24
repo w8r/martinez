@@ -1,15 +1,13 @@
 import L from 'leaflet';
 import * as jsts from 'jsts';
 import 'leaflet-editable';
-import { CoordinatesControl } from './js/coordinates';
-import { NewPolygonControl } from './js/polygoncontrol';
-import { BooleanControl } from './js/booleanopcontrol';
-import * as martinez from '../src/';
+import { CoordinatesControl, NewPolygonControl, BooleanControl } from './src';
 import { FeatureCollection, GeometryObject } from 'geojson';
+import * as martinez from '../src/';
 // import * as martinez from '../../dist/martinez.min';
 
 let mode = globalThis.location.hash.substring(1);
-let path = 'data/';
+let path = '/';
 const ext = '.geojson';
 let file;
 
