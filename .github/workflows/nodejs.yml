@@ -30,6 +30,8 @@ jobs:
       - run: npm run build --if-present
 
   deploy:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
