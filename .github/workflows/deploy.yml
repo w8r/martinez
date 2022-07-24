@@ -10,12 +10,9 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  deploy:
+    if: success()
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x]
 
     steps:
       - name: Checkout
@@ -26,5 +23,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm test
-      - run: npm run build --if-present
+      - run: npm run build:demo
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: public
