@@ -2,7 +2,8 @@
 import load from 'load-json-file';
 import Benchmark from 'benchmark';
 import jstsUnion from '@turf/union';
-import * as martinez from './dist/martinez.es.js';
+import mfogel from 'polygon-clipping';
+import * as martinez from './dist/martinez.esm.js';
 
 /**
  * Benmark Results
@@ -38,6 +39,12 @@ new Benchmark.Suite('Hole_Hole', options)
   .add('JSTS', () => {
     jstsUnion(holeHole.features[0], holeHole.features[1]);
   })
+  .add('mfogel', () => {
+    mfogel.union(
+      holeHole.features[0].geometry.coordinates,
+      holeHole.features[1].geometry.coordinates
+    );
+  })
   .run();
 
 const asia = load.sync('./test/fixtures/asia.geojson');
@@ -50,6 +57,12 @@ new Benchmark.Suite('Asia union', options)
     );
   })
   .add('JSTS', () => jstsUnion(asia.features[0], unionPoly))
+  .add('mfogel', () =>
+    mfogel.union(
+      asia.features[0].geometry.coordinates,
+      unionPoly.geometry.coordinates
+    )
+  )
   .run();
 
 const states = load.sync('./test/fixtures/states_source.geojson');
@@ -62,5 +75,11 @@ new Benchmark.Suite('States clip', options)
   })
   .add('JSTS', () => {
     jstsUnion(states.features[0], states.features[1]);
+  })
+  .add('mfogel', () => {
+    mfogel.union(
+      states.features[0].geometry.coordinates,
+      states.features[1].geometry.coordinates
+    );
   })
   .run();

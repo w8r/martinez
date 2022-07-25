@@ -44,11 +44,11 @@ test('sweep line', () => {
 
   let iter = tree.find(EF);
 
-  assert.equal(tree.next(iter).key, EG);
+  assert.equal(tree.next(iter)!.key, EG);
 
   iter = tree.find(EG);
 
-  assert.equal(tree.prev(iter).key, EF);
+  assert.equal(tree.prev(iter)!.key, EF);
 
   const DA = new SweepEvent(
     c[0][0],

@@ -7,17 +7,14 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'martinez',
-      fileName: (format) => `martinez.${format}.js`
+      fileName: (format) => `martinez.${format}.js`,
+      formats: ['umd', 'cjs', 'esm']
     },
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'web/index.html'),
-        orthogonal: resolve(__dirname, 'web/orthogonal.html')
-      }
-    }
+    target: 'es2015'
   },
   test: {
     dir: resolve(__dirname, 'test'),
     include: ['**/*.test.ts']
-  }
+  },
+  mode: 'development'
 });

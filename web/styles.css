@@ -16,3 +16,7 @@ body,
   margin-right: 10px;
   float: left;
 }
+
+.dg.ac {
+  z-index: 900 !important;
+}

@@ -5,6 +5,7 @@ import { GUI } from 'dat.gui';
 import { CoordinatesControl, NewPolygonControl } from './src';
 import { FeatureCollection, GeometryObject } from 'geojson';
 import * as martinez from '../src/';
+import mfogel from 'polygon-clipping';
 
 let mode = globalThis.location.hash.substring(1);
 let path = '/';
@@ -168,10 +169,7 @@ const gui = new GUI({ name: 'martinez' });
 const operationsFolder = gui.addFolder('Operation');
 operationsFolder.open();
 Object.keys(state.operations).forEach((operation) => {
-  operationsFolder
-    .add(state.operations, operation)
-    .onChange((e) => run(e))
-    .name(operation);
+  operationsFolder.add(state.operations, operation).name(operation);
 });
 gui
   .add(state, 'files', files)
@@ -218,6 +216,7 @@ function getClippingPoly(layers) {
 type valueOf<T> = T[keyof T];
 
 function run(op: valueOf<typeof OPERATIONS>) {
+  console.trace('run run');
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   // @ts-ignore
@@ -267,7 +266,7 @@ function run(op: valueOf<typeof OPERATIONS>) {
       }
     });
 
-    setTimeout(function () {
+    setTimeout(() => {
       console.time('jsts');
       var s = reader.read(subject);
       var c = reader.read(clipping);
@@ -289,6 +288,16 @@ function run(op: valueOf<typeof OPERATIONS>) {
       console.timeEnd('jsts');
       // console.log('JSTS result', res);
     }, 500);
+
+    setTimeout(() => {
+      console.time('mfogel');
+      var result = mfogel.union(
+        subject.geometry.coordinates,
+        clipping.geometry.coordinates
+      );
+      console.timeEnd('mfogel');
+      // console.log('martinez result', result);
+    });
   }
 }
 
@@ -316,4 +325,5 @@ var results = (globalThis.results = L.geoJson(null, {
   }
 }).addTo(map));
 
-loadData(path + file);
+// @ts-ignore
+loadData(path + gui.__controllers[0].object.files + '.geojson');
