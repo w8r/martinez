@@ -55,7 +55,7 @@
     "benchmark": "^2.1.4",
     "dat.gui": "^0.7.9",
     "eslint": "^8.20.0",
-    "eslint-plugin-import-order": "^2.1.4",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.3.3",
     "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",

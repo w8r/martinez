@@ -21,7 +21,7 @@
     "Worker": true,
     "URL": true
   },
-  "plugins": ["promise", "import-order", "jsdoc"],
+  "plugins": ["promise", "jsdoc"],
   "rules": {
     "indent": 0,
     //    "prefer-const": "error",
