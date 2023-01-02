@@ -96,7 +96,13 @@ function initializeContourFromContext(event, contours, contourId) {
     // in an earlier iteration, otherwise it wouldn't be possible that it is "previous in
     // result".
     const lowerContourId = prevInResult.outputContourId;
-    const lowerResultTransition = prevInResult.resultTransition;
+    let lowerResultTransition = prevInResult.resultTransition;
+    if (!event.isExteriorRing && !event.isSubject) {
+      contour.cull = true;
+    } else if (!event.isExteriorRing && prevInResult.isExteriorRing) {
+      lowerResultTransition = 1;
+    }
+
     if (lowerResultTransition > 0) {
       // We are inside. Now we have to check if the thing below us is another hole or
       // an exterior contour.

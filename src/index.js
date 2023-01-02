@@ -80,7 +80,7 @@ export default function boolean(subject, clipping, operation) {
   const polygons = [];
   for (let i = 0; i < contours.length; i++) {
     let contour = contours[i];
-    if (contour.isExterior()) {
+    if (contour.isExterior() && contour.cull !== true) {
       // The exterior ring goes first
       let rings = [contour.points];
       // Followed by holes if any
