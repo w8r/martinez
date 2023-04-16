@@ -51,7 +51,7 @@
     "eslint-plugin-jsdoc": "^20.0.2",
     "eslint-plugin-promise": "^3.8.0",
     "geojson-project": "^1.0.0",
-    "http-server": "^0.12.1",
+    "http-server": "^14.1.1",
     "json-stringify-pretty-compact": "^2.0.0",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
