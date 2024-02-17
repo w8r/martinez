@@ -1,11 +1,8 @@
-import signedArea from './signed_area';
+import { signedArea } from "./signed_area";
+import type { SweepEvent } from "./sweep_event";
+import { Point } from "./types";
 
-/**
- * @param  {SweepEvent} e1
- * @param  {SweepEvent} e2
- * @return {Number}
- */
-export default function compareEvents(e1, e2) {
+export function compareEvents(e1: SweepEvent, e2: SweepEvent) {
   const p1 = e1.point;
   const p2 = e2.point;
 
@@ -20,13 +17,11 @@ export default function compareEvents(e1, e2) {
   return specialCases(e1, e2, p1, p2);
 }
 
-
 /* eslint-disable no-unused-vars */
-function specialCases(e1, e2, p1, p2) {
+function specialCases(e1: SweepEvent, e2: SweepEvent, p1: Point, _: Point) {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
-  if (e1.left !== e2.left)
-    return e1.left ? 1 : -1;
+  if (e1.left !== e2.left) return e1.left ? 1 : -1;
 
   // const p2 = e1.otherEvent.point, p3 = e2.otherEvent.point;
   // const sa = (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
@@ -35,9 +30,9 @@ function specialCases(e1, e2, p1, p2) {
   // not collinear
   if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
     // the event associate to the bottom segment is processed first
-    return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
+    return !e1.isBelow(e2.otherEvent.point) ? 1 : -1;
   }
 
-  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
+  return !e1.isSubject && e2.isSubject ? 1 : -1;
 }
 /* eslint-enable no-unused-vars */

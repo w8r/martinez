@@ -1,6 +1,9 @@
-import SweepEvent    from './sweep_event';
-import equals        from './equals';
-import compareEvents from './compare_events';
+import { SweepEvent } from "./sweep_event";
+import { equals } from "./equals";
+import { compareEvents } from "./compare_events";
+import { NORMAL } from "./edge_type";
+import { Point } from "./types";
+import type Queue from "tinyqueue";
 
 /**
  * @param  {SweepEvent} se
@@ -8,13 +11,17 @@ import compareEvents from './compare_events';
  * @param  {Queue} queue
  * @return {Queue}
  */
-export default function divideSegment(se, p, queue)  {
-  const r = new SweepEvent(p, false, se,            se.isSubject);
-  const l = new SweepEvent(p, true,  se.otherEvent, se.isSubject);
+export function divideSegment(
+  se: SweepEvent,
+  p: Point,
+  queue: Queue<SweepEvent>
+) {
+  const r = new SweepEvent(p, false, se, se.isSubject, NORMAL);
+  const l = new SweepEvent(p, true, se.otherEvent, se.isSubject, NORMAL);
 
   /* eslint-disable no-console */
   if (equals(se.point, se.otherEvent.point)) {
-    console.warn('what is that, a collapsed segment?', se);
+    console.warn("what is that, a collapsed segment?", se);
   }
   /* eslint-enable no-console */
 

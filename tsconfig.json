@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "outDir": "./dist",
+    "useDefineForClassFields": true,
+    "module": "commonjs",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"]
+}
