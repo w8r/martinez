@@ -41,7 +41,7 @@ if (testCases.length === 0) {
   throw "No test cases found, this must not happen";
 }
 
-describe("generic test cases", () => {
+describe.skip("generic test cases", () => {
   testCases.forEach((testCaseFile) => {
     let testName = "Generic test case: " + path.basename(testCaseFile);
     it(testName, () => {

@@ -16,7 +16,6 @@ export function divideSegment(
   p: Point,
   queue: Queue<SweepEvent>
 ) {
-  console.log("divide", se, "at", p);
   const r = new SweepEvent(p, false, se, se.isSubject, NORMAL);
   const l = new SweepEvent(p, true, se.otherEvent, se.isSubject, NORMAL);
 
