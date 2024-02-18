@@ -23,8 +23,7 @@
     "ts": "tsc index.d.ts",
     "bench": "node --require reify bench.js",
     "lint": "eslint ./src/",
-    "serve": "http-server -p 3000",
-    "start": "run-p watch serve",
+    "start": "vite dev",
     "build": "npm run lint && vite build",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },

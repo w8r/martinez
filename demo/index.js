@@ -6,9 +6,10 @@ import * as L from "leaflet";
 import jsts from "jsts/dist/jsts.min";
 import "leaflet-editable";
 
+// CSS
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import "../css/styles.css";
+import "./styles.css";
 // import * as martinez from '../../dist/martinez.min';
 
 let mode = window.location.hash.substring(1);
