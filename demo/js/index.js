@@ -1,141 +1,163 @@
-import './coordinates';
-import './polygoncontrol';
-import './booleanopcontrol';
-import * as martinez from '../../index';
+import "./coordinates";
+import "./polygoncontrol";
+import "./booleanopcontrol";
+import * as martinez from "../../src";
+import * as L from "leaflet";
+import jsts from "jsts/dist/jsts.min";
+import "leaflet-editable";
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
+import "../css/styles.css";
 // import * as martinez from '../../dist/martinez.min';
 
 let mode = window.location.hash.substring(1);
-let path = '../test/fixtures/';
-const ext  = '.geojson';
+let path = "../test/fixtures/";
+const ext = ".geojson";
 let file;
 
 let files = [
-  'asia', 'trapezoid-box', 'canada', 'horseshoe', 'hourglasses', 'overlap_y',
-  'polygon_trapezoid_edge_overlap', 'touching_boxes', 'two_pointed_triangles',
-  'hole_cut', 'overlapping_segments', 'overlap_loop', 'disjoint_boxes'
+  "asia",
+  "trapezoid-box",
+  "canada",
+  "horseshoe",
+  "hourglasses",
+  "overlap_y",
+  "polygon_trapezoid_edge_overlap",
+  "touching_boxes",
+  "two_pointed_triangles",
+  "hole_cut",
+  "overlapping_segments",
+  "overlap_loop",
+  "disjoint_boxes",
 ];
 
 switch (mode) {
-  case 'geo':
-    file = 'asia.geojson';
+  case "geo":
+    file = "asia.geojson";
     break;
-  case 'states':
-    file = 'states_source.geojson';
+  case "states":
+    file = "states_source.geojson";
     break;
-  case 'trapezoid':
-    file = 'trapezoid-box.geojson';
+  case "trapezoid":
+    file = "trapezoid-box.geojson";
     break;
-  case 'canada':
-    file = 'canada.geojson';
+  case "canada":
+    file = "canada.geojson";
     break;
-  case 'horseshoe':
-    file = 'horseshoe.geojson';
+  case "horseshoe":
+    file = "horseshoe.geojson";
     break;
-  case 'hourglasses':
-    file = 'hourglasses.geojson';
+  case "hourglasses":
+    file = "hourglasses.geojson";
     break;
-  case 'edge_overlap':
-    file = 'polygon_trapezoid_edge_overlap.geojson';
+  case "edge_overlap":
+    file = "polygon_trapezoid_edge_overlap.geojson";
     break;
-  case 'touching_boxes':
-    file = 'touching_boxes.geojson';
+  case "touching_boxes":
+    file = "touching_boxes.geojson";
     break;
-  case 'triangles':
-    file = 'two_pointed_triangles.geojson';
+  case "triangles":
+    file = "two_pointed_triangles.geojson";
     break;
-  case 'holecut':
-    file = 'hole_cut.geojson';
+  case "holecut":
+    file = "hole_cut.geojson";
     break;
-  case 'overlapping_segments':
-    file = 'overlapping_segments.geojson';
+  case "overlapping_segments":
+    file = "overlapping_segments.geojson";
     break;
-  case 'overlap_loop':
-    file = 'overlap_loop.geojson';
+  case "overlap_loop":
+    file = "overlap_loop.geojson";
     break;
-  case 'overlap_y':
-    file = 'overlap_y.geojson';
+  case "overlap_y":
+    file = "overlap_y.geojson";
     break;
-  case 'overlap_two':
-    file = 'overlap_two.geojson';
+  case "overlap_two":
+    file = "overlap_two.geojson";
     break;
-  case 'disjoint_boxes':
-    file = 'disjoint_boxes.geojson';
+  case "disjoint_boxes":
+    file = "disjoint_boxes.geojson";
     break;
-  case 'polygons_edge_overlap':
-    file = 'polygons_edge_overlap.geojson';
+  case "polygons_edge_overlap":
+    file = "polygons_edge_overlap.geojson";
     break;
-  case 'vertical_boxes':
-    file = 'vertical_boxes.geojson';
+  case "vertical_boxes":
+    file = "vertical_boxes.geojson";
     break;
-  case 'collapsed':
-    file = 'collapsed.geojson';
+  case "collapsed":
+    file = "collapsed.geojson";
     break;
-  case 'fatal1':
-    file = 'fatal1.geojson';
+  case "fatal1":
+    file = "fatal1.geojson";
     break;
-  case 'fatal2':
-    file = 'fatal2.geojson';
+  case "fatal2":
+    file = "fatal2.geojson";
     break;
-  case 'fatal3':
-    file = 'fatal3.geojson';
+  case "fatal3":
+    file = "fatal3.geojson";
     break;
-  case 'fatal4':
-    file = 'fatal4.geojson';
+  case "fatal4":
+    file = "fatal4.geojson";
     break;
-  case 'rectangles':
-    file = 'rectangles.geojson';
+  case "rectangles":
+    file = "rectangles.geojson";
     break;
   default:
-    file = 'hole_hole.geojson';
+    file = "hole_hole.geojson";
     break;
 }
 
 console.log(mode);
 
-
 var OPERATIONS = {
   INTERSECTION: 0,
-  UNION:        1,
-  DIFFERENCE:   2,
-  XOR:          3
+  UNION: 1,
+  DIFFERENCE: 2,
+  XOR: 3,
 };
 
-var div = document.createElement('div');
-div.id = 'image-map';
-div.style.width = div.style.height = '100%';
+var div = document.createElement("div");
+div.id = "image-map";
+div.style.width = div.style.height = "100%";
 document.body.appendChild(div);
 
 // create the slippy map
-var map = window.map = L.map('image-map', {
+var map = (window.map = L.map("image-map", {
   minZoom: 1,
   maxZoom: 20,
   center: [0, 0],
   zoom: 2,
-  crs: mode === 'geo' ? L.CRS.EPSG4326 : L.extend({}, L.CRS.Simple, {
-    transformation: new L.Transformation(1/8, 0, -1/8, 0)
-  }),
-  editable: true
-});
-
-map.addControl(new L.NewPolygonControl({
-  callback: map.editTools.startPolygon
+  crs:
+    mode === "geo"
+      ? L.CRS.EPSG4326
+      : L.extend({}, L.CRS.Simple, {
+          transformation: new L.Transformation(1 / 8, 0, -1 / 8, 0),
+        }),
+  editable: true,
 }));
+
+map.addControl(
+  new L.NewPolygonControl({
+    callback: map.editTools.startPolygon,
+  })
+);
 map.addControl(new L.Coordinates());
-map.addControl(new L.BooleanControl({
-  callback: run,
-  clear: clear
-}));
+map.addControl(
+  new L.BooleanControl({
+    callback: run,
+    clear: clear,
+  })
+);
 
-var drawnItems = window.drawnItems = L.geoJson().addTo(map);
+var drawnItems = (window.drawnItems = L.geoJson().addTo(map));
 var rawData = null;
 function loadData(path) {
   console.log(path);
   fetch(path)
     .then((r) => r.json())
     .then((json) => {
-        drawnItems.addData(json);
-        rawData = json;
-        map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
+      drawnItems.addData(json);
+      rawData = json;
+      map.fitBounds(drawnItems.getBounds().pad(0.05), { animate: false });
     });
 }
 
@@ -148,12 +170,13 @@ function clear() {
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
-function getClippingPoly (layers) {
-  if (rawData !== null && rawData.features.length > 1) return rawData.features[1];
+function getClippingPoly(layers) {
+  if (rawData !== null && rawData.features.length > 1)
+    return rawData.features[1];
   return layers[1].toGeoJSON();
 }
 
-function run (op) {
+function run(op) {
   var layers = drawnItems.getLayers();
   if (layers.length < 2) return;
   var subject = rawData !== null ? rawData.features[0] : layers[0].toGeoJSON();
@@ -171,35 +194,39 @@ function run (op) {
     operation = martinez.union;
   } else if (op === OPERATIONS.DIFFERENCE) {
     operation = martinez.diff;
-  } else if (op === 5) { // B - A
+  } else if (op === 5) {
+    // B - A
     operation = martinez.diff;
 
     var temp = subject;
-    subject  = clipping;
+    subject = clipping;
     clipping = temp;
   } else {
     operation = martinez.xor;
   }
 
-  console.time('martinez');
-  var result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
-  console.timeEnd('martinez');
+  console.time("martinez");
+  var result = operation(
+    subject.geometry.coordinates,
+    clipping.geometry.coordinates
+  );
+  console.timeEnd("martinez");
 
-  console.log('result', result);
+  console.log("result", result);
   // console.log(JSON.stringify(result));
   results.clearLayers();
 
   if (result !== null) {
     results.addData({
-      'type': 'Feature',
-      'geometry': {
-        'type': 'MultiPolygon',
-        'coordinates': result
-      }
+      type: "Feature",
+      geometry: {
+        type: "MultiPolygon",
+        coordinates: result,
+      },
     });
 
-    setTimeout(function() {
-      console.time('jsts');
+    setTimeout(function () {
+      console.time("jsts");
       var s = reader.read(subject);
       var c = reader.read(clipping);
       var res;
@@ -213,28 +240,31 @@ function run (op) {
         res = s.geometry.symDifference(c.geometry);
       }
       res = writer.write(res);
-      console.timeEnd('jsts');
+      console.timeEnd("jsts");
       // console.log('JSTS result', res);
     }, 500);
   }
 }
 
-map.on('editable:created', function(evt) {
+map.on("editable:created", function (evt) {
   drawnItems.addLayer(evt.layer);
-  evt.layer.on('click', function(e) {
-    if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+  evt.layer.on("click", function (e) {
+    if (
+      (e.originalEvent.ctrlKey || e.originalEvent.metaKey) &&
+      this.editEnabled()
+    ) {
       this.editor.newHole(e.latlng);
     }
   });
 });
 
-var results = window.results = L.geoJson(null, {
-  style: function(feature) {
+var results = (window.results = L.geoJson(null, {
+  style: function (feature) {
     return {
-      color: 'red',
-      weight: 1
+      color: "red",
+      weight: 1,
     };
-  }
-}).addTo(map);
+  },
+}).addTo(map));
 
 loadData(path + file);

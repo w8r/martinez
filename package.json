@@ -19,15 +19,13 @@
     }
   },
   "scripts": {
-    "test": "tape -r reify buble/register test/*.test.js | tap-spec && npm run ts",
+    "test": "vitest run",
     "ts": "tsc index.d.ts",
     "bench": "node --require reify bench.js",
     "lint": "eslint ./src/",
-    "watch": "rollup -c -w",
     "serve": "http-server -p 3000",
     "start": "run-p watch serve",
-    "build": "npm run lint && rollup -c && npm run min",
-    "min": "uglifyjs ./dist/martinez.umd.js -o ./dist/martinez.min.js -m --comments",
+    "build": "npm run lint && vite build",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
@@ -60,7 +58,9 @@
     "geojson-project": "^1.0.0",
     "http-server": "^0.12.1",
     "json-stringify-pretty-compact": "^2.0.0",
+    "jsts": "^2.11.0",
     "leaflet": "^1.2.0",
+    "leaflet-draw": "^1.0.4",
     "leaflet-editable": "^1.1.0",
     "load-json-file": "^2.0.0",
     "npm-run-all": "^4.1.5",

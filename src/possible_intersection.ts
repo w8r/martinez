@@ -8,10 +8,9 @@ import {
   SAME_TRANSITION,
   DIFFERENT_TRANSITION,
 } from "./edge_type";
-import { Point } from "./types";
 import { SweepEvent } from "./sweep_event";
 
-const out: [Point, Point] = [
+const out: [[number, number], [number, number]] = [
   [-1, -1],
   [-1, -1],
 ];

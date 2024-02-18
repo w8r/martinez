@@ -1,4 +1,6 @@
-export type Point = [number, number];
+import { Position } from "geojson";
+
+export type Point = Position;
 
 export type BoundingBox = [number, number, number, number];
 

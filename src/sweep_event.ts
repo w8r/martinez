@@ -1,4 +1,4 @@
-import { EdgeType } from "./edge_type";
+import { EdgeType, NORMAL } from "./edge_type";
 import { Point } from "./types";
 
 export class SweepEvent {
@@ -30,13 +30,6 @@ export class SweepEvent {
   public isExteriorRing: boolean;
   /**
    * Sweepline event
-   *
-   * @class {SweepEvent}
-   * @param {Array.<Number>}  point
-   * @param {Boolean}         left
-   * @param {SweepEvent=}     otherEvent
-   * @param {Boolean}         isSubject
-   * @param {Number}          edgeType
    */
   constructor(
     point: Point,
@@ -112,3 +105,12 @@ export class SweepEvent {
     return copy;
   }
 }
+
+// version with defaults for testing
+export const sweepEvent = (
+  point: Point,
+  left: boolean,
+  otherEvent: SweepEvent | undefined = undefined,
+  isSubject: boolean = true,
+  edgeType: EdgeType = NORMAL
+) => new SweepEvent(point, left, otherEvent, isSubject, edgeType);

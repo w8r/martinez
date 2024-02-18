@@ -1,4 +1,5 @@
-html, body,
+html,
+body,
 #image-map {
   width: 100%;
   height: 100%;
@@ -9,11 +10,9 @@ html, body,
 #diff-map,
 #union-map,
 #intersection-map {
-	display: none;
-	width: 400px;
-	height: 400px;
-	margin-right: 10px;
-	float: left;
+  display: none;
+  width: 400px;
+  height: 400px;
+  margin-right: 10px;
+  float: left;
 }
-
-@import url("../../node_modules/leaflet-draw/dist/leaflet.draw.css") screen;
