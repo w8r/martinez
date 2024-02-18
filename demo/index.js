@@ -1,10 +1,11 @@
 import "./coordinates";
 import "./polygoncontrol";
 import "./booleanopcontrol";
-import * as martinez from "../../src";
+import * as martinez from "../src";
 import * as L from "leaflet";
 import jsts from "jsts/dist/jsts.min";
 import "leaflet-editable";
+
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../css/styles.css";
