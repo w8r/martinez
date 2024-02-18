@@ -42,7 +42,7 @@
     "type": "git"
   },
   "homepage": "https://github.com/w8r/martinez",
-  "author": "Alex Milevski <info@w8r.name>",
+  "author": "Alex Milevski <alex@milevski.co>",
   "license": "MIT",
   "devDependencies": {
     "@turf/union": "^4.6.0",
