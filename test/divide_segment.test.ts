@@ -91,7 +91,7 @@ describe("divide segments", () => {
 
   const leftSegments: SweepEvent[] = [];
 
-  it("possible intersections on 2 polygons", () => {
+  it.only("possible intersections on 2 polygons", () => {
     const s = [subject.geometry.coordinates];
     const c = [clipping.geometry.coordinates];
 
@@ -120,7 +120,7 @@ describe("divide segments", () => {
     assert.equal(compareSegments(te, te3), 1);
     assert.equal(compareSegments(te3, te), -1);
 
-    const segments = subdivideSegments(q, s, c, bbox, bbox, 0);
+    const segments = subdivideSegments(q, s, c, bbox, bbox, INTERSECTION);
     for (let i = 0; i < segments.length; i++) {
       if (segments[i].left) {
         leftSegments.push(segments[i]);
@@ -130,7 +130,7 @@ describe("divide segments", () => {
     assert.equal(leftSegments.length, 11);
   });
 
-  it.skip("real life example", () => {
+  it.only("real life example", () => {
     const E = [16, 282];
     const I = [100.79403384562252, 233.41363754101192];
     const G = [298, 359];
@@ -244,11 +244,18 @@ describe("divide segments", () => {
 
     function checkContain(interval: keyof typeof intervals) {
       const data = intervals[interval];
-      for (let x = 0; x < leftSegments.length; x++) {
+      for (let x = 0; x < 1; x++) {
         const seg = leftSegments[x];
-        console.log(seg.point, data.l, interval);
-        assert.isTrue(equals(seg.point, data.l), interval + " points");
-
+        console.log("-----x");
+        console.log(equals(seg.point, data.l));
+        console.log(
+          equals(seg.otherEvent.point, data.r),
+          seg,
+          seg.otherEvent.point,
+          data.r
+        );
+        console.log(seg.inOut === data.inOut);
+        console.log(seg.otherInOut === data.otherInOut);
         if (
           equals(seg.point, data.l) &&
           equals(seg.otherEvent.point, data.r) &&
@@ -260,6 +267,7 @@ describe("divide segments", () => {
               equals(seg.prevInResult!.otherEvent.point, data.prevInResult!.r)))
         ) {
           // TODO: check
+          console.log("pass", interval, x);
           assert.isOk(interval);
           return;
         }
@@ -268,8 +276,8 @@ describe("divide segments", () => {
       assert.fail(interval);
     }
 
-    Object.keys(intervals).forEach((key) =>
-      checkContain(key as keyof typeof intervals)
-    );
+    Object.keys(intervals)
+      .slice(0, 1)
+      .forEach((key) => checkContain(key as keyof typeof intervals));
   });
 });

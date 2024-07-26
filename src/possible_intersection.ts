@@ -1,6 +1,6 @@
 import type Queue from "tinyqueue";
 import { divideSegment } from "./divide_segment";
-import { findIntersection } from "segment-intersection";
+import { findIntersection as isect } from "segment-intersection";
 import { equals } from "./equals";
 import { compareEvents } from "./compare_events";
 import {
@@ -31,30 +31,25 @@ export function possibleIntersection(
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
 
-  const nintersections = findIntersection(
-    se1.point[0],
-    se1.point[1],
-    se1.otherEvent.point[0],
-    se1.otherEvent.point[1],
-    se2.point[0],
-    se2.point[1],
-    se2.otherEvent.point[0],
-    se2.otherEvent.point[1],
-    out
-  );
+  const a0 = se1.point;
+  const a1 = se1.otherEvent.point;
+  const b0 = se2.point;
+  const b1 = se2.otherEvent.point;
 
-  if (nintersections === 0) return 0; // no intersection
+  const x = isect(a0[0], a0[1], a1[0], a1[1], b0[0], b0[1], b1[0], b1[1], out);
+
+  if (x === 0) return 0; // no intersection
 
   // the line segments intersect at an endpoint of both line segments
   if (
-    nintersections === 1 &&
+    x === 1 &&
     (equals(se1.point, se2.point) ||
       equals(se1.otherEvent.point, se2.otherEvent.point))
   ) {
     return 0;
   }
 
-  if (nintersections === 2 && se1.isSubject === se2.isSubject) {
+  if (x === 2 && se1.isSubject === se2.isSubject) {
     // if(se1.contourId === se2.contourId){
     // console.warn('Edges of the same polygon overlap',
     //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
@@ -64,7 +59,7 @@ export function possibleIntersection(
   }
 
   // The line segments associated to se1 and se2 intersect
-  if (nintersections === 1) {
+  if (x === 1) {
     // if the intersection point is not an endpoint of se1
     if (!equals(se1.point, out[0]) && !equals(se1.otherEvent.point, out[0])) {
       divideSegment(se1, out[0], queue);

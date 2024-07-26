@@ -24,6 +24,7 @@ export function subdivideSegments(
 
   while (eventQueue.length !== 0) {
     let event = eventQueue.pop()!;
+    console.log(event.point, event.left);
     sortedEvents.push(event);
 
     // optimization by bboxes for intersection and difference goes here
@@ -56,7 +57,8 @@ export function subdivideSegments(
 
       if (prev) {
         // @ts-expect-error
-        if (possibleIntersection(prev.key, event, eventQueue) === 2) {
+        const pe = possibleIntersection(prev.key, event, eventQueue);
+        if (pe === 2) {
           let prevprev = prev;
           if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
           // @ts-expect-error

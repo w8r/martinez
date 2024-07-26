@@ -16,14 +16,14 @@ export function divideSegment(
   p: Point,
   queue: Queue<SweepEvent>
 ) {
+  console.log("divide");
   const r = new SweepEvent(p, false, se, se.isSubject, NORMAL);
   const l = new SweepEvent(p, true, se.otherEvent, se.isSubject, NORMAL);
 
-  /* eslint-disable no-console */
   if (equals(se.point, se.otherEvent.point)) {
+    // eslint-disable-next-line no-console
     console.warn("what is that, a collapsed segment?", se);
   }
-  /* eslint-enable no-console */
 
   r.contourId = l.contourId = se.contourId;
 
@@ -39,8 +39,11 @@ export function divideSegment(
   se.otherEvent.otherEvent = l;
   se.otherEvent = r;
 
+  console.log("push", l.point, r.point);
   queue.push(l);
   queue.push(r);
+
+  console.log("\t peek", queue.peek().point);
 
   return queue;
 }
