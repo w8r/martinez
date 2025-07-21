@@ -49,10 +49,12 @@
   "devDependencies": {
     "@turf/union": "^4.6.0",
     "@types/geojson": "^1.0.2",
+    "@types/glob": "^8.1.0",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^1.0.0",
     "benchmark": "^2.1.4",
     "geojson-project": "^1.0.0",
+    "glob": "^11.0.3",
     "json-stringify-pretty-compact": "^2.0.0",
     "leaflet": "^1.2.0",
     "leaflet-editable": "^1.1.0",
