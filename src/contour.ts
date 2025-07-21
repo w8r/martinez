@@ -1,4 +1,10 @@
+import { Position } from './types';
+
 export default class Contour {
+  public points: Position[];
+  public holeIds: number[];
+  public holeOf: Contour | null;
+  public depth: number | null;
 
   /**
    * Contour
@@ -12,7 +18,7 @@ export default class Contour {
     this.depth = null;
   }
 
-  isExterior() {
+  isExterior(): boolean {
     return this.holeOf == null;
   }
 

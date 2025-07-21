@@ -18,6 +18,11 @@
 
   </head>
   <body>
+    <!-- Load the new built library -->
+    <script type="module">
+      import * as martinez from '../dist/martinez.js';
+      window.martinez = martinez;
+    </script>
     <script src="js/bundle.js"></script>
   </body>
 </html>

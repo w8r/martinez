@@ -1,11 +1,13 @@
 import signedArea from './signed_area';
+import SweepEvent from './sweep_event';
+import { Position } from './types';
 
 /**
  * @param  {SweepEvent} e1
  * @param  {SweepEvent} e2
- * @return {Number}
+ * @return {number}
  */
-export default function compareEvents(e1, e2) {
+export default function compareEvents(e1: SweepEvent, e2: SweepEvent): number {
   const p1 = e1.point;
   const p2 = e2.point;
 
@@ -22,7 +24,7 @@ export default function compareEvents(e1, e2) {
 
 
 /* eslint-disable no-unused-vars */
-function specialCases(e1, e2, p1, p2) {
+function specialCases(e1: SweepEvent, e2: SweepEvent, p1: Position, p2: Position): number {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
   if (e1.left !== e2.left)
@@ -33,9 +35,9 @@ function specialCases(e1, e2, p1, p2) {
   // Same coordinates, both events
   // are left endpoints or right endpoints.
   // not collinear
-  if (signedArea(p1, e1.otherEvent.point, e2.otherEvent.point) !== 0) {
+  if (signedArea(p1, e1.otherEvent!.point, e2.otherEvent!.point) !== 0) {
     // the event associate to the bottom segment is processed first
-    return (!e1.isBelow(e2.otherEvent.point)) ? 1 : -1;
+    return (!e1.isBelow(e2.otherEvent!.point)) ? 1 : -1;
   }
 
   return (!e1.isSubject && e2.isSubject) ? 1 : -1;

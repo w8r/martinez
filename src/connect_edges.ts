@@ -1,17 +1,18 @@
 import compareEvents from './compare_events';
 import Contour from './contour';
+import SweepEvent from './sweep_event';
 
 /**
- * @param  {Array.<SweepEvent>} sortedEvents
- * @return {Array.<SweepEvent>}
+ * @param  {SweepEvent[]} sortedEvents
+ * @return {SweepEvent[]}
  */
-function orderEvents(sortedEvents) {
-  let event, i, len, tmp;
-  const resultEvents = [];
+function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
+  let event: SweepEvent, i: number, len: number, tmp: SweepEvent;
+  const resultEvents: SweepEvent[] = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
     if ((event.left && event.inResult) ||
-      (!event.left && event.otherEvent.inResult)) {
+      (!event.left && event.otherEvent!.inResult)) {
       resultEvents.push(event);
     }
   }

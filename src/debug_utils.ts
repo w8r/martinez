@@ -1,5 +1,5 @@
 /* eslint-disable */
-export function renderPoints(possiblePoints, prop) {
+export function renderPoints(possiblePoints: any[], prop: string): void {
   var map = window.map;
   var points = window.points;
   if (!map) return;
@@ -16,7 +16,7 @@ export function renderPoints(possiblePoints, prop) {
   });
 };
 
-export function renderSweepLine(sweepLine, pos, event) {
+export function renderSweepLine(sweepLine: any[], pos: any, event: any): void {
   var map = window.map;
   if (!map) return;
   if (window.sws) window.sws.forEach(function (p) {

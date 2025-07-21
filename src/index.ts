@@ -1,20 +1,21 @@
 import subdivideSegments from './subdivide_segments';
-import connectEdges      from './connect_edges';
-import fillQueue         from './fill_queue';
+import connectEdges from './connect_edges';
+import fillQueue from './fill_queue';
 import {
   INTERSECTION,
   DIFFERENCE,
   UNION,
   XOR
-}        from './operation';
+} from './operation';
+import { Geometry, Polygon, MultiPolygon } from './types';
 
 const EMPTY = [];
 
 
-function trivialOperation(subject, clipping, operation) {
-  let result = null;
+function trivialOperation(subject: MultiPolygon, clipping: MultiPolygon, operation: number): MultiPolygon | null {
+  let result: MultiPolygon | null = null;
   if (subject.length * clipping.length === 0) {
-    if        (operation === INTERSECTION) {
+    if (operation === INTERSECTION) {
       result = EMPTY;
     } else if (operation === DIFFERENCE) {
       result = subject;
@@ -27,13 +28,13 @@ function trivialOperation(subject, clipping, operation) {
 }
 
 
-function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
-  let result = null;
+function compareBBoxes(subject: MultiPolygon, clipping: MultiPolygon, sbbox: number[], cbbox: number[], operation: number): MultiPolygon | null {
+  let result: MultiPolygon | null = null;
   if (sbbox[0] > cbbox[2] ||
       cbbox[0] > sbbox[2] ||
       sbbox[1] > cbbox[3] ||
       cbbox[1] > sbbox[3]) {
-    if        (operation === INTERSECTION) {
+    if (operation === INTERSECTION) {
       result = EMPTY;
     } else if (operation === DIFFERENCE) {
       result = subject;
@@ -46,14 +47,17 @@ function compareBBoxes(subject, clipping, sbbox, cbbox, operation) {
 }
 
 
-export default function boolean(subject, clipping, operation) {
-  if (typeof subject[0][0][0] === 'number') {
-    subject = [subject];
+export default function boolean(subject: Geometry, clipping: Geometry, operation: number): MultiPolygon | null {
+  let subjectMP: MultiPolygon = subject as MultiPolygon;
+  let clippingMP: MultiPolygon = clipping as MultiPolygon;
+  
+  if (typeof (subject as any)[0][0][0] === 'number') {
+    subjectMP = [subject as Polygon];
   }
-  if (typeof clipping[0][0][0] === 'number') {
-    clipping = [clipping];
+  if (typeof (clipping as any)[0][0][0] === 'number') {
+    clippingMP = [clipping as Polygon];
   }
-  let trivial = trivialOperation(subject, clipping, operation);
+  let trivial = trivialOperation(subjectMP, clippingMP, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
@@ -61,15 +65,15 @@ export default function boolean(subject, clipping, operation) {
   const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
 
   // console.time('fill queue');
-  const eventQueue = fillQueue(subject, clipping, sbbox, cbbox, operation);
+  const eventQueue = fillQueue(subjectMP, clippingMP, sbbox, cbbox, operation);
   //console.timeEnd('fill queue');
 
-  trivial = compareBBoxes(subject, clipping, sbbox, cbbox, operation);
+  trivial = compareBBoxes(subjectMP, clippingMP, sbbox, cbbox, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
   // console.time('subdivide edges');
-  const sortedEvents = subdivideSegments(eventQueue, subject, clipping, sbbox, cbbox, operation);
+  const sortedEvents = subdivideSegments(eventQueue, subjectMP, clippingMP, sbbox, cbbox, operation);
   //console.timeEnd('subdivide edges');
 
   // console.time('connect vertices');

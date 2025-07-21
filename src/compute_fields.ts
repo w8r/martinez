@@ -10,13 +10,14 @@ import {
   DIFFERENCE,
   XOR
 } from './operation';
+import SweepEvent from './sweep_event';
 
 /**
  * @param  {SweepEvent} event
- * @param  {SweepEvent} prev
- * @param  {Operation} operation
+ * @param  {SweepEvent | null} prev
+ * @param  {number} operation
  */
-export default function computeFields (event, prev, operation) {
+export default function computeFields (event: SweepEvent, prev: SweepEvent | null, operation: number): void {
   // compute inOut and otherInOut fields
   if (prev === null) {
     event.inOut      = false;

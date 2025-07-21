@@ -2,6 +2,7 @@ import divideSegment from './divide_segment';
 import intersection  from './segment_intersection';
 import equals        from './equals';
 import compareEvents from './compare_events';
+import SweepEvent from './sweep_event';
 import {
   NON_CONTRIBUTING,
   SAME_TRANSITION,
@@ -11,17 +12,17 @@ import {
 /**
  * @param  {SweepEvent} se1
  * @param  {SweepEvent} se2
- * @param  {Queue}      queue
- * @return {Number}
+ * @param  {any[]}      queue
+ * @return {number}
  */
-export default function possibleIntersection (se1, se2, queue) {
+export default function possibleIntersection (se1: SweepEvent, se2: SweepEvent, queue: any[]): number {
   // that disallows self-intersecting polygons,
   // did cost us half a day, so I'll leave it
   // out of respect
   // if (se1.isSubject === se2.isSubject) return;
   const inter = intersection(
-    se1.point, se1.otherEvent.point,
-    se2.point, se2.otherEvent.point
+    se1.point, se1.otherEvent!.point,
+    se2.point, se2.otherEvent!.point
   );
 
   const nintersections = inter ? inter.length : 0;
@@ -30,7 +31,7 @@ export default function possibleIntersection (se1, se2, queue) {
   // the line segments intersect at an endpoint of both line segments
   if ((nintersections === 1) &&
       (equals(se1.point, se2.point) ||
-       equals(se1.otherEvent.point, se2.otherEvent.point))) {
+       equals(se1.otherEvent!.point, se2.otherEvent!.point))) {
     return 0;
   }
 
@@ -47,19 +48,19 @@ export default function possibleIntersection (se1, se2, queue) {
   if (nintersections === 1) {
 
     // if the intersection point is not an endpoint of se1
-    if (!equals(se1.point, inter[0]) && !equals(se1.otherEvent.point, inter[0])) {
+    if (!equals(se1.point, inter[0]) && !equals(se1.otherEvent!.point, inter[0])) {
       divideSegment(se1, inter[0], queue);
     }
 
     // if the intersection point is not an endpoint of se2
-    if (!equals(se2.point, inter[0]) && !equals(se2.otherEvent.point, inter[0])) {
+    if (!equals(se2.point, inter[0]) && !equals(se2.otherEvent!.point, inter[0])) {
       divideSegment(se2, inter[0], queue);
     }
     return 1;
   }
 
   // The line segments associated to se1 and se2 overlap
-  const events        = [];
+  const events: SweepEvent[] = [];
   let leftCoincide  = false;
   let rightCoincide = false;
 
@@ -71,12 +72,12 @@ export default function possibleIntersection (se1, se2, queue) {
     events.push(se1, se2);
   }
 
-  if (equals(se1.otherEvent.point, se2.otherEvent.point)) {
+  if (equals(se1.otherEvent!.point, se2.otherEvent!.point)) {
     rightCoincide = true;
-  } else if (compareEvents(se1.otherEvent, se2.otherEvent) === 1) {
-    events.push(se2.otherEvent, se1.otherEvent);
+  } else if (compareEvents(se1.otherEvent!, se2.otherEvent!) === 1) {
+    events.push(se2.otherEvent!, se1.otherEvent!);
   } else {
-    events.push(se1.otherEvent, se2.otherEvent);
+    events.push(se1.otherEvent!, se2.otherEvent!);
   }
 
   if ((leftCoincide && rightCoincide) || leftCoincide) {
@@ -88,7 +89,7 @@ export default function possibleIntersection (se1, se2, queue) {
     if (leftCoincide && !rightCoincide) {
       // honestly no idea, but changing events selection from [2, 1]
       // to [0, 1] fixes the overlapping self-intersecting polygons issue
-      divideSegment(events[1].otherEvent, events[0].point, queue);
+      divideSegment(events[1].otherEvent!, events[0].point, queue);
     }
     return 2;
   }
@@ -100,7 +101,7 @@ export default function possibleIntersection (se1, se2, queue) {
   }
 
   // no line segment includes totally the other one
-  if (events[0] !== events[3].otherEvent) {
+  if (events[0] !== events[3].otherEvent!) {
     divideSegment(events[0], events[1].point, queue);
     divideSegment(events[1], events[2].point, queue);
     return 3;
@@ -108,7 +109,7 @@ export default function possibleIntersection (se1, se2, queue) {
 
   // one line segment includes the other one
   divideSegment(events[0], events[1].point, queue);
-  divideSegment(events[3].otherEvent, events[2].point, queue);
+  divideSegment(events[3].otherEvent!, events[2].point, queue);
 
   return 3;
 }

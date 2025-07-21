@@ -5,20 +5,21 @@ import {
   UNION,
   XOR
 } from './src/operation';
+import { Geometry } from './src/types';
 
-export function union (subject, clipping) {
+export function union(subject: Geometry, clipping: Geometry): Geometry | null {
   return boolean(subject, clipping, UNION);
 }
 
-export function diff (subject, clipping) {
+export function diff(subject: Geometry, clipping: Geometry): Geometry | null {
   return boolean(subject, clipping, DIFFERENCE);
 }
 
-export function xor (subject, clipping) {
+export function xor(subject: Geometry, clipping: Geometry): Geometry | null {
   return boolean(subject, clipping, XOR);
 }
 
-export function intersection (subject, clipping) {
+export function intersection(subject: Geometry, clipping: Geometry): Geometry | null {
   return boolean(subject, clipping, INTERSECTION);
 }
 

@@ -2,22 +2,24 @@ import Tree                 from 'splaytree';
 import computeFields        from './compute_fields';
 import possibleIntersection from './possible_intersection';
 import compareSegments      from './compare_segments';
+import SweepEvent from './sweep_event';
+import { MultiPolygon, BBox } from './types';
 import {
   INTERSECTION,
   DIFFERENCE
 } from './operation';
 
 
-export default function subdivide(eventQueue, subject, clipping, sbbox, cbbox, operation) {
+export default function subdivide(eventQueue: any, subject: MultiPolygon, clipping: MultiPolygon, sbbox: BBox, cbbox: BBox, operation: number): SweepEvent[] {
   const sweepLine = new Tree(compareSegments);
-  const sortedEvents = [];
+  const sortedEvents: SweepEvent[] = [];
 
   const rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  let prev, next, begin;
+  let prev: any, next: any, begin: any;
 
   while (eventQueue.length !== 0) {
-    let event = eventQueue.pop();
+    let event: SweepEvent = eventQueue.pop();
     sortedEvents.push(event);
 
     // optimization by bboxes for intersection and difference goes here
