@@ -7,7 +7,7 @@ import SweepEvent from './sweep_event';
  * @return {SweepEvent[]}
  */
 function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
-  let event: SweepEvent, i: number, len: number, tmp: SweepEvent;
+  let event: SweepEvent, i: number, len: number, tmpEvent: SweepEvent, tmpPos: number;
   const resultEvents: SweepEvent[] = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
@@ -23,9 +23,9 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
     for (i = 0, len = resultEvents.length; i < len; i++) {
       if ((i + 1) < len &&
         compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
-        tmp = resultEvents[i];
+        tmpEvent = resultEvents[i];
         resultEvents[i] = resultEvents[i + 1];
-        resultEvents[i + 1] = tmp;
+        resultEvents[i + 1] = tmpEvent;
         sorted = false;
       }
     }
@@ -42,9 +42,9 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
     if (!event.left) {
-      tmp = event.otherPos;
-      event.otherPos = event.otherEvent.otherPos;
-      event.otherEvent.otherPos = tmp;
+      tmpPos = event.otherPos;
+      event.otherPos = event.otherEvent!.otherPos;
+      event.otherEvent!.otherPos = tmpPos;
     }
   }
 

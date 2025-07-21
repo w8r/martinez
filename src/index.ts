@@ -7,7 +7,7 @@ import {
   UNION,
   XOR
 } from './operation';
-import { Geometry, Polygon, MultiPolygon } from './types';
+import { Geometry, Polygon, MultiPolygon, BBox } from './types';
 
 const EMPTY = [];
 
@@ -28,7 +28,7 @@ function trivialOperation(subject: MultiPolygon, clipping: MultiPolygon, operati
 }
 
 
-function compareBBoxes(subject: MultiPolygon, clipping: MultiPolygon, sbbox: number[], cbbox: number[], operation: number): MultiPolygon | null {
+function compareBBoxes(subject: MultiPolygon, clipping: MultiPolygon, sbbox: BBox, cbbox: BBox, operation: number): MultiPolygon | null {
   let result: MultiPolygon | null = null;
   if (sbbox[0] > cbbox[2] ||
       cbbox[0] > sbbox[2] ||
@@ -61,8 +61,8 @@ export default function boolean(subject: Geometry, clipping: Geometry, operation
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  const sbbox = [Infinity, Infinity, -Infinity, -Infinity];
-  const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
+  const sbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
+  const cbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
 
   // console.time('fill queue');
   const eventQueue = fillQueue(subjectMP, clippingMP, sbbox, cbbox, operation);
@@ -77,7 +77,7 @@ export default function boolean(subject: Geometry, clipping: Geometry, operation
   //console.timeEnd('subdivide edges');
 
   // console.time('connect vertices');
-  const contours = connectEdges(sortedEvents, operation);
+  const contours = connectEdges(sortedEvents);
   //console.timeEnd('connect vertices');
 
   // Convert contours to polygons
