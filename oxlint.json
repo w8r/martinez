@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "rules": {
+    "typescript": "warn",
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "allow": [
+    "no-unused-vars",
+    "prefer-const"
+  ]
+}
