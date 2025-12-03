@@ -40,7 +40,7 @@ function extractExpectedResults(features: any[]) {
 const caseDir = path.join(__dirname, 'genericTestCases');
 const testCases = globSync(path.join(caseDir, '*.geojson'));
 if (testCases.length === 0) {
-  throw 'No test cases found, this must not happen';
+  throw new Error('No test cases found, this must not happen');
 }
 
 describe('Generic Test Cases', () => {
