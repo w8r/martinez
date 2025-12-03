@@ -26,8 +26,4 @@ export default defineConfig({
       external: ['robust-predicates', 'splaytree', 'tinyqueue']
     }
   },
-  test: {
-    globals: true,
-    environment: 'node'
-  }
 });
