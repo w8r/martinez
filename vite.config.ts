@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import { resolve } from "path";
+import { copyFileSync, mkdirSync, readdirSync, statSync } from "fs";
+import { join } from "path";
 
 export default defineConfig(({ mode }) => {
   const isDemo = mode === "demo";
@@ -20,6 +22,30 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      plugins: [
+        {
+          name: "copy-fixtures",
+          closeBundle() {
+            const fixturesSource = resolve(__dirname, "test/fixtures");
+            const fixturesDest = resolve(__dirname, "dist/demo/fixtures");
+
+            // Create destination directory
+            mkdirSync(fixturesDest, { recursive: true });
+
+            // Copy all files from fixtures
+            const files = readdirSync(fixturesSource);
+            files.forEach(file => {
+              const sourcePath = join(fixturesSource, file);
+              const destPath = join(fixturesDest, file);
+
+              if (statSync(sourcePath).isFile()) {
+                copyFileSync(sourcePath, destPath);
+                console.log(`Copied fixture: ${file}`);
+              }
+            });
+          }
+        }
+      ]
     };
   }
 
