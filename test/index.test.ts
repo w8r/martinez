@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import path from 'path';
 import load from 'load-json-file';
-import martinez from '../';
 import fillQueue from '../src/fill_queue';
+import { INTERSECTION } from '../src/operation';
 
 // GeoJSON Data
 const data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson')) as any;
@@ -14,9 +14,9 @@ describe('fill event queue', () => {
   const s = [subject.geometry.coordinates];
   const c = [clipping.geometry.coordinates];
 
-  const sbbox = [Infinity, Infinity, -Infinity, -Infinity];
-  const cbbox = [Infinity, Infinity, -Infinity, -Infinity];
-  const q = fillQueue(s, c, sbbox, cbbox);
+  const sbbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+  const cbbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+  const q = fillQueue(s, c, sbbox, cbbox, INTERSECTION);
   let currentPoint: any;
 
   describe('bboxes', () => {

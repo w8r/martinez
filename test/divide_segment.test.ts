@@ -1,38 +1,51 @@
-import { describe, it, expect } from 'vitest';
-import path              from 'path';
-import Queue             from 'tinyqueue';
-import load              from 'load-json-file';
-import martinez          from '../';
-import SweepEvent        from '../src/sweep_event';
-import compareEvents     from '../src/compare_events';
-import intersection      from '../src/segment_intersection';
-import equals            from '../src/equals';
-import fillQueue         from '../src/fill_queue';
-import divideSegment     from '../src/divide_segment';
-import subdivideSegments from '../src/subdivide_segments';
-import possibleIntersection from '../src/possible_intersection';
-import Tree              from 'splaytree';
-import compareSegments   from '../src/compare_segments';
+import { describe, it, expect } from "vitest";
+import path from "path";
+import Queue from "tinyqueue";
+import load from "load-json-file";
+import SweepEvent from "../src/sweep_event";
+import compareEvents from "../src/compare_events";
+import intersection from "../src/segment_intersection";
+import equals from "../src/equals";
+import fillQueue from "../src/fill_queue";
+import divideSegment from "../src/divide_segment";
+import subdivideSegments from "../src/subdivide_segments";
+import possibleIntersection from "../src/possible_intersection";
+import Tree from "splaytree";
+import compareSegments from "../src/compare_segments";
+import { INTERSECTION } from "../src/operation";
 
 // GeoJSON Data
-const shapes = load.sync(path.join(__dirname, 'fixtures', 'two_shapes.geojson'));
+const shapes = load.sync(
+  path.join(__dirname, "fixtures", "two_shapes.geojson")
+);
 
 const subject = shapes.features[0];
 const clipping = shapes.features[1];
 
-describe('divide segments', () => {
-
-  it('should divide 2 segments', () => {
-    const se1 = new SweepEvent([0, 0], true, new SweepEvent([5, 5], false), true);
-    const se2 = new SweepEvent([0, 5], true, new SweepEvent([5, 0], false), false);
+describe("divide segments", () => {
+  it("should divide 2 segments", () => {
+    const se1 = new SweepEvent(
+      [0, 0],
+      true,
+      new SweepEvent([5, 5], false),
+      true
+    );
+    const se2 = new SweepEvent(
+      [0, 5],
+      true,
+      new SweepEvent([5, 0], false),
+      false
+    );
     const q = new Queue(null, compareEvents);
 
     q.push(se1);
     q.push(se2);
 
     const iter = intersection(
-      se1.point, se1.otherEvent.point,
-      se2.point, se2.otherEvent.point
+      se1.point,
+      se1.otherEvent.point,
+      se2.point,
+      se2.otherEvent.point
     );
 
     divideSegment(se1, iter[0], q);
@@ -41,14 +54,24 @@ describe('divide segments', () => {
     expect(q.length).toBe(6);
   });
 
-  it('should handle possible intersections', () => {
+  it("should handle possible intersections", () => {
     const s = subject.geometry.coordinates;
     const c = clipping.geometry.coordinates;
 
     const q = new Queue(null, compareEvents);
 
-    const se1 = new SweepEvent(s[0][3], true, new SweepEvent(s[0][2], false), true);
-    const se2 = new SweepEvent(c[0][0], true, new SweepEvent(c[0][1], false), false);
+    const se1 = new SweepEvent(
+      s[0][3],
+      true,
+      new SweepEvent(s[0][2], false),
+      true
+    );
+    const se2 = new SweepEvent(
+      c[0][0],
+      true,
+      new SweepEvent(c[0][1], false),
+      false
+    );
 
     expect(possibleIntersection(se1, se2, q)).toBe(1);
     expect(q.length).toBe(4);
@@ -72,17 +95,17 @@ describe('divide segments', () => {
     expect(e.otherEvent.point).toEqual([153, 294.5]);
   });
 
-  it('should handle possible intersections on 2 polygons', () => {
+  it("should handle possible intersections on 2 polygons", () => {
     const s = [subject.geometry.coordinates];
     const c = [clipping.geometry.coordinates];
 
-    const bbox = [Infinity, Infinity, -Infinity, -Infinity];
-    const q = fillQueue(s, c, bbox, bbox);
+    const bbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+    const q = fillQueue(s, c, bbox, bbox, INTERSECTION);
     const p0 = [16, 282];
     const p1 = [298, 359];
     const p2 = [156, 203.5];
 
-    const te  = new SweepEvent(p0, true, null, true);
+    const te = new SweepEvent(p0, true, null, true);
     const te2 = new SweepEvent(p1, false, te, false);
     te.otherEvent = te2;
 
@@ -122,104 +145,120 @@ describe('divide segments', () => {
     const B = [241.5, 229.5];
 
     const intervals = {
-      'EI': {
-        l: E, r: I,
+      EI: {
+        l: E,
+        r: I,
         inOut: false,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
-      'IF': {
-        l: I, r: F,
-        inOut: false,
-        otherInOut: false,
-        inResult: true,
-        prevInResult: null
-      },
-      'FJ': {
-        l: F, r: J,
+      IF: {
+        l: I,
+        r: F,
         inOut: false,
         otherInOut: false,
         inResult: true,
-        prevInResult: null
+        prevInResult: null,
       },
-      'JG': {
-        l: J, r: G,
+      FJ: {
+        l: F,
+        r: J,
+        inOut: false,
+        otherInOut: false,
+        inResult: true,
+        prevInResult: null,
+      },
+      JG: {
+        l: J,
+        r: G,
         inOut: false,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
-      'EG': {
-        l: E, r: G,
+      EG: {
+        l: E,
+        r: G,
         inOut: true,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
-      'DA': {
-        l: D, r: A,
+      DA: {
+        l: D,
+        r: A,
         inOut: false,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
-      'AB': {
-        l: A, r: B,
+      AB: {
+        l: A,
+        r: B,
         inOut: false,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
-      'JB': {
-        l: J, r: B,
+      JB: {
+        l: J,
+        r: B,
         inOut: true,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
+        prevInResult: null,
       },
 
-      'CJ': {
-        l: C, r: J,
+      CJ: {
+        l: C,
+        r: J,
         inOut: true,
         otherInOut: false,
         inResult: true,
         prevInResult: {
-          l: F, r: J,
-          prevInResult: null
-        }
+          l: F,
+          r: J,
+          prevInResult: null,
+        },
       },
-      'IC': {
-        l: I, r: C,
+      IC: {
+        l: I,
+        r: C,
         inOut: true,
         otherInOut: false,
         inResult: true,
         prevInResult: {
-          l: I, r: F,
-          prevInResult: null
-        }},
+          l: I,
+          r: F,
+          prevInResult: null,
+        },
+      },
 
-      'DI': {
-        l: D, r: I,
+      DI: {
+        l: D,
+        r: I,
         inOut: true,
         otherInOut: true,
         inResult: false,
-        prevInResult: null
-      }
+        prevInResult: null,
+      },
     };
 
     function checkContain(interval: string) {
       const data = intervals[interval];
       for (let x = 0; x < leftSegments.length; x++) {
         const seg = leftSegments[x];
-        if (equals(seg.point, data.l) &&
-           equals(seg.otherEvent.point, data.r) &&
-           seg.inOut      === data.inOut &&
-           seg.otherInOut === data.otherInOut &&
-           seg.inResult   === data.inResult &&
-           ((seg.prevInResult === null && data.prevInResult === null) ||
+        if (
+          equals(seg.point, data.l) &&
+          equals(seg.otherEvent.point, data.r) &&
+          seg.inOut === data.inOut &&
+          seg.otherInOut === data.otherInOut &&
+          seg.inResult === data.inResult &&
+          ((seg.prevInResult === null && data.prevInResult === null) ||
             (equals(seg.prevInResult.point, data.prevInResult.l) &&
-            equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))) {
+              equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))
+        ) {
           expect(true).toBeTruthy(); // Pass test for interval
           return;
         }

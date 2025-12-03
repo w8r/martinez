@@ -2,43 +2,44 @@ import {
   NORMAL,
   SAME_TRANSITION,
   DIFFERENT_TRANSITION,
-  NON_CONTRIBUTING
-} from './edge_type';
-import {
-  INTERSECTION,
-  UNION,
-  DIFFERENCE,
-  XOR
-} from './operation';
-import SweepEvent from './sweep_event';
+  NON_CONTRIBUTING,
+} from "./edge_type";
+import { INTERSECTION, UNION, DIFFERENCE, XOR } from "./operation";
+import SweepEvent from "./sweep_event";
 
 /**
  * @param  {SweepEvent} event
  * @param  {SweepEvent | null} prev
  * @param  {number} operation
  */
-export default function computeFields (event: SweepEvent, prev: SweepEvent | null, operation: number): void {
+export default function computeFields(
+  event: SweepEvent,
+  prev: SweepEvent | null,
+  operation: number
+): void {
   // compute inOut and otherInOut fields
   if (prev === null) {
-    event.inOut      = false;
+    event.inOut = false;
     event.otherInOut = true;
 
-  // previous line segment in sweepline belongs to the same polygon
+    // previous line segment in sweepline belongs to the same polygon
   } else {
     if (event.isSubject === prev.isSubject) {
-      event.inOut      = !prev.inOut;
+      event.inOut = !prev.inOut;
       event.otherInOut = prev.otherInOut;
 
-    // previous line segment in sweepline belongs to the clipping polygon
+      // previous line segment in sweepline belongs to the clipping polygon
     } else {
-      event.inOut      = !prev.otherInOut;
+      event.inOut = !prev.otherInOut;
       event.otherInOut = prev.isVertical() ? !prev.inOut : prev.inOut;
     }
 
     // compute prevInResult field
     if (prev) {
-      event.prevInResult = (!inResult(prev, operation) || prev.isVertical())
-        ? prev.prevInResult : prev;
+      event.prevInResult =
+        !inResult(prev, operation) || prev.isVertical()
+          ? prev.prevInResult
+          : prev;
     }
   }
 
@@ -50,7 +51,6 @@ export default function computeFields (event: SweepEvent, prev: SweepEvent | nul
     event.resultTransition = 0;
   }
 }
-
 
 /* eslint-disable indent */
 function inResult(event, operation) {
@@ -64,8 +64,10 @@ function inResult(event, operation) {
         case DIFFERENCE:
           // return (event.isSubject && !event.otherInOut) ||
           //         (!event.isSubject && event.otherInOut);
-          return (event.isSubject && event.otherInOut) ||
-                  (!event.isSubject && !event.otherInOut);
+          return (
+            (event.isSubject && event.otherInOut) ||
+            (!event.isSubject && !event.otherInOut)
+          );
         case XOR:
           return true;
       }
@@ -81,7 +83,6 @@ function inResult(event, operation) {
 }
 /* eslint-enable indent */
 
-
 function determineResultTransition(event, operation) {
   let thisIn = !event.inOut;
   let thatIn = !event.otherInOut;
@@ -89,11 +90,14 @@ function determineResultTransition(event, operation) {
   let isIn;
   switch (operation) {
     case INTERSECTION:
-      isIn = thisIn && thatIn; break;
+      isIn = thisIn && thatIn;
+      break;
     case UNION:
-      isIn = thisIn || thatIn; break;
+      isIn = thisIn || thatIn;
+      break;
     case XOR:
-      isIn = thisIn ^ thatIn; break;
+      isIn = thisIn !== thatIn;
+      break;
     case DIFFERENCE:
       if (event.isSubject) {
         isIn = thisIn && !thatIn;
