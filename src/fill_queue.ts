@@ -1,22 +1,33 @@
-import Queue           from 'tinyqueue';
-import SweepEvent      from './sweep_event';
-import compareEvents   from './compare_events';
-import { DIFFERENCE }  from './operation';
-import { Position, Polygon, MultiPolygon, BBox } from './types';
+import Queue from "tinyqueue";
+import SweepEvent from "./sweep_event";
+import compareEvents from "./compare_events";
+import { DIFFERENCE } from "./operation";
+import { Position, Polygon, MultiPolygon, BBox } from "./types";
 
 const max = Math.max;
 const min = Math.min;
 
 let contourId = 0;
 
-
-function processPolygon(contourOrHole: Position[], isSubject: boolean, depth: number, Q: any, bbox: BBox, isExteriorRing: boolean): void {
-  let i: number, len: number, s1: Position, s2: Position, e1: SweepEvent, e2: SweepEvent;
+function processPolygon(
+  contourOrHole: Position[],
+  isSubject: boolean,
+  depth: number,
+  Q: any,
+  bbox: BBox,
+  isExteriorRing: boolean
+): void {
+  let i: number,
+    len: number,
+    s1: Position,
+    s2: Position,
+    e1: SweepEvent,
+    e2: SweepEvent;
   for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
     s1 = contourOrHole[i];
     s2 = contourOrHole[i + 1];
     e1 = new SweepEvent(s1, false, undefined, isSubject);
-    e2 = new SweepEvent(s2, false, e1,        isSubject);
+    e2 = new SweepEvent(s2, false, e1, isSubject);
     e1.otherEvent = e2;
 
     if (s1[0] === s2[0] && s1[1] === s2[1]) {
@@ -34,7 +45,8 @@ function processPolygon(contourOrHole: Position[], isSubject: boolean, depth: nu
       e1.left = true;
     }
 
-    const x = s1[0], y = s1[1];
+    const x = s1[0],
+      y = s1[1];
     bbox[0] = min(bbox[0], x);
     bbox[1] = min(bbox[1], y);
     bbox[2] = max(bbox[2], x);
@@ -47,17 +59,34 @@ function processPolygon(contourOrHole: Position[], isSubject: boolean, depth: nu
   }
 }
 
-
-export default function fillQueue(subject: MultiPolygon, clipping: MultiPolygon, sbbox: BBox, cbbox: BBox, operation: number): any {
+export default function fillQueue(
+  subject: MultiPolygon,
+  clipping: MultiPolygon,
+  sbbox: BBox,
+  cbbox: BBox,
+  operation: number
+) {
   const eventQueue = new Queue(null, compareEvents);
-  let polygonSet: Polygon, isExteriorRing: boolean, i: number, ii: number, j: number, jj: number; //, k, kk;
+  let polygonSet: Polygon,
+    isExteriorRing: boolean,
+    i: number,
+    ii: number,
+    j: number,
+    jj: number; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
       isExteriorRing = j === 0;
       if (isExteriorRing) contourId++;
-      processPolygon(polygonSet[j], true, contourId, eventQueue, sbbox, isExteriorRing);
+      processPolygon(
+        polygonSet[j],
+        true,
+        contourId,
+        eventQueue,
+        sbbox,
+        isExteriorRing
+      );
     }
   }
 
@@ -67,7 +96,14 @@ export default function fillQueue(subject: MultiPolygon, clipping: MultiPolygon,
       isExteriorRing = j === 0;
       if (operation === DIFFERENCE) isExteriorRing = false;
       if (isExteriorRing) contourId++;
-      processPolygon(polygonSet[j], false, contourId, eventQueue, cbbox, isExteriorRing);
+      processPolygon(
+        polygonSet[j],
+        false,
+        contourId,
+        eventQueue,
+        cbbox,
+        isExteriorRing
+      );
     }
   }
 

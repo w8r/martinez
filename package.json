@@ -74,6 +74,6 @@
   "dependencies": {
     "robust-predicates": "^2.0.4",
     "splaytree": "^0.1.4",
-    "tinyqueue": "^1.2.0"
+    "tinyqueue": "3.0.0"
   }
 }

@@ -1,39 +1,47 @@
-import Tree                 from 'splaytree';
-import computeFields        from './compute_fields';
-import possibleIntersection from './possible_intersection';
-import compareSegments      from './compare_segments';
-import SweepEvent from './sweep_event';
-import { MultiPolygon, BBox } from './types';
-import {
-  INTERSECTION,
-  DIFFERENCE
-} from './operation';
+import Tree, { Node } from "splaytree";
+import computeFields from "./compute_fields";
+import possibleIntersection from "./possible_intersection";
+import compareSegments from "./compare_segments";
+import SweepEvent from "./sweep_event";
+import { MultiPolygon, BBox } from "./types";
+import { INTERSECTION, DIFFERENCE } from "./operation";
+import Queue from "tinyqueue";
 
-
-export default function subdivide(eventQueue: any, subject: MultiPolygon, clipping: MultiPolygon, sbbox: BBox, cbbox: BBox, operation: number): SweepEvent[] {
+export default function subdivide(
+  eventQueue: Queue<SweepEvent>,
+  subject: MultiPolygon,
+  clipping: MultiPolygon,
+  sbbox: BBox,
+  cbbox: BBox,
+  operation: number
+): SweepEvent[] {
   const sweepLine = new Tree(compareSegments);
   const sortedEvents: SweepEvent[] = [];
 
   const rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  let prev: any, next: any, begin: any;
+  let prev: Node<SweepEvent, unknown>,
+    next: Node<SweepEvent, unknown>,
+    begin: Node<SweepEvent, unknown>;
 
   while (eventQueue.length !== 0) {
     let event: SweepEvent = eventQueue.pop();
     sortedEvents.push(event);
 
     // optimization by bboxes for intersection and difference goes here
-    if ((operation === INTERSECTION && event.point[0] > rightbound) ||
-        (operation === DIFFERENCE   && event.point[0] > sbbox[2])) {
+    if (
+      (operation === INTERSECTION && event.point[0] > rightbound) ||
+      (operation === DIFFERENCE && event.point[0] > sbbox[2])
+    ) {
       break;
     }
 
     if (event.left) {
-      next  = prev = sweepLine.insert(event);
+      next = prev = sweepLine.insert(event);
       begin = sweepLine.minNode();
 
       if (prev !== begin) prev = sweepLine.prev(prev);
-      else                prev = null;
+      else prev = null;
 
       next = sweepLine.next(next);
 
@@ -51,11 +59,11 @@ export default function subdivide(eventQueue: any, subject: MultiPolygon, clippi
         if (possibleIntersection(prev.key, event, eventQueue) === 2) {
           let prevprev = prev;
           if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
-          else                    prevprev = null;
+          else prevprev = null;
 
           prevprevEvent = prevprev ? prevprev.key : null;
           computeFields(prevEvent, prevprevEvent, operation);
-          computeFields(event,     prevEvent,     operation);
+          computeFields(event, prevEvent, operation);
         }
       }
     } else {
@@ -63,9 +71,8 @@ export default function subdivide(eventQueue: any, subject: MultiPolygon, clippi
       next = prev = sweepLine.find(event);
 
       if (prev && next) {
-
         if (prev !== begin) prev = sweepLine.prev(prev);
-        else                prev = null;
+        else prev = null;
 
         next = sweepLine.next(next);
         sweepLine.remove(event);
