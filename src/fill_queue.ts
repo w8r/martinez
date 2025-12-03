@@ -66,7 +66,7 @@ export default function fillQueue(
   cbbox: BBox,
   operation: number
 ) {
-  const eventQueue = new Queue(null, compareEvents);
+  const eventQueue = new Queue(undefined, compareEvents);
   let polygonSet: Polygon,
     isExteriorRing: boolean,
     i: number,

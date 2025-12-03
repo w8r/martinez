@@ -17,7 +17,7 @@ declare global {
 }
 
 const mode = window.location.hash.substring(1);
-const path = "../test/fixtures/";
+const path = "/fixtures/";
 let file: string;
 
 switch (mode) {

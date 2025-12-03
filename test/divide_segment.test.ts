@@ -36,7 +36,7 @@ describe("divide segments", () => {
       new SweepEvent([5, 0], false),
       false
     );
-    const q = new Queue(null, compareEvents);
+    const q = new Queue(undefined, compareEvents);
 
     q.push(se1);
     q.push(se2);
@@ -58,7 +58,7 @@ describe("divide segments", () => {
     const s = subject.geometry.coordinates;
     const c = clipping.geometry.coordinates;
 
-    const q = new Queue(null, compareEvents);
+    const q = new Queue(undefined, compareEvents);
 
     const se1 = new SweepEvent(
       s[0][3],
@@ -99,7 +99,12 @@ describe("divide segments", () => {
     const s = [subject.geometry.coordinates];
     const c = [clipping.geometry.coordinates];
 
-    const bbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+    const bbox: [number, number, number, number] = [
+      Infinity,
+      Infinity,
+      -Infinity,
+      -Infinity,
+    ];
     const q = fillQueue(s, c, bbox, bbox, INTERSECTION);
     const p0 = [16, 282];
     const p1 = [298, 359];
