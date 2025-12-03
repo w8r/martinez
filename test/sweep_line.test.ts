@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import path from 'path';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import Tree from 'splaytree';
-import load from 'load-json-file';
 import compareSegments from '../src/compare_segments';
 import SweepEvent from '../src/sweep_event';
 
 // GeoJSON Data
-const data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson'));
+const data = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'two_triangles.geojson'), 'utf-8'));
 
 const subject = data.features[0];
 const clipping = data.features[1];

@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import path from 'path';
-import load from 'load-json-file';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import fillQueue from '../src/fill_queue';
 import { INTERSECTION } from '../src/operation';
 
 // GeoJSON Data
-const data = load.sync(path.join(__dirname, 'fixtures', 'two_triangles.geojson')) as any;
+const data = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'two_triangles.geojson'), 'utf-8'));
 
 const subject = data.features[0];
 const clipping = data.features[1];

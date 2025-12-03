@@ -1,6 +1,6 @@
 import { describe, bench } from 'vitest';
-import path from 'path';
-import load from 'load-json-file';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import jstsUnion from '@turf/union';
 import * as martinez from '../index';
 
@@ -14,11 +14,14 @@ import * as martinez from '../index';
  * Asia - JSTS x 6.62 ops/sec ±2.74% (21 runs sampled)
  */
 
+// Helper to load JSON files
+const loadJSON = (filePath: string) => JSON.parse(readFileSync(filePath, 'utf-8'));
+
 // Load test fixtures
-const hole_hole = load.sync(path.join(__dirname, '../test/fixtures/hole_hole.geojson')) as any;
-const asia = load.sync(path.join(__dirname, '../test/fixtures/asia.geojson')) as any;
-const unionPoly = load.sync(path.join(__dirname, '../test/fixtures/asia_unionPoly.geojson')) as any;
-const states = load.sync(path.join(__dirname, '../test/fixtures/states_source.geojson')) as any;
+const hole_hole = loadJSON(join(__dirname, '../test/fixtures/hole_hole.geojson'));
+const asia = loadJSON(join(__dirname, '../test/fixtures/asia.geojson'));
+const unionPoly = loadJSON(join(__dirname, '../test/fixtures/asia_unionPoly.geojson'));
+const states = loadJSON(join(__dirname, '../test/fixtures/states_source.geojson'));
 
 describe('Hole_Hole union', () => {
   bench('Martinez', () => {

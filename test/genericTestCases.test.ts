@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import path from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+import { join, basename } from 'path';
 import { globSync } from 'glob';
-import load from 'load-json-file';
-import fs from 'fs';
 import stringify from 'json-stringify-pretty-compact';
 import * as martinez from '../index';
 
@@ -37,19 +36,19 @@ function extractExpectedResults(features: any[]) {
   });
 }
 
-const caseDir = path.join(__dirname, 'genericTestCases');
-const testCases = globSync(path.join(caseDir, '*.geojson'));
+const caseDir = join(__dirname, 'genericTestCases');
+const testCases = globSync(join(caseDir, '*.geojson'));
 if (testCases.length === 0) {
   throw new Error('No test cases found, this must not happen');
 }
 
 describe('Generic Test Cases', () => {
   testCases.forEach((testCaseFile) => {
-    let testName = 'Generic test case: ' + path.basename(testCaseFile);
-    
+    let testName = 'Generic test case: ' + basename(testCaseFile);
+
     describe(testName, () => {
       it('should execute test case operations correctly', () => {
-        const data = load.sync(testCaseFile) as any;
+        const data = JSON.parse(readFileSync(testCaseFile, 'utf-8'));
         if (data.features.length < 2) {
           throw `Test case file must contain at least two features, but ${testCaseFile} doesn't.`;
         }
@@ -74,7 +73,7 @@ describe('Generic Test Cases', () => {
         }
 
         if (process.env.REGEN) {
-          fs.writeFileSync(testCaseFile, stringify(data));
+          writeFileSync(testCaseFile, stringify(data));
         }
       });
     });

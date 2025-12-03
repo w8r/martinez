@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import path from "path";
+import { readFileSync } from "fs";
+import { join } from "path";
 import Queue from "tinyqueue";
-import load from "load-json-file";
 import SweepEvent from "../src/sweep_event";
 import compareEvents from "../src/compare_events";
 import intersection from "../src/segment_intersection";
@@ -15,8 +15,8 @@ import compareSegments from "../src/compare_segments";
 import { INTERSECTION } from "../src/operation";
 
 // GeoJSON Data
-const shapes = load.sync(
-  path.join(__dirname, "fixtures", "two_shapes.geojson")
+const shapes = JSON.parse(
+  readFileSync(join(__dirname, "fixtures", "two_shapes.geojson"), "utf-8")
 );
 
 const subject = shapes.features[0];
