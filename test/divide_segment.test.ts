@@ -13,6 +13,7 @@ import possibleIntersection from "../src/possible_intersection";
 import Tree from "splaytree";
 import compareSegments from "../src/compare_segments";
 import { INTERSECTION } from "../src/operation";
+import { Position } from "../src/types";
 
 // GeoJSON Data
 const shapes = JSON.parse(
@@ -106,9 +107,9 @@ describe("divide segments", () => {
       -Infinity,
     ];
     const q = fillQueue(s, c, bbox, bbox, INTERSECTION);
-    const p0 = [16, 282];
-    const p1 = [298, 359];
-    const p2 = [156, 203.5];
+    const p0 = [16, 282] as Position;
+    const p1 = [298, 359] as Position;
+    const p2 = [156, 203.5] as Position;
 
     const te = new SweepEvent(p0, true, null, true);
     const te2 = new SweepEvent(p1, false, te, false);

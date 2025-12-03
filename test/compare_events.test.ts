@@ -2,12 +2,13 @@ import { describe, it, expect } from "vitest";
 import Queue from "tinyqueue";
 import sweepEventsComp from "../src/compare_events";
 import SweepEvent from "../src/sweep_event";
+import { S } from "vitest/dist/reporters-w_64AS5f.js";
 
 describe("queue", () => {
   it("should process least(by x) sweep event first", () => {
     const queue = new Queue(undefined, sweepEventsComp);
-    const e1 = { point: [0.0, 0.0] };
-    const e2 = { point: [0.5, 0.5] };
+    const e1 = { point: [0.0, 0.0] } as SweepEvent;
+    const e2 = { point: [0.5, 0.5] } as SweepEvent;
 
     queue.push(e1);
     queue.push(e2);
@@ -18,8 +19,8 @@ describe("queue", () => {
 
   it("should process least(by y) sweep event first", () => {
     const queue = new Queue(undefined, sweepEventsComp);
-    const e1 = { point: [0.0, 0.0] };
-    const e2 = { point: [0.0, 0.5] };
+    const e1 = { point: [0.0, 0.0] } as SweepEvent;
+    const e2 = { point: [0.0, 0.5] } as SweepEvent;
 
     queue.push(e1);
     queue.push(e2);
@@ -30,8 +31,8 @@ describe("queue", () => {
 
   it("should pop least(by left prop) sweep event first", () => {
     const queue = new Queue(undefined, sweepEventsComp);
-    const e1 = { point: [0.0, 0.0], left: true };
-    const e2 = { point: [0.0, 0.0], left: false };
+    const e1 = { point: [0.0, 0.0], left: true } as SweepEvent;
+    const e2 = { point: [0.0, 0.0], left: false } as SweepEvent;
 
     queue.push(e1);
     queue.push(e2);
@@ -43,8 +44,8 @@ describe("queue", () => {
 
 describe("sweep event comparison x coordinates", () => {
   it("should compare x coordinates correctly", () => {
-    const e1 = { point: [0.0, 0.0] };
-    const e2 = { point: [0.5, 0.5] };
+    const e1 = { point: [0.0, 0.0] } as SweepEvent;
+    const e2 = { point: [0.5, 0.5] } as SweepEvent;
 
     expect(sweepEventsComp(e1, e2)).toBe(-1);
     expect(sweepEventsComp(e2, e1)).toBe(1);
@@ -53,8 +54,8 @@ describe("sweep event comparison x coordinates", () => {
 
 describe("sweep event comparison y coordinates", () => {
   it("should compare y coordinates correctly", () => {
-    const e1 = { point: [0.0, 0.0] };
-    const e2 = { point: [0.0, 0.5] };
+    const e1 = { point: [0.0, 0.0] } as SweepEvent;
+    const e2 = { point: [0.0, 0.5] } as SweepEvent;
 
     expect(sweepEventsComp(e1, e2)).toBe(-1);
     expect(sweepEventsComp(e2, e1)).toBe(1);
@@ -63,8 +64,8 @@ describe("sweep event comparison y coordinates", () => {
 
 describe("sweep event comparison not left first", () => {
   it("should process not left events first", () => {
-    const e1 = { point: [0.0, 0.0], left: true };
-    const e2 = { point: [0.0, 0.0], left: false };
+    const e1 = { point: [0.0, 0.0], left: true } as SweepEvent;
+    const e2 = { point: [0.0, 0.0], left: false } as SweepEvent;
 
     expect(sweepEventsComp(e1, e2)).toBe(1);
     expect(sweepEventsComp(e2, e1)).toBe(-1);

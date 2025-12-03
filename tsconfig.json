@@ -9,21 +9,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    
+
     "strict": false,
     "skipLibCheck": true,
-    
+
     "declaration": true,
     "outDir": "dist"
   },
-  "include": [
-    "src/**/*",
-    "index.ts",
-    "test/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "demo"
-  ]
+  "include": ["src/**/*", "index.ts", "test/**/*"],
+  "exclude": ["node_modules", "dist", "demo", "src/debug_utils.ts"]
 }
