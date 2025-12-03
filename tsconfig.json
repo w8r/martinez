@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    
+    "strict": false,
+    "skipLibCheck": true,
+    
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*",
+    "index.ts",
+    "test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "demo"
+  ]
+}
