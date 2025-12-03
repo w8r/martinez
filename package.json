@@ -30,7 +30,7 @@
     "build:demo": "vite build --mode demo",
     "preview": "vite preview",
     "preview:demo": "vite preview --outDir dist/demo",
-    "deploy:demo": "npm run build:demo && gh-pages -d dist/demo -t -m 'Deploy demo'",
+    "deploy:demo": "npm run build:demo && gh-pages --nojekyll -d dist/demo -t -m 'Deploy demo'",
     "prepublishOnly": "npm run lint && npm run test:run && npm run build"
   },
   "keywords": [
