@@ -9,7 +9,7 @@ import * as martinez from '../index';
 function extractExpectedResults(features: any[]) {
   return features.map(feature => {
     let mode = feature.properties.operation;
-    var op: any;
+    let op: any;
     switch (mode) {
       case "union":
         op = martinez.union;
