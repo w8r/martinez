@@ -5,7 +5,9 @@ import {
   UNION,
   XOR
 } from './src/operation';
-import { Geometry } from './src/types';
+import type { Geometry } from './src/types';
+
+export type { Position, Ring, Polygon, MultiPolygon, Geometry } from './src/types';
 
 export function union(subject: Geometry, clipping: Geometry): Geometry | null {
   return boolean(subject, clipping, UNION);
