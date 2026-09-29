@@ -1,6 +1,6 @@
 import divideSegment from "./divide_segment";
 import intersection from "./segment_intersection";
-import equals from "./equals";
+import equals, { nearlyEquals } from "./equals";
 import compareEvents from "./compare_events";
 import SweepEvent from "./sweep_event";
 import {
@@ -28,6 +28,24 @@ export default function possibleIntersection(
 
   const nintersections = inter ? inter.length : 0;
   if (nintersections === 0) return 0; // no intersection
+
+  // Snap a crossing that lands a few ulps off an existing endpoint onto it.
+  // Otherwise nearly collinear pieces keep producing new intersection points
+  // just to the right of each other and the subdivision never ends (#98).
+  if (nintersections === 1) {
+    const endpoints = [
+      se1.point,
+      se1.otherEvent!.point,
+      se2.point,
+      se2.otherEvent!.point,
+    ];
+    for (const p of endpoints) {
+      if (nearlyEquals(inter[0], p)) {
+        inter[0] = p;
+        break;
+      }
+    }
+  }
 
   // the line segments intersect at an endpoint of both line segments
   if (
