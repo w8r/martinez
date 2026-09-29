@@ -143,7 +143,7 @@ test('Asia vs shifted Asia: union', async ({ bench }) => {
       polygonClipping.union(asiaGeometry.coordinates, asiaShifted.coordinates);
     })
   );
-});
+}, 300_000); // polyclip-ts needs ~1 s per sample
 
 test('Asia vs shifted Asia: difference', async ({ bench }) => {
   await bench.compare(
@@ -160,4 +160,4 @@ test('Asia vs shifted Asia: difference', async ({ bench }) => {
       polygonClipping.difference(asiaGeometry.coordinates, asiaShifted.coordinates);
     })
   );
-});
+}, 300_000); // polyclip-ts needs ~1 s per sample
