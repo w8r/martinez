@@ -2,6 +2,7 @@ import subdivideSegments from "./subdivide_segments";
 import connectEdges from "./connect_edges";
 import fillQueue from "./fill_queue";
 import isDegenerateRing from "./is_degenerate_ring";
+import normalizeContour from "./normalize_contour";
 import { INTERSECTION, DIFFERENCE, UNION, XOR } from "./operation";
 import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 
@@ -121,21 +122,22 @@ export default function boolean(
   const contours = connectEdges(sortedEvents);
   //console.timeEnd('connect vertices');
 
+  // Clean up output rings; degenerate ones become null and are left out
+  const rings = contours.map((contour) => normalizeContour(contour.points));
+
   // Convert contours to polygons
   const polygons = [];
   for (let i = 0; i < contours.length; i++) {
-    let contour = contours[i];
-    if (contour.isExterior() && !isDegenerateRing(contour.points)) {
+    const contour = contours[i];
+    if (contour.isExterior() && rings[i] !== null) {
       // The exterior ring goes first
-      let rings = [contour.points];
+      const polygon = [rings[i]];
       // Followed by holes if any
       for (let j = 0; j < contour.holeIds.length; j++) {
-        let holeId = contour.holeIds[j];
-        if (!isDegenerateRing(contours[holeId].points)) {
-          rings.push(contours[holeId].points);
-        }
+        const hole = rings[contour.holeIds[j]];
+        if (hole !== null) polygon.push(hole);
       }
-      polygons.push(rings);
+      polygons.push(polygon);
     }
   }
 
