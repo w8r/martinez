@@ -3,28 +3,12 @@ import { Position } from './types';
 //const EPS = 1e-9;
 
 /**
- * Finds the magnitude of the cross product of two vectors (if we pretend
- * they're in three dimensions)
+ * Point p + s * d, where d is the vector (dx, dy)
  *
- * @param {Position} a First vector
- * @param {Position} b Second vector
  * @private
- * @returns {number} The magnitude of the cross product
  */
-function crossProduct(a: Position, b: Position): number {
-  return (a[0] * b[1]) - (a[1] * b[0]);
-}
-
-/**
- * Finds the dot product of two vectors.
- *
- * @param {Position} a First vector
- * @param {Position} b Second vector
- * @private
- * @returns {number} The dot product
- */
-function dotProduct(a: Position, b: Position): number {
-  return (a[0] * b[0]) + (a[1] * b[1]);
+function toPoint(px: number, py: number, s: number, dx: number, dy: number): Position {
+  return [px + s * dx, py + s * dy];
 }
 
 /**
@@ -52,28 +36,15 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   // We are passed two points. P can be the first point of each pair. The
   // vector, then, could be thought of as the distance (in x and y components)
   // from the first point to the second point.
-  // So first, let's make our vectors:
-  const va: Position = [a2[0] - a1[0], a2[1] - a1[1]];
-  const vb: Position = [b2[0] - b1[0], b2[1] - b1[1]];
-  // We also define a function to convert back to regular point form:
-
-  /* eslint-disable arrow-body-style */
-
-  function toPoint(p: Position, s: number, d: Position): Position {
-    return [
-      p[0] + s * d[0],
-      p[1] + s * d[1]
-    ];
-  }
-
-  /* eslint-enable arrow-body-style */
+  // Vectors are kept as scalar pairs to avoid allocating on this hot path.
+  const a1x = a1[0], a1y = a1[1], b1x = b1[0], b1y = b1[1];
+  const vax = a2[0] - a1x, vay = a2[1] - a1y;
+  const vbx = b2[0] - b1x, vby = b2[1] - b1y;
 
   // The rest is pretty much a straight port of the algorithm.
-  const e: Position = [b1[0] - a1[0], b1[1] - a1[1]];
-  let kross    = crossProduct(va, vb);
+  const ex = b1x - a1x, ey = b1y - a1y;
+  let kross    = vax * vby - vay * vbx;
   let sqrKross = kross * kross;
-  const sqrLenA  = dotProduct(va, va);
-  //const sqrLenB  = dotProduct(vb, vb);
 
   // Check for line intersection. This works because of the properties of the
   // cross product -- specifically, two vectors are parallel if and only if the
@@ -84,25 +55,25 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
-    const s = crossProduct(e, vb) / kross;
+    const s = (ex * vby - ey * vbx) / kross;
     if (s < 0 || s > 1) {
       // not on line segment a
       return null;
     }
-    const t = crossProduct(e, va) / kross;
+    const t = (ex * vay - ey * vax) / kross;
     if (t < 0 || t > 1) {
       // not on line segment b
       return null;
     }
     if (s === 0 || s === 1) {
       // on an endpoint of line segment a
-      return noEndpointTouch ? null : [toPoint(a1, s, va)];
+      return noEndpointTouch ? null : [toPoint(a1x, a1y, s, vax, vay)];
     }
     if (t === 0 || t === 1) {
       // on an endpoint of line segment b
-      return noEndpointTouch ? null : [toPoint(b1, t, vb)];
+      return noEndpointTouch ? null : [toPoint(b1x, b1y, t, vbx, vby)];
     }
-    return [toPoint(a1, s, va)];
+    return [toPoint(a1x, a1y, s, vax, vay)];
   }
 
   // If we've reached this point, then the lines are either parallel or the
@@ -111,8 +82,7 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   // the (vector) difference between the two initial points. If this is parallel
   // with the line itself, then the two lines are the same line, and there will
   // be overlap.
-  //const sqrLenE = dotProduct(e, e);
-  kross = crossProduct(e, va);
+  kross = ex * vay - ey * vax;
   sqrKross = kross * kross;
 
   if (sqrKross > 0 /* EPS * sqLenB * sqLenE */) {
@@ -120,8 +90,9 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
     return null;
   }
 
-  const sa = dotProduct(va, e) / sqrLenA;
-  const sb = sa + dotProduct(va, vb) / sqrLenA;
+  const sqrLenA = vax * vax + vay * vay;
+  const sa = (vax * ex + vay * ey) / sqrLenA;
+  const sb = sa + (vax * vbx + vay * vby) / sqrLenA;
   const smin = Math.min(sa, sb);
   const smax = Math.max(sa, sb);
 
@@ -131,19 +102,19 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
 
     // overlap on an end point
     if (smin === 1) {
-      return noEndpointTouch ? null : [toPoint(a1, smin > 0 ? smin : 0, va)];
+      return noEndpointTouch ? null : [toPoint(a1x, a1y, smin > 0 ? smin : 0, vax, vay)];
     }
 
     if (smax === 0) {
-      return noEndpointTouch ? null : [toPoint(a1, smax < 1 ? smax : 1, va)];
+      return noEndpointTouch ? null : [toPoint(a1x, a1y, smax < 1 ? smax : 1, vax, vay)];
     }
 
     if (noEndpointTouch && smin === 0 && smax === 1) return null;
 
     // There's overlap on a segment -- two points of intersection. Return both.
     return [
-      toPoint(a1, smin > 0 ? smin : 0, va),
-      toPoint(a1, smax < 1 ? smax : 1, va)
+      toPoint(a1x, a1y, smin > 0 ? smin : 0, vax, vay),
+      toPoint(a1x, a1y, smax < 1 ? smax : 1, vax, vay)
     ];
   }
 
