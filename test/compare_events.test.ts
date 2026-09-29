@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import Queue from "tinyqueue";
 import sweepEventsComp from "../src/compare_events";
 import SweepEvent from "../src/sweep_event";
-import { S } from "vitest/dist/reporters-w_64AS5f.js";
 
 describe("queue", () => {
   it("should process least(by x) sweep event first", () => {
