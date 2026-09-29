@@ -1,8 +1,11 @@
-import { describe, bench } from 'vitest';
+import { test } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import jstsUnion from '@turf/union';
-import * as martinez from '../index';
+// Benchmark the built bundle (`npm run bench` builds it first): run from
+// source, Vite's module runner wraps every internal import in a getter and
+// that overhead would be measured too.
+import * as martinez from '../dist/martinez.js';
 
 /**
  * Benchmark Results
@@ -23,41 +26,44 @@ const asia = loadJSON(join(__dirname, '../test/fixtures/asia.geojson'));
 const unionPoly = loadJSON(join(__dirname, '../test/fixtures/asia_unionPoly.geojson'));
 const states = loadJSON(join(__dirname, '../test/fixtures/states_source.geojson'));
 
-describe('Hole_Hole union', () => {
-  bench('Martinez', () => {
-    martinez.union(
-      hole_hole.features[0].geometry.coordinates,
-      hole_hole.features[1].geometry.coordinates
-    );
-  });
-
-  bench('JSTS', () => {
-    jstsUnion(hole_hole.features[0], hole_hole.features[1]);
-  });
+test('Hole_Hole union', async ({ bench }) => {
+  await bench.compare(
+    bench('Martinez', () => {
+      martinez.union(
+        hole_hole.features[0].geometry.coordinates,
+        hole_hole.features[1].geometry.coordinates
+      );
+    }),
+    bench('JSTS', () => {
+      jstsUnion(hole_hole.features[0], hole_hole.features[1]);
+    })
+  );
 });
 
-describe('Asia union', () => {
-  bench('Martinez', () => {
-    martinez.union(
-      asia.features[0].geometry.coordinates,
-      unionPoly.geometry.coordinates
-    );
-  });
-
-  bench('JSTS', () => {
-    jstsUnion(asia.features[0], unionPoly);
-  });
+test('Asia union', async ({ bench }) => {
+  await bench.compare(
+    bench('Martinez', () => {
+      martinez.union(
+        asia.features[0].geometry.coordinates,
+        unionPoly.geometry.coordinates
+      );
+    }),
+    bench('JSTS', () => {
+      jstsUnion(asia.features[0], unionPoly);
+    })
+  );
 });
 
-describe('States clip', () => {
-  bench('Martinez', () => {
-    martinez.union(
-      states.features[0].geometry.coordinates,
-      states.features[1].geometry.coordinates
-    );
-  });
-
-  bench('JSTS', () => {
-    jstsUnion(states.features[0], states.features[1]);
-  });
+test('States clip', async ({ bench }) => {
+  await bench.compare(
+    bench('Martinez', () => {
+      martinez.union(
+        states.features[0].geometry.coordinates,
+        states.features[1].geometry.coordinates
+      );
+    }),
+    bench('JSTS', () => {
+      jstsUnion(states.features[0], states.features[1]);
+    })
+  );
 });

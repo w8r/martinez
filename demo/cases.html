@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Martinez test cases</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #fafafa;
+        font: 12px/1.4 system-ui, sans-serif;
+      }
+      #view {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+      }
+      #view.dragging {
+        cursor: grabbing;
+      }
+      #status {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        font-family: ui-monospace, monospace;
+        white-space: pre;
+        pointer-events: none;
+      }
+      #legend {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+      }
+      #legend span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin: 0 4px 0 10px;
+        vertical-align: -1px;
+        border: 1px solid;
+      }
+      #legend span:first-child {
+        margin-left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="legend">
+      <span style="background: rgba(37, 99, 235, 0.15); border-color: #2563eb"></span>subject
+      <span style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626"></span>clipping
+      <span style="background: rgba(22, 163, 74, 0.35); border-color: #15803d"></span>result
+      <span style="border: 1px dashed #7c3aed"></span>expected
+    </div>
+    <div id="status"></div>
+    <script type="module" src="./cases.ts"></script>
+  </body>
+</html>

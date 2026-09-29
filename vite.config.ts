@@ -17,8 +17,9 @@ export default defineConfig(({ mode }) => {
         emptyOutDir: true,
         rollupOptions: {
           input: {
-            main: resolve(__dirname, "demo/index.html"),
-            orthogonal: resolve(__dirname, "demo/orthogonal.html"),
+            main: resolve(import.meta.dirname, "demo/index.html"),
+            orthogonal: resolve(import.meta.dirname, "demo/orthogonal.html"),
+            cases: resolve(import.meta.dirname, "demo/cases.html"),
           },
         },
       },
@@ -26,8 +27,8 @@ export default defineConfig(({ mode }) => {
         {
           name: "copy-fixtures",
           closeBundle() {
-            const fixturesSource = resolve(__dirname, "test/fixtures");
-            const fixturesDest = resolve(__dirname, "dist/demo/fixtures");
+            const fixturesSource = resolve(import.meta.dirname, "test/fixtures");
+            const fixturesDest = resolve(import.meta.dirname, "dist/demo/fixtures");
 
             // Create destination directory
             mkdirSync(fixturesDest, { recursive: true });
@@ -61,7 +62,7 @@ export default defineConfig(({ mode }) => {
     ],
     build: {
       lib: {
-        entry: resolve(__dirname, "index.ts"),
+        entry: resolve(import.meta.dirname, "index.ts"),
         name: "martinez",
         formats: ["es", "cjs", "umd"],
         fileName: (format) => {
