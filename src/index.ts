@@ -2,6 +2,7 @@ import subdivideSegments from "./subdivide_segments";
 import connectEdges from "./connect_edges";
 import fillQueue from "./fill_queue";
 import isDegenerateRing from "./is_degenerate_ring";
+import removeSpikes from "./remove_spikes";
 import { INTERSECTION, DIFFERENCE, UNION, XOR } from "./operation";
 import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 
@@ -120,6 +121,10 @@ export default function boolean(
   // console.time('connect vertices');
   const contours = connectEdges(sortedEvents);
   //console.timeEnd('connect vertices');
+
+  for (let i = 0; i < contours.length; i++) {
+    contours[i].points = removeSpikes(contours[i].points);
+  }
 
   // Convert contours to polygons
   const polygons = [];
