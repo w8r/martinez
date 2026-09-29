@@ -2,6 +2,8 @@ import Tree, { Node } from "splaytree";
 import computeFields from "./compute_fields";
 import possibleIntersection from "./possible_intersection";
 import compareSegments from "./compare_segments";
+import compareEvents from "./compare_events";
+import equals from "./equals";
 import SweepEvent from "./sweep_event";
 import { MultiPolygon, BBox } from "./types";
 import { INTERSECTION, DIFFERENCE } from "./operation";
@@ -46,6 +48,7 @@ export default function subdivide(
       next = sweepLine.next(next);
 
       const prevEvent = prev ? prev.key : null;
+      const queueLength = eventQueue.length;
       let prevprevEvent;
       computeFields(event, prevEvent, operation);
       if (next) {
@@ -64,6 +67,23 @@ export default function subdivide(
           prevprevEvent = prevprev ? prevprev.key : null;
           computeFields(prevEvent, prevprevEvent, operation);
           computeFields(event, prevEvent, operation);
+        }
+      }
+
+      // Splitting a neighbour at this event's point can queue events that
+      // precede this one (e.g. the left half of a segment divided exactly at
+      // our left endpoint). Our fields were computed without them, so take
+      // this event out and process it again after them (#155).
+      if (eventQueue.length > queueLength) {
+        const top = eventQueue.peek()!;
+        if (
+          equals(top.point, event.point) &&
+          compareEvents(top, event) === -1 &&
+          compareEvents(event, top) === 1
+        ) {
+          sweepLine.remove(event);
+          sortedEvents.pop();
+          eventQueue.push(event);
         }
       }
     } else {
