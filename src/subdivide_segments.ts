@@ -7,10 +7,10 @@ import equals from "./equals";
 import SweepEvent from "./sweep_event";
 import { MultiPolygon, BBox } from "./types";
 import { INTERSECTION, DIFFERENCE } from "./operation";
-import Queue from "tinyqueue";
+import EventQueue from "./event_queue";
 
 export default function subdivide(
-  eventQueue: Queue<SweepEvent>,
+  eventQueue: EventQueue,
   subject: MultiPolygon,
   clipping: MultiPolygon,
   sbbox: BBox,
@@ -39,7 +39,7 @@ export default function subdivide(
     }
 
     if (event.left) {
-      next = prev = sweepLine.insert(event);
+      next = prev = event.node = sweepLine.insert(event);
       begin = sweepLine.minNode();
 
       if (prev !== begin) prev = sweepLine.prev(prev);
@@ -81,21 +81,24 @@ export default function subdivide(
           compareEvents(top, event) === -1 &&
           compareEvents(event, top) === 1
         ) {
-          sweepLine.remove(event);
+          sweepLine.removeNode(event.node!);
+          event.node = null;
           sortedEvents.pop();
           eventQueue.push(event);
         }
       }
     } else {
       event = event.otherEvent;
-      next = prev = sweepLine.find(event);
+      // Use the node kept since insertion instead of searching the tree
+      next = prev = event.node;
 
       if (prev && next) {
         if (prev !== begin) prev = sweepLine.prev(prev);
         else prev = null;
 
         next = sweepLine.next(next);
-        sweepLine.remove(event);
+        sweepLine.removeNode(event.node!);
+        event.node = null;
 
         if (next && prev) {
           possibleIntersection(prev.key, next.key, eventQueue);

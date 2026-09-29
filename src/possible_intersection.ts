@@ -8,12 +8,12 @@ import {
   SAME_TRANSITION,
   DIFFERENT_TRANSITION,
 } from "./edge_type";
-import Queue from "tinyqueue";
+import EventQueue from "./event_queue";
 
 export default function possibleIntersection(
   se1: SweepEvent,
   se2: SweepEvent,
-  queue: Queue<SweepEvent>
+  queue: Pick<EventQueue, "push">
 ): number {
   // that disallows self-intersecting polygons,
   // did cost us half a day, so I'll leave it

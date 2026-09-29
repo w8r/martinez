@@ -1,4 +1,5 @@
 import { NORMAL, EdgeType } from './edge_type';
+import type { Node } from 'splaytree';
 import { Position } from './types';
 
 
@@ -17,6 +18,8 @@ export default class SweepEvent {
   outputContourId: number;
   isExteriorRing: boolean;
   contourId?: number;
+  // Sweep line node of a left event while its segment is in the sweep line
+  node: Node<SweepEvent, unknown> | null;
 
   /**
    * Sweepline event
@@ -41,6 +44,7 @@ export default class SweepEvent {
     this.otherPos = -1;
     this.outputContourId = -1;
     this.isExteriorRing = true;
+    this.node = null;
   }
 
 

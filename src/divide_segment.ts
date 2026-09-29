@@ -2,12 +2,12 @@ import SweepEvent from "./sweep_event";
 import equals from "./equals";
 import compareEvents from "./compare_events";
 import { Position } from "./types";
-import Queue from "tinyqueue";
+import EventQueue from "./event_queue";
 
 export default function divideSegment(
   se: SweepEvent,
   p: Position,
-  queue: Queue<SweepEvent>
+  queue: Pick<EventQueue, "push">
 ) {
   const r = new SweepEvent(p, false, se, se.isSubject);
   const l = new SweepEvent(p, true, se.otherEvent!, se.isSubject);

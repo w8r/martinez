@@ -1,6 +1,6 @@
-import Queue from "tinyqueue";
 import SweepEvent from "./sweep_event";
 import compareEvents from "./compare_events";
+import EventQueue from "./event_queue";
 import { DIFFERENCE } from "./operation";
 import { Position, Polygon, MultiPolygon, BBox } from "./types";
 
@@ -13,7 +13,7 @@ function processPolygon(
   contourOrHole: Position[],
   isSubject: boolean,
   depth: number,
-  Q: any,
+  Q: SweepEvent[],
   bbox: BBox,
   isExteriorRing: boolean
 ): void {
@@ -57,10 +57,7 @@ function processPolygon(
     bbox[2] = max(bbox[2], x);
     bbox[3] = max(bbox[3], y);
 
-    // Pushing it so the queue is sorted from left to right,
-    // with object on the left having the highest priority.
-    Q.push(e1);
-    Q.push(e2);
+    Q.push(e1, e2);
   }
 }
 
@@ -71,7 +68,7 @@ export default function fillQueue(
   cbbox: BBox,
   operation: number
 ) {
-  const eventQueue = new Queue(undefined, compareEvents);
+  const events: SweepEvent[] = [];
   let polygonSet: Polygon,
     isExteriorRing: boolean,
     i: number,
@@ -88,7 +85,7 @@ export default function fillQueue(
         polygonSet[j],
         true,
         contourId,
-        eventQueue,
+        events,
         sbbox,
         isExteriorRing
       );
@@ -105,12 +102,13 @@ export default function fillQueue(
         polygonSet[j],
         false,
         contourId,
-        eventQueue,
+        events,
         cbbox,
         isExteriorRing
       );
     }
   }
 
-  return eventQueue;
+  // Sorted from left to right, with the leftmost event processed first.
+  return new EventQueue(events.sort(compareEvents));
 }
