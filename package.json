@@ -21,7 +21,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "bench": "vitest bench",
+    "bench": "vite build && vitest bench --run --reporter verbose",
     "lint": "oxlint src test bench demo",
     "typecheck": "tsc --noEmit",
     "dev": "vite --mode demo",
@@ -56,8 +56,8 @@
     "@types/glob": "^8.1.0",
     "@types/jsts": "0.17.24",
     "@types/leaflet": "1.9.21",
-    "@types/node": "^20.0.0",
-    "@vitest/ui": "^1.0.0",
+    "@types/node": "^22.20.4",
+    "@vitest/ui": "^5.0.2",
     "benchmark": "^2.1.4",
     "geojson-project": "^1.0.0",
     "gh-pages": "^6.1.1",
@@ -68,9 +68,9 @@
     "lil-gui": "^0.21.0",
     "oxlint": "^0.9.10",
     "typescript": "^5.0.0",
-    "vite": "^5.0.0",
+    "vite": "^8.3.1",
     "vite-plugin-dts": "^3.0.0",
-    "vitest": "^1.0.0"
+    "vitest": "^5.0.2"
   },
   "dependencies": {
     "robust-predicates": "^2.0.4",
