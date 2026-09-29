@@ -2,6 +2,7 @@ import { test } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import jstsUnion from '@turf/union';
+import polygonClipping from 'polygon-clipping';
 // Benchmark the built bundle (`npm run bench` builds it first): run from
 // source, Vite's module runner wraps every internal import in a getter and
 // that overhead would be measured too.
@@ -36,6 +37,12 @@ test('Hole_Hole union', async ({ bench }) => {
     }),
     bench('JSTS', () => {
       jstsUnion(hole_hole.features[0], hole_hole.features[1]);
+    }),
+    bench('polygon-clipping', () => {
+      polygonClipping.union(
+        hole_hole.features[0].geometry.coordinates,
+        hole_hole.features[1].geometry.coordinates
+      );
     })
   );
 });
@@ -50,6 +57,12 @@ test('Asia union', async ({ bench }) => {
     }),
     bench('JSTS', () => {
       jstsUnion(asia.features[0], unionPoly);
+    }),
+    bench('polygon-clipping', () => {
+      polygonClipping.union(
+        asia.features[0].geometry.coordinates,
+        unionPoly.geometry.coordinates
+      );
     })
   );
 });
@@ -64,6 +77,12 @@ test('States clip', async ({ bench }) => {
     }),
     bench('JSTS', () => {
       jstsUnion(states.features[0], states.features[1]);
+    }),
+    bench('polygon-clipping', () => {
+      polygonClipping.union(
+        states.features[0].geometry.coordinates,
+        states.features[1].geometry.coordinates
+      );
     })
   );
 });
