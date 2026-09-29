@@ -61,6 +61,13 @@ JSTS x 100 ops/sec ±2.54% (73 runs sampled)
 
 The algorithm of Martinez et al. was extended to work with multipolygons without cascading.
 
+### Demos
+
+`npm run dev` starts the demos:
+
+- `demo/index.html`: interactive map where you can edit the polygons.
+- `demo/cases.html`: test case viewer. Pick any case from `test/genericTestCases` or `test/fixtures` and an operation to see the inputs, the computed result and, for generic test cases, whether it matches the expected result. Use ←/→ to step through cases, keys 1–5 to switch the operation, and F to fit the view. The selection is kept in the URL, so a case can be linked, e.g. `cases.html#generic%2Fissue155/xor`.
+
 ### Authors
 
 - [Alexander Milevski](https://github.com/w8r/)

@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
           input: {
             main: resolve(__dirname, "demo/index.html"),
             orthogonal: resolve(__dirname, "demo/orthogonal.html"),
+            cases: resolve(__dirname, "demo/cases.html"),
           },
         },
       },
