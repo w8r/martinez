@@ -28,9 +28,14 @@ const PAIRS: Record<string, string> = {
 const caseName = (path: string) =>
   path.replace("../test/", "").replace("genericTestCases/", "generic/").replace(".geojson", "");
 const pathByName = new Map(Object.keys(sources).map((p) => [caseName(p), p]));
-const names = [...pathByName.keys()].sort((a, b) =>
-  a.startsWith("generic/") === b.startsWith("generic/") ? a.localeCompare(b) : a.startsWith("generic/") ? -1 : 1
-);
+// Stress test: Asia against a copy of itself shifted east by params.shift
+const SHIFTED = "synthetic/asia shifted";
+const names = [
+  ...[...pathByName.keys()].sort((a, b) =>
+    a.startsWith("generic/") === b.startsWith("generic/") ? a.localeCompare(b) : a.startsWith("generic/") ? -1 : 1
+  ),
+  SHIFTED,
+];
 
 const toMultiPolygon = (geometry: any): MultiPolygon =>
   geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
@@ -46,7 +51,14 @@ function centralBox(mp: MultiPolygon): MultiPolygon {
   return [[[[x0 + dx, y0 + dy], [x1 - dx, y0 + dy], [x1 - dx, y1 - dy], [x0 + dx, y1 - dy], [x0 + dx, y0 + dy]]]];
 }
 
+const shiftBy = (mp: MultiPolygon, dx: number): MultiPolygon =>
+  mp.map((polygon) => polygon.map((ring) => ring.map(([x, y]) => [x + dx, y] as Position)));
+
 async function loadCase(name: string): Promise<TestCase> {
+  if (name === SHIFTED) {
+    const subject = toMultiPolygon((await loadFeatures("fixtures/asia"))[0].geometry);
+    return { subject, clipping: shiftBy(subject, params.shift), expected: {}, note: "clipping: fixtures/asia shifted east (use the shift slider)" };
+  }
   const features = (await loadFeatures(name)).filter((f) => f.geometry);
   const expected: TestCase["expected"] = {};
   for (const f of features.slice(2)) {
@@ -181,6 +193,7 @@ const params = {
   result: true,
   expected: true,
   vertices: false,
+  shift: 0.05,
   fit,
   previous: () => step(-1),
   next: () => step(1),
@@ -234,8 +247,20 @@ async function selectCase(name: string, keepOperation = false) {
   // Switch to an operation the case has an expectation for
   const ops = Object.keys(tc.expected) as Operation[];
   if (!keepOperation && ops.length && !ops.includes(params.operation)) params.operation = ops[0];
+  shiftController.show(name === SHIFTED);
   fit();
   compute();
+}
+
+// Recompute live while the shift slider moves, at most once per frame
+let shiftFrame = 0;
+function onShift() {
+  if (!current || params.case !== SHIFTED || shiftFrame) return;
+  shiftFrame = requestAnimationFrame(() => {
+    shiftFrame = 0;
+    current!.clipping = shiftBy(current!.subject, params.shift);
+    compute();
+  });
 }
 
 function step(delta: number) {
@@ -252,6 +277,7 @@ const gui = new GUI({ title: "Martinez test cases" });
 const blur = () => (document.activeElement as HTMLElement | null)?.blur();
 gui.add(params, "case", names).name("test case").onChange((name: string) => { blur(); selectCase(name); });
 gui.add(params, "operation", OPERATIONS).onChange(() => { blur(); compute(); });
+const shiftController = gui.add(params, "shift", 0, 2, 0.01).name("shift (°)").onChange(onShift).hide();
 const nav = gui.addFolder("Navigate");
 nav.add(params, "previous").name("← previous case");
 nav.add(params, "next").name("next case →");
@@ -313,7 +339,7 @@ window.addEventListener("resize", draw);
 // Selection lives in the URL, e.g. #generic%2Fissue155/union
 function selectFromHash() {
   const [hashCase, hashOp] = location.hash.slice(1).split("/").map(decodeURIComponent);
-  if (hashCase && pathByName.has(hashCase)) params.case = hashCase;
+  if (hashCase && names.includes(hashCase)) params.case = hashCase;
   if (OPERATIONS.includes(hashOp as Operation)) params.operation = hashOp as Operation;
   selectCase(params.case, Boolean(hashOp));
 }

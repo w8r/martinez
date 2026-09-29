@@ -28,6 +28,8 @@ const writer = new GeoJSONWriter();
 // Same work as the others: GeoJSON coordinates in, GeoJSON coordinates out
 const jstsUnion2 = (a: any, b: any) =>
   writer.write(reader.read(a.geometry ?? a).union(reader.read(b.geometry ?? b)));
+const jstsDiff = (a: any, b: any) =>
+  writer.write(reader.read(a.geometry ?? a).difference(reader.read(b.geometry ?? b)));
 
 const loadJSON = (filePath: string) => JSON.parse(readFileSync(filePath, 'utf-8'));
 
@@ -36,6 +38,17 @@ const hole_hole = loadJSON(join(__dirname, '../test/fixtures/hole_hole.geojson')
 const asia = loadJSON(join(__dirname, '../test/fixtures/asia.geojson'));
 const unionPoly = loadJSON(join(__dirname, '../test/fixtures/asia_unionPoly.geojson'));
 const states = loadJSON(join(__dirname, '../test/fixtures/states_source.geojson'));
+
+// Stress test: Asia against itself shifted 0.05° east. Every coastline
+// crosses its shifted copy many times, so almost every edge is subdivided.
+const SHIFT = 0.05;
+const asiaGeometry = asia.features[0].geometry;
+const asiaShifted = {
+  type: asiaGeometry.type,
+  coordinates: asiaGeometry.coordinates.map((polygon: number[][][]) =>
+    polygon.map((ring) => ring.map(([x, y]) => [x + SHIFT, y]))
+  ),
+};
 
 test('Hole_Hole union', async ({ bench }) => {
   await bench.compare(
@@ -111,6 +124,40 @@ test('States clip', async ({ bench }) => {
         states.features[0].geometry.coordinates,
         states.features[1].geometry.coordinates
       );
+    })
+  );
+});
+
+test('Asia vs shifted Asia: union', async ({ bench }) => {
+  await bench.compare(
+    bench('Martinez', () => {
+      martinez.union(asiaGeometry.coordinates, asiaShifted.coordinates);
+    }),
+    bench('JSTS 2.12 (direct)', () => {
+      jstsUnion2(asiaGeometry, asiaShifted);
+    }),
+    bench('polyclip-ts', () => {
+      polyclip.union(asiaGeometry.coordinates, asiaShifted.coordinates);
+    }),
+    bench('polygon-clipping', () => {
+      polygonClipping.union(asiaGeometry.coordinates, asiaShifted.coordinates);
+    })
+  );
+});
+
+test('Asia vs shifted Asia: difference', async ({ bench }) => {
+  await bench.compare(
+    bench('Martinez', () => {
+      martinez.diff(asiaGeometry.coordinates, asiaShifted.coordinates);
+    }),
+    bench('JSTS 2.12 (direct)', () => {
+      jstsDiff(asiaGeometry, asiaShifted);
+    }),
+    bench('polyclip-ts', () => {
+      polyclip.difference(asiaGeometry.coordinates, asiaShifted.coordinates);
+    }),
+    bench('polygon-clipping', () => {
+      polygonClipping.difference(asiaGeometry.coordinates, asiaShifted.coordinates);
     })
   );
 });
