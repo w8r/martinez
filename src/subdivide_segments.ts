@@ -48,6 +48,7 @@ export default function subdivide(
       next = sweepLine.next(next);
 
       const prevEvent = prev ? prev.key : null;
+      const queueLength = eventQueue.length;
       let prevprevEvent;
       computeFields(event, prevEvent, operation);
       if (next) {
@@ -73,16 +74,17 @@ export default function subdivide(
       // precede this one (e.g. the left half of a segment divided exactly at
       // our left endpoint). Our fields were computed without them, so take
       // this event out and process it again after them (#155).
-      const top = eventQueue.peek();
-      if (
-        top &&
-        equals(top.point, event.point) &&
-        compareEvents(top, event) === -1 &&
-        compareEvents(event, top) === 1
-      ) {
-        sweepLine.remove(event);
-        sortedEvents.pop();
-        eventQueue.push(event);
+      if (eventQueue.length > queueLength) {
+        const top = eventQueue.peek()!;
+        if (
+          equals(top.point, event.point) &&
+          compareEvents(top, event) === -1 &&
+          compareEvents(event, top) === 1
+        ) {
+          sweepLine.remove(event);
+          sortedEvents.pop();
+          eventQueue.push(event);
+        }
       }
     } else {
       event = event.otherEvent;
