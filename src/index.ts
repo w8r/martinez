@@ -1,6 +1,7 @@
 import subdivideSegments from "./subdivide_segments";
 import connectEdges from "./connect_edges";
 import fillQueue from "./fill_queue";
+import isDegenerateRing from "./is_degenerate_ring";
 import { INTERSECTION, DIFFERENCE, UNION, XOR } from "./operation";
 import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 
@@ -49,6 +50,31 @@ function compareBBoxes(
   return result;
 }
 
+/**
+ * Drops rings that enclose no area, and polygons whose exterior ring does
+ * not. They contribute nothing to the result but confuse edge connection
+ * (#65). Returns the input unchanged when there is nothing to drop.
+ */
+function removeDegenerateRings(multiPolygon: MultiPolygon): MultiPolygon {
+  let result: MultiPolygon | null = null;
+  for (let i = 0; i < multiPolygon.length; i++) {
+    const polygon = multiPolygon[i];
+    let kept: Polygon | null = null;
+    for (let j = 0; j < polygon.length; j++) {
+      const degenerate = isDegenerateRing(polygon[j]);
+      if (degenerate && kept === null) kept = polygon.slice(0, j);
+      else if (!degenerate && kept !== null) kept.push(polygon[j]);
+      if (degenerate && j === 0) break;
+    }
+    if (kept !== null && result === null) result = multiPolygon.slice(0, i);
+    if (result !== null) {
+      const cleaned = kept === null ? polygon : kept;
+      if (cleaned.length > 0) result.push(cleaned);
+    }
+  }
+  return result === null ? multiPolygon : result;
+}
+
 export default function boolean(
   subject: Geometry,
   clipping: Geometry,
@@ -63,6 +89,8 @@ export default function boolean(
   if (typeof clipping[0][0][0] === "number") {
     clippingMP = [clipping as Polygon];
   }
+  subjectMP = removeDegenerateRings(subjectMP);
+  clippingMP = removeDegenerateRings(clippingMP);
   let trivial = trivialOperation(subjectMP, clippingMP, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
@@ -97,13 +125,15 @@ export default function boolean(
   const polygons = [];
   for (let i = 0; i < contours.length; i++) {
     let contour = contours[i];
-    if (contour.isExterior()) {
+    if (contour.isExterior() && !isDegenerateRing(contour.points)) {
       // The exterior ring goes first
       let rings = [contour.points];
       // Followed by holes if any
       for (let j = 0; j < contour.holeIds.length; j++) {
         let holeId = contour.holeIds[j];
-        rings.push(contours[holeId].points);
+        if (!isDegenerateRing(contours[holeId].points)) {
+          rings.push(contours[holeId].points);
+        }
       }
       polygons.push(rings);
     }

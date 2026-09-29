@@ -23,9 +23,14 @@ function processPolygon(
     s2: Position,
     e1: SweepEvent,
     e2: SweepEvent;
-  for (i = 0, len = contourOrHole.length - 1; i < len; i++) {
+  // Rings are expected to be closed (first point repeated at the end), but
+  // an unclosed ring gets its closing edge added implicitly (#57).
+  const last = contourOrHole.length - 1;
+  const first = contourOrHole[0];
+  const closed = first[0] === contourOrHole[last][0] && first[1] === contourOrHole[last][1];
+  for (i = 0, len = closed ? last : last + 1; i < len; i++) {
     s1 = contourOrHole[i];
-    s2 = contourOrHole[i + 1];
+    s2 = i < last ? contourOrHole[i + 1] : first;
     e1 = new SweepEvent(s1, false, undefined, isSubject);
     e2 = new SweepEvent(s2, false, e1, isSubject);
     e1.otherEvent = e2;
