@@ -79,6 +79,21 @@ The algorithm of Martinez et al. was extended to work with multipolygons without
 
 - [A new algorithm for computing Boolean operations on polygons](http://www.sciencedirect.com/science/article/pii/S0965997813000379) (2008, 2013) by Francisco Martinez, Antonio Jesus Rueda, Francisco Ramon Feito (and its C++ code)
 
+### Related projects
+
+Other JavaScript implementations of the Martinez–Rueda–Feito algorithm:
+
+- [polygon-clipping](https://github.com/mfogel/polygon-clipping) by Mike Fogel was forked from this
+  repository in February 2018 (see its license) and developed separately since. It snaps coordinates
+  and intersection points to previously seen values within floating-point precision, and caps the
+  sizes of its internal structures as a guard against infinite loops. Latest release: 0.15.7
+  (December 2023).
+- [polyclip-ts](https://github.com/luizbarboza/polyclip-ts) by Luiz Barboza is a TypeScript fork of
+  polygon-clipping, and so, indirectly, of this repository. It computes with arbitrary-precision
+  decimals (bignumber.js) and is the engine behind `@turf/union` and the other Turf 7 boolean operations.
+
+See [Benchmarks](#benchmarks) for how they compare in speed on the same inputs.
+
 ### License
 
 The MIT License (MIT)
