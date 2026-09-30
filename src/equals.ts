@@ -1,4 +1,4 @@
-import { Position } from './types';
+import { Position } from "./types";
 
 export default function equals(p1: Position, p2: Position): boolean {
   if (p1[0] === p2[0]) {

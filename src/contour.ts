@@ -1,4 +1,4 @@
-import { Position } from './types';
+import { Position } from "./types";
 
 export default class Contour {
   public points: Position[];
@@ -22,5 +22,4 @@ export default class Contour {
   isExterior(): boolean {
     return this.holeOf == null;
   }
-
 }

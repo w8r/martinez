@@ -5,8 +5,11 @@ declare module "robust-predicates" {
    * counter-clockwise, positive if clockwise, zero if the points are collinear.
    */
   export function orient2d(
-    ax: number, ay: number,
-    bx: number, by: number,
-    cx: number, cy: number
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number,
+    cx: number,
+    cy: number,
   ): number;
 }

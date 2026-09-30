@@ -47,7 +47,7 @@ declare module "leaflet" {
       function (this: any) {
         window.LAYER = this.options.callback.call(map.editTools);
       },
-      this
+      this,
     );
 
     return container;

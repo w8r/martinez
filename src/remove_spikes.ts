@@ -1,5 +1,5 @@
-import equals from './equals';
-import { Position } from './types';
+import equals from "./equals";
+import { Position } from "./types";
 
 /**
  * Removes zero-width spikes (A -> B -> A) and repeated consecutive points

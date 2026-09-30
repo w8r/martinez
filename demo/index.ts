@@ -127,14 +127,14 @@ const map = (window.map = L.map("image-map", {
 map.addControl(
   new (L as any).NewPolygonControl({
     callback: (map as any).editTools.startPolygon,
-  })
+  }),
 );
 map.addControl(new (L.Control as any).Coordinates());
 map.addControl(
   new (L as any).BooleanControl({
     callback: run,
     clear: clear,
-  })
+  }),
 );
 
 const drawnItems = (window.drawnItems = L.geoJSON().addTo(map));
@@ -161,16 +161,14 @@ const reader = new jsts.io.GeoJSONReader();
 const writer = new jsts.io.GeoJSONWriter();
 
 function getClippingPoly(layers: L.Layer[]): any {
-  if (rawData !== null && rawData.features.length > 1)
-    return rawData.features[1];
+  if (rawData !== null && rawData.features.length > 1) return rawData.features[1];
   return (layers[1] as any).toGeoJSON();
 }
 
 function run(op: number) {
   const layers = drawnItems.getLayers();
   if (layers.length < 2) return;
-  let subject =
-    rawData !== null ? rawData.features[0] : (layers[0] as any).toGeoJSON();
+  let subject = rawData !== null ? rawData.features[0] : (layers[0] as any).toGeoJSON();
   let clipping = getClippingPoly(layers);
 
   let operation: (a: any, b: any) => any;
@@ -191,10 +189,7 @@ function run(op: number) {
   }
 
   console.time("martinez");
-  const result = operation(
-    subject.geometry.coordinates,
-    clipping.geometry.coordinates
-  );
+  const result = operation(subject.geometry.coordinates, clipping.geometry.coordinates);
   console.timeEnd("martinez");
 
   console.log("result", result);
@@ -232,10 +227,7 @@ function run(op: number) {
 map.on("editable:created", function (evt: any) {
   drawnItems.addLayer(evt.layer);
   evt.layer.on("click", function (this: any, e: any) {
-    if (
-      (e.originalEvent.ctrlKey || e.originalEvent.metaKey) &&
-      this.editEnabled()
-    ) {
+    if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
       this.editor.newHole(e.latlng);
     }
   });

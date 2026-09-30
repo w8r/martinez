@@ -17,7 +17,7 @@ interface TestCase {
 
 const sources = import.meta.glob<string>(
   ["../test/genericTestCases/*.geojson", "../test/fixtures/*.geojson"],
-  { query: "?raw", import: "default" }
+  { query: "?raw", import: "default" },
 );
 
 // Fixtures with a single feature: pair them up, or clip against a box
@@ -32,7 +32,11 @@ const pathByName = new Map(Object.keys(sources).map((p) => [caseName(p), p]));
 const SHIFTED = "synthetic/asia shifted";
 const names = [
   ...[...pathByName.keys()].sort((a, b) =>
-    a.startsWith("generic/") === b.startsWith("generic/") ? a.localeCompare(b) : a.startsWith("generic/") ? -1 : 1
+    a.startsWith("generic/") === b.startsWith("generic/")
+      ? a.localeCompare(b)
+      : a.startsWith("generic/")
+        ? -1
+        : 1,
   ),
   SHIFTED,
 ];
@@ -47,8 +51,19 @@ async function loadFeatures(name: string): Promise<any[]> {
 
 function centralBox(mp: MultiPolygon): MultiPolygon {
   const [x0, y0, x1, y1] = bounds([mp]);
-  const dx = (x1 - x0) / 4, dy = (y1 - y0) / 4;
-  return [[[[x0 + dx, y0 + dy], [x1 - dx, y0 + dy], [x1 - dx, y1 - dy], [x0 + dx, y1 - dy], [x0 + dx, y0 + dy]]]];
+  const dx = (x1 - x0) / 4,
+    dy = (y1 - y0) / 4;
+  return [
+    [
+      [
+        [x0 + dx, y0 + dy],
+        [x1 - dx, y0 + dy],
+        [x1 - dx, y1 - dy],
+        [x0 + dx, y1 - dy],
+        [x0 + dx, y0 + dy],
+      ],
+    ],
+  ];
 }
 
 const shiftBy = (mp: MultiPolygon, dx: number): MultiPolygon =>
@@ -57,20 +72,37 @@ const shiftBy = (mp: MultiPolygon, dx: number): MultiPolygon =>
 async function loadCase(name: string): Promise<TestCase> {
   if (name === SHIFTED) {
     const subject = toMultiPolygon((await loadFeatures("fixtures/asia"))[0].geometry);
-    return { subject, clipping: shiftBy(subject, params.shift), expected: {}, note: "clipping: fixtures/asia shifted east (use the shift slider)" };
+    return {
+      subject,
+      clipping: shiftBy(subject, params.shift),
+      expected: {},
+      note: "clipping: fixtures/asia shifted east (use the shift slider)",
+    };
   }
   const features = (await loadFeatures(name)).filter((f) => f.geometry);
   const expected: TestCase["expected"] = {};
   for (const f of features.slice(2)) {
-    if (f.properties?.operation) expected[f.properties.operation as Operation] = f.geometry.coordinates;
+    if (f.properties?.operation)
+      expected[f.properties.operation as Operation] = f.geometry.coordinates;
   }
   const subject = toMultiPolygon(features[0].geometry);
-  if (features.length > 1) return { subject, clipping: toMultiPolygon(features[1].geometry), expected };
+  if (features.length > 1)
+    return { subject, clipping: toMultiPolygon(features[1].geometry), expected };
   if (PAIRS[name]) {
     const other = await loadFeatures(PAIRS[name]);
-    return { subject, clipping: toMultiPolygon(other[0].geometry), expected, note: `clipping: ${PAIRS[name]}` };
+    return {
+      subject,
+      clipping: toMultiPolygon(other[0].geometry),
+      expected,
+      note: `clipping: ${PAIRS[name]}`,
+    };
   }
-  return { subject, clipping: centralBox(subject), expected, note: "clipping: central box of the bounds" };
+  return {
+    subject,
+    clipping: centralBox(subject),
+    expected,
+    note: "clipping: central box of the bounds",
+  };
 }
 
 function run(tc: TestCase, op: Operation): MultiPolygon | null {
@@ -90,15 +122,20 @@ let result: MultiPolygon | null = null;
 let mouse: Position | null = null;
 
 function bounds(sets: (MultiPolygon | null | undefined)[]): [number, number, number, number] {
-  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  let x0 = Infinity,
+    y0 = Infinity,
+    x1 = -Infinity,
+    y1 = -Infinity;
   for (const mp of sets) {
     if (!mp) continue;
-    for (const poly of mp) for (const ring of poly) for (const [x, y] of ring) {
-      if (x < x0) x0 = x;
-      if (y < y0) y0 = y;
-      if (x > x1) x1 = x;
-      if (y > y1) y1 = y;
-    }
+    for (const poly of mp)
+      for (const ring of poly)
+        for (const [x, y] of ring) {
+          if (x < x0) x0 = x;
+          if (y < y0) y0 = y;
+          if (x > x1) x1 = x;
+          if (y > y1) y1 = y;
+        }
   }
   return [x0, y0, x1, y1];
 }
@@ -107,27 +144,36 @@ function fit() {
   if (!current) return;
   const [x0, y0, x1, y1] = bounds([current.subject, current.clipping]);
   // Keep clear of the controls on the right
-  const pad = 40, panel = gui.domElement.offsetWidth + pad;
-  const w = canvas.clientWidth - panel, h = canvas.clientHeight;
+  const pad = 40,
+    panel = gui.domElement.offsetWidth + pad;
+  const w = canvas.clientWidth - panel,
+    h = canvas.clientHeight;
   view.scale = Math.min((w - 2 * pad) / (x1 - x0 || 1), (h - 2 * pad) / (y1 - y0 || 1));
   view.x = (x0 + x1) / 2 - w / 2 / view.scale;
   view.y = (y0 + y1) / 2 + h / 2 / view.scale;
   draw();
 }
 
-const toScreen = (p: Position): Position => [(p[0] - view.x) * view.scale, (view.y - p[1]) * view.scale];
-const toWorld = (sx: number, sy: number): Position => [sx / view.scale + view.x, view.y - sy / view.scale];
+const toScreen = (p: Position): Position => [
+  (p[0] - view.x) * view.scale,
+  (view.y - p[1]) * view.scale,
+];
+const toWorld = (sx: number, sy: number): Position => [
+  sx / view.scale + view.x,
+  view.y - sy / view.scale,
+];
 
 function tracePolygons(mp: MultiPolygon) {
   ctx.beginPath();
-  for (const poly of mp) for (const ring of poly) {
-    ring.forEach((p, i) => {
-      const [x, y] = toScreen(p);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-  }
+  for (const poly of mp)
+    for (const ring of poly) {
+      ring.forEach((p, i) => {
+        const [x, y] = toScreen(p);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+    }
 }
 
 function fillLayer(mp: MultiPolygon | null | undefined, fill: string) {
@@ -137,7 +183,12 @@ function fillLayer(mp: MultiPolygon | null | undefined, fill: string) {
   ctx.fill("evenodd");
 }
 
-function strokeLayer(mp: MultiPolygon | null | undefined, stroke: string, width: number, dash: number[] = []) {
+function strokeLayer(
+  mp: MultiPolygon | null | undefined,
+  stroke: string,
+  width: number,
+  dash: number[] = [],
+) {
   if (!mp) return;
   tracePolygons(mp);
   ctx.setLineDash(dash);
@@ -150,15 +201,18 @@ function strokeLayer(mp: MultiPolygon | null | undefined, stroke: string, width:
 function drawVertices(mp: MultiPolygon | null | undefined, color: string) {
   if (!mp) return;
   ctx.fillStyle = color;
-  for (const poly of mp) for (const ring of poly) for (const p of ring) {
-    const [x, y] = toScreen(p);
-    ctx.fillRect(x - 2, y - 2, 4, 4);
-  }
+  for (const poly of mp)
+    for (const ring of poly)
+      for (const p of ring) {
+        const [x, y] = toScreen(p);
+        ctx.fillRect(x - 2, y - 2, 4, 4);
+      }
 }
 
 function draw() {
   const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth, h = canvas.clientHeight;
+  const w = canvas.clientWidth,
+    h = canvas.clientHeight;
   if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
     canvas.width = w * dpr;
     canvas.height = h * dpr;
@@ -204,8 +258,13 @@ const info = { time: "", output: "", expected: "" };
 
 function countRings(mp: MultiPolygon | null) {
   if (!mp) return "null";
-  let rings = 0, vertices = 0;
-  for (const poly of mp) for (const ring of poly) { rings++; vertices += ring.length; }
+  let rings = 0,
+    vertices = 0;
+  for (const poly of mp)
+    for (const ring of poly) {
+      rings++;
+      vertices += ring.length;
+    }
   return `${mp.length} polygons, ${rings} rings, ${vertices} vertices`;
 }
 
@@ -221,9 +280,12 @@ function compute() {
   }
   info.time = `${(performance.now() - t0).toFixed(2)} ms`;
   const exp = current.expected[params.operation];
-  info.expected = exp === undefined
-    ? "no expectation"
-    : JSON.stringify(exp) === JSON.stringify(result) ? "✓ matches" : "✗ differs";
+  info.expected =
+    exp === undefined
+      ? "no expectation"
+      : JSON.stringify(exp) === JSON.stringify(result)
+        ? "✓ matches"
+        : "✗ differs";
   gui.controllersRecursive().forEach((c) => c.updateDisplay());
   const hash = `#${encodeURIComponent(params.case)}/${params.operation}`;
   if (location.hash !== hash) history.replaceState(null, "", hash);
@@ -275,9 +337,22 @@ const gui = new GUI({ title: "Martinez test cases" });
 // Give focus back to the page after picking from a dropdown, otherwise the
 // arrow keys keep changing the dropdown instead of navigating cases
 const blur = () => (document.activeElement as HTMLElement | null)?.blur();
-gui.add(params, "case", names).name("test case").onChange((name: string) => { blur(); selectCase(name); });
-gui.add(params, "operation", OPERATIONS).onChange(() => { blur(); compute(); });
-const shiftController = gui.add(params, "shift", 0, 2, 0.01).name("shift (°)").onChange(onShift).hide();
+gui
+  .add(params, "case", names)
+  .name("test case")
+  .onChange((name: string) => {
+    blur();
+    selectCase(name);
+  });
+gui.add(params, "operation", OPERATIONS).onChange(() => {
+  blur();
+  compute();
+});
+const shiftController = gui
+  .add(params, "shift", 0, 2, 0.01)
+  .name("shift (°)")
+  .onChange(onShift)
+  .hide();
 const nav = gui.addFolder("Navigate");
 nav.add(params, "previous").name("← previous case");
 nav.add(params, "next").name("next case →");
@@ -316,14 +391,18 @@ canvas.addEventListener("pointerup", () => {
   drag = null;
   canvas.classList.remove("dragging");
 });
-canvas.addEventListener("wheel", (e) => {
-  e.preventDefault();
-  const [wx, wy] = toWorld(e.offsetX, e.offsetY);
-  view.scale *= Math.exp(-e.deltaY * 0.002);
-  view.x = wx - e.offsetX / view.scale;
-  view.y = wy + e.offsetY / view.scale;
-  draw();
-}, { passive: false });
+canvas.addEventListener(
+  "wheel",
+  (e) => {
+    e.preventDefault();
+    const [wx, wy] = toWorld(e.offsetX, e.offsetY);
+    view.scale *= Math.exp(-e.deltaY * 0.002);
+    view.x = wx - e.offsetX / view.scale;
+    view.y = wy + e.offsetY / view.scale;
+    draw();
+  },
+  { passive: false },
+);
 window.addEventListener("keydown", (e) => {
   if (e.target instanceof Element && e.target.closest(".lil-gui")) return;
   if (e.key === "ArrowLeft") step(-1);

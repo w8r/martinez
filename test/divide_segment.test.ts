@@ -16,38 +16,21 @@ import { INTERSECTION } from "../src/operation";
 import { Position } from "../src/types";
 
 // GeoJSON Data
-const shapes = JSON.parse(
-  readFileSync(join(__dirname, "fixtures", "two_shapes.geojson"), "utf-8")
-);
+const shapes = JSON.parse(readFileSync(join(__dirname, "fixtures", "two_shapes.geojson"), "utf-8"));
 
 const subject = shapes.features[0];
 const clipping = shapes.features[1];
 
 describe("divide segments", () => {
   it("should divide 2 segments", () => {
-    const se1 = new SweepEvent(
-      [0, 0],
-      true,
-      new SweepEvent([5, 5], false),
-      true
-    );
-    const se2 = new SweepEvent(
-      [0, 5],
-      true,
-      new SweepEvent([5, 0], false),
-      false
-    );
+    const se1 = new SweepEvent([0, 0], true, new SweepEvent([5, 5], false), true);
+    const se2 = new SweepEvent([0, 5], true, new SweepEvent([5, 0], false), false);
     const q = new Queue(undefined, compareEvents);
 
     q.push(se1);
     q.push(se2);
 
-    const iter = intersection(
-      se1.point,
-      se1.otherEvent!.point,
-      se2.point,
-      se2.otherEvent!.point
-    );
+    const iter = intersection(se1.point, se1.otherEvent!.point, se2.point, se2.otherEvent!.point);
 
     divideSegment(se1, iter![0], q);
     divideSegment(se2, iter![0], q);
@@ -61,18 +44,8 @@ describe("divide segments", () => {
 
     const q = new Queue(undefined, compareEvents);
 
-    const se1 = new SweepEvent(
-      s[0][3],
-      true,
-      new SweepEvent(s[0][2], false),
-      true
-    );
-    const se2 = new SweepEvent(
-      c[0][0],
-      true,
-      new SweepEvent(c[0][1], false),
-      false
-    );
+    const se1 = new SweepEvent(s[0][3], true, new SweepEvent(s[0][2], false), true);
+    const se2 = new SweepEvent(c[0][0], true, new SweepEvent(c[0][1], false), false);
 
     expect(possibleIntersection(se1, se2, q)).toBe(1);
     expect(q.length).toBe(4);
@@ -100,12 +73,7 @@ describe("divide segments", () => {
     const s = [subject.geometry.coordinates];
     const c = [clipping.geometry.coordinates];
 
-    const bbox: [number, number, number, number] = [
-      Infinity,
-      Infinity,
-      -Infinity,
-      -Infinity,
-    ];
+    const bbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
     const q = fillQueue(s, c, bbox, bbox, INTERSECTION);
     const p0 = [16, 282] as Position;
     const p1 = [298, 359] as Position;
