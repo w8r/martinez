@@ -1,6 +1,7 @@
 import compareEvents from './compare_events';
 import Contour from './contour';
 import SweepEvent from './sweep_event';
+import { Position } from './types';
 
 /**
  * @param  {SweepEvent[]} sortedEvents
@@ -53,15 +54,16 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
 
 
 /**
- * @param  {Number} pos
- * @param  {Array.<SweepEvent>} resultEvents
- * @param  {Object>}    processed
- * @return {Number}
+ * @param  {number} pos
+ * @param  {SweepEvent[]} resultEvents
+ * @param  {Uint8Array} processed
+ * @param  {number} origPos
+ * @return {number}
  */
-function nextPos(pos, resultEvents, processed, origPos) {
-  let newPos = pos + 1,
-    p = resultEvents[pos].point,
-    p1;
+function nextPos(pos: number, resultEvents: SweepEvent[], processed: Uint8Array, origPos: number): number {
+  let newPos = pos + 1;
+  const p = resultEvents[pos].point;
+  let p1: Position = p;
   const length = resultEvents.length;
 
   if (newPos < length)
@@ -88,7 +90,7 @@ function nextPos(pos, resultEvents, processed, origPos) {
 }
 
 
-function initializeContourFromContext(event, contours, contourId) {
+function initializeContourFromContext(event: SweepEvent, contours: Contour[], contourId: number): Contour {
   const contour = new Contour();
   if (event.prevInResult != null) {
     const prevInResult = event.prevInResult;
@@ -130,16 +132,16 @@ function initializeContourFromContext(event, contours, contourId) {
 }
 
 /**
- * @param  {Array.<SweepEvent>} sortedEvents
- * @return {Array.<*>} polygons
+ * @param  {SweepEvent[]} sortedEvents
+ * @return {Contour[]}
  */
-export default function connectEdges(sortedEvents) {
-  let i, len;
+export default function connectEdges(sortedEvents: SweepEvent[]): Contour[] {
+  let i: number, len: number;
   const resultEvents = orderEvents(sortedEvents);
 
   // "false"-filled array
   const processed = new Uint8Array(resultEvents.length);
-  const contours = [];
+  const contours: Contour[] = [];
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
 
@@ -151,7 +153,7 @@ export default function connectEdges(sortedEvents) {
     const contour = initializeContourFromContext(resultEvents[i], contours, contourId);
 
     // Helper function that combines marking an event as processed with assigning its output contour ID
-    const markAsProcessed = (pos) => {
+    const markAsProcessed = (pos: number) => {
       processed[pos] = 1;
       if (pos < resultEvents.length && resultEvents[pos]) {
         resultEvents[pos].outputContourId = contourId;

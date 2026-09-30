@@ -16,8 +16,8 @@ describe("compare segments", () => {
       tree.insert(se1);
       tree.insert(se2);
 
-      expect(tree.maxNode().key.otherEvent.point).toEqual([2, 3]);
-      expect(tree.minNode().key.otherEvent.point).toEqual([1, 1]);
+      expect(tree.maxNode().key!.otherEvent!.point).toEqual([2, 3]);
+      expect(tree.minNode().key!.otherEvent!.point).toEqual([1, 1]);
     });
 
     it("should sort by different left point - right point y coord", () => {
@@ -28,8 +28,8 @@ describe("compare segments", () => {
       tree.insert(se1);
       tree.insert(se2);
 
-      expect(tree.minNode().key.otherEvent.point).toEqual([1, 1]);
-      expect(tree.maxNode().key.otherEvent.point).toEqual([2, 3]);
+      expect(tree.minNode().key!.otherEvent!.point).toEqual([1, 1]);
+      expect(tree.maxNode().key!.otherEvent!.point).toEqual([2, 3]);
     });
 
     it("should maintain events order in sweep line", () => {

@@ -53,7 +53,7 @@ export default function computeFields(
 }
 
 /* eslint-disable indent */
-function inResult(event, operation) {
+function inResult(event: SweepEvent, operation: number): boolean {
   switch (event.type) {
     case NORMAL:
       switch (operation) {
@@ -81,7 +81,7 @@ function inResult(event, operation) {
 }
 /* eslint-enable indent */
 
-function determineResultTransition(event, operation) {
+function determineResultTransition(event: SweepEvent, operation: number): number {
   let thisIn = !event.inOut;
   let thatIn = !event.otherInOut;
 

@@ -3,8 +3,9 @@ import { Position } from './types';
 export default class Contour {
   public points: Position[];
   public holeIds: number[];
-  public holeOf: Contour | null;
-  public depth: number | null;
+  // Index of the exterior contour this contour is a hole of
+  public holeOf: number | null;
+  public depth: number;
 
   /**
    * Contour
@@ -15,7 +16,7 @@ export default class Contour {
     this.points = [];
     this.holeIds = [];
     this.holeOf = null;
-    this.depth = null;
+    this.depth = 0;
   }
 
   isExterior(): boolean {

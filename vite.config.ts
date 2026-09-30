@@ -54,7 +54,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       dts({
-        include: ["src/**/*", "index.ts"],
+        include: ["src/**/*", "index.ts", "types/**/*"],
         exclude: ["test/**/*", "demo/**/*", "bench/**/*"],
         rollupTypes: true,
         bundledPackages: ["robust-predicates", "splaytree", "tinyqueue"],
