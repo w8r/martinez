@@ -1,0 +1,56 @@
+var e=`{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [-1, 1],
+            [1, 1],
+            [1, -1],
+            [-1, -1],
+            [-1, -0.9],
+            [0.9, -0.9],
+            [0.9, 0.9],
+            [-1, 0.9],
+            [-1, 1]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {},
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [[[-1, 1], [-0.9, 1], [-0.9, -1], [-1, -1], [-1, 1]]],
+        "type": "Polygon"
+      },
+      "properties": {},
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              [-1, -1],
+              [-0.9, -1],
+              [1, -1],
+              [1, 1],
+              [-0.9, 1],
+              [-1, 1],
+              [-1, 0.9],
+              [-1, -0.9],
+              [-1, -1]
+            ],
+            [[-0.9, -0.9], [-0.9, 0.9], [0.9, 0.9], [0.9, -0.9], [-0.9, -0.9]]
+          ]
+        ],
+        "type": "MultiPolygon"
+      },
+      "properties": {"operation": "union"},
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}`;export{e as default};

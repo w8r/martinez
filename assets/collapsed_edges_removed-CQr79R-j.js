@@ -1,0 +1,64 @@
+var e=`{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [355, 139],
+            [420, 202],
+            [384, 237],
+            [353, 205],
+            [330, 230],
+            [330, 230],
+            [291, 197]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {},
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [355, 139],
+            [420, 202],
+            [384, 237],
+            [353, 205],
+            [330, 230],
+            [330, 230],
+            [291, 197]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {},
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              [291, 197],
+              [355, 139],
+              [420, 202],
+              [384, 237],
+              [353, 205],
+              [330, 230],
+              [291, 197]
+            ]
+          ]
+        ],
+        "type": "MultiPolygon"
+      },
+      "properties": {
+        "operation": "intersection",
+        "comment": "This test case is currently weird, because the rings aren't closed, so the operation doesn't make sense."
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}`;export{e as default};

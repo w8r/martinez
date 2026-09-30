@@ -1,0 +1,13 @@
+var e=`{
+  "type": "FeatureCollection",
+  "features": [{
+    "type": "Feature", 
+    "properties": {},
+    "geometry": { "type": "Polygon", "coordinates": [[[ -530, -530], [-530, 530], [530, 530], [530, -530], [ -530, -530]]] }
+},{
+    "type": "Feature", 
+    "properties": {},
+    "geometry": { "type": "Polygon", "coordinates": [[[1.2500125250252, -531],[-98, -531],[-98, 531],[1.250012525025, 531],[1.2500125250252, -531]]] }
+}]
+}
+`;export{e as default};
