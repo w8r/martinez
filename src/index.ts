@@ -99,15 +99,12 @@ export default function boolean(
   const sbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
   const cbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
 
-  // console.time('fill queue');
   const eventQueue = fillQueue(subjectMP, clippingMP, sbbox, cbbox, operation);
-  //console.timeEnd('fill queue');
 
   trivial = compareBBoxes(subjectMP, clippingMP, sbbox, cbbox, operation);
   if (trivial) {
     return trivial === EMPTY ? null : trivial;
   }
-  // console.time('subdivide edges');
   const sortedEvents = subdivideSegments(
     eventQueue,
     subjectMP,
@@ -116,11 +113,8 @@ export default function boolean(
     cbbox,
     operation
   );
-  //console.timeEnd('subdivide edges');
 
-  // console.time('connect vertices');
   const contours = connectEdges(sortedEvents);
-  //console.timeEnd('connect vertices');
 
   // Clean up output rings; degenerate ones become null and are left out
   const rings = contours.map((contour) => normalizeContour(contour.points));

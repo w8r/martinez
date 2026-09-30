@@ -7,6 +7,7 @@ declare module "leaflet" {
   }
 
   namespace Control {
+    // oxlint-disable-next-line no-unused-vars -- type declaration for Leaflet's typings
     class BooleanControl extends Control {
       constructor(options?: BooleanControlOptions);
       options: BooleanControlOptions;
@@ -19,7 +20,7 @@ declare module "leaflet" {
     position: "topright",
   },
 
-  onAdd: function (this: any, map: L.Map) {
+  onAdd: function (this: any, _map: L.Map) {
     const container = (this._container = L.DomUtil.create(
       "div",
       "leaflet-bar"

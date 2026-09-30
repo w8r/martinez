@@ -6,6 +6,7 @@ declare module "leaflet" {
   }
 
   namespace Control {
+    // oxlint-disable-next-line no-unused-vars -- type declaration for Leaflet's typings
     class Coordinates extends Control {
       constructor(options?: ControlOptions);
     }

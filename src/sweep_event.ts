@@ -54,11 +54,10 @@ export default class SweepEvent {
    */
   isBelow (p: Position): boolean {
     const p0 = this.point, p1 = this.otherEvent!.point;
+    // Inlined signed area of (p0, p1, p) for left events, (p1, p0, p) otherwise
     return this.left
       ? (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0
-      // signedArea(this.point, this.otherEvent.point, p) > 0 :
       : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
-      //signedArea(this.otherEvent.point, this.point, p) > 0;
   }
 
 

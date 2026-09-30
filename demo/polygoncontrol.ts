@@ -19,6 +19,7 @@ declare module "leaflet" {
       options: EditControlOptions;
     }
 
+    // oxlint-disable-next-line no-unused-vars -- type declaration for Leaflet's typings
     class NewPolygonControl extends EditControl {
       constructor(options?: EditControlOptions);
     }
