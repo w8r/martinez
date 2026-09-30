@@ -40,22 +40,21 @@ which operation do you need
 
 ### Benchmarks
 
-```
-Hole_Hole
-Martinez x 29,530 ops/sec ±1.65% (85 runs sampled)
-JSTS x 2,051 ops/sec ±2.62% (85 runs sampled)
-- Fastest is Martinez
+Operations per second, higher is better. Run `npm run bench` to reproduce: it benchmarks the built bundle against [JSTS](https://github.com/bjornharrtell/jsts), [polygon-clipping](https://github.com/mfogel/polygon-clipping) and [polyclip-ts](https://github.com/luizbarboza/polyclip-ts) (the engine behind `@turf/union` 7). All libraries produce the same result areas on these inputs.
 
-Asia union
-Martinez x 9.19 ops/sec ±3.30% (26 runs sampled)
-JSTS x 7.60 ops/sec ±4.24% (23 runs sampled)
-- Fastest is Martinez
+| Benchmark | Martinez | JSTS 2.12 | polygon-clipping 0.15 | polyclip-ts 0.16 |
+|---|---:|---:|---:|---:|
+| Hole_Hole union (20 vertices) | **68,058** | 10,549 | 28,687 | 1,712 |
+| Asia union (28k vertices) | **46.8** | 32.2 | 19.2 | 3.18 |
+| States union (2.3k vertices) | **754** | 426 | 399 | 40.2 |
+| Asia vs Asia shifted 0.05°: union | **16.2** | 5.29 | 6.06 | 0.97 |
+| Asia vs Asia shifted 0.05°: difference | **16.0** | 5.25 | 5.11 | 0.72 |
 
-States clip
-Martinez x 227 ops/sec ±1.10% (82 runs sampled)
-JSTS x 100 ops/sec ±2.54% (73 runs sampled)
-- Fastest is Martinez
-```
+Apple M3, Node 22.17. The "shifted" cases clip the Asia polygon against a copy of itself moved slightly east, so that nearly every edge intersects; `demo/cases.html` shows it with a slider for the shift.
+
+![Asia minus a copy of itself shifted 0.3° east: land in grey, the difference in red](bench/img/asia-shifted-diff.png)
+
+*The difference with a larger 0.3° shift, to make the slivers visible (the benchmark uses 0.05°).*
 
 ### Features
 

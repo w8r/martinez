@@ -5,7 +5,7 @@ import * as martinez from "../index";
 import L from "leaflet";
 import "leaflet-editable";
 import "leaflet/dist/leaflet.css";
-import * as jsts from "jsts";
+import jsts from "jsts/dist/jsts.min.js";
 
 declare global {
   interface Window {
