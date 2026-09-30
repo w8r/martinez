@@ -53,7 +53,7 @@ Operations per second, higher is better. Run `npm run bench` to reproduce: it be
 | Asia vs Asia shifted 0.05°: union      |   **16.2** |      5.29 |                  6.06 |             0.97 |
 | Asia vs Asia shifted 0.05°: difference |   **16.0** |      5.25 |                  5.11 |             0.72 |
 
-Apple M3, Node 22.17. The "shifted" cases clip the Asia polygon against a copy of itself moved slightly east, so that nearly every edge intersects; `demo/cases.html` shows it with a slider for the shift.
+Apple M3, Node 22.17. The "shifted" cases clip the Asia polygon against a copy of itself moved slightly east, so that nearly every edge intersects; [`demo/cases.html`](https://w8r.github.io/martinez/cases.html) shows it with a slider for the shift.
 
 ![Asia minus a copy of itself shifted 0.3° east: land in grey, the difference in red](bench/img/asia-shifted-diff.png)
 
