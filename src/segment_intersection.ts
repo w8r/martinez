@@ -1,4 +1,4 @@
-import { Position } from './types';
+import { Position } from "./types";
 
 /**
  * Point p + s * d, where d is the vector (dx, dy)
@@ -28,20 +28,32 @@ function toPoint(px: number, py: number, s: number, dx: number, dy: number): Pos
  * intersection. If they overlap, the two end points of the overlapping segment.
  * Otherwise, null.
  */
-export default function segmentIntersection(a1: Position, a2: Position, b1: Position, b2: Position, noEndpointTouch?: boolean): Position[] | null {
+export default function segmentIntersection(
+  a1: Position,
+  a2: Position,
+  b1: Position,
+  b2: Position,
+  noEndpointTouch?: boolean,
+): Position[] | null {
   // The algorithm expects our lines in the form P + sd, where P is a point,
   // s is on the interval [0, 1], and d is a vector.
   // We are passed two points. P can be the first point of each pair. The
   // vector, then, could be thought of as the distance (in x and y components)
   // from the first point to the second point.
   // Vectors are kept as scalar pairs to avoid allocating on this hot path.
-  const a1x = a1[0], a1y = a1[1], b1x = b1[0], b1y = b1[1];
-  const vax = a2[0] - a1x, vay = a2[1] - a1y;
-  const vbx = b2[0] - b1x, vby = b2[1] - b1y;
+  const a1x = a1[0],
+    a1y = a1[1],
+    b1x = b1[0],
+    b1y = b1[1];
+  const vax = a2[0] - a1x,
+    vay = a2[1] - a1y;
+  const vbx = b2[0] - b1x,
+    vby = b2[1] - b1y;
 
   // The rest is pretty much a straight port of the algorithm.
-  const ex = b1x - a1x, ey = b1y - a1y;
-  let kross    = vax * vby - vay * vbx;
+  const ex = b1x - a1x,
+    ey = b1y - a1y;
+  let kross = vax * vby - vay * vbx;
   let sqrKross = kross * kross;
 
   // Check for line intersection. This works because of the properties of the
@@ -84,7 +96,7 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   sqrKross = kross * kross;
 
   if (sqrKross > 0) {
-  // Lines are just parallel, not the same. No overlap.
+    // Lines are just parallel, not the same. No overlap.
     return null;
   }
 
@@ -97,7 +109,6 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   // this is, essentially, the FindIntersection acting on floats from
   // Schneider & Eberly, just inlined into this function.
   if (smin <= 1 && smax >= 0) {
-
     // overlap on an end point
     if (smin === 1) {
       return noEndpointTouch ? null : [toPoint(a1x, a1y, smin > 0 ? smin : 0, vax, vay)];
@@ -112,7 +123,7 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
     // There's overlap on a segment -- two points of intersection. Return both.
     return [
       toPoint(a1x, a1y, smin > 0 ? smin : 0, vax, vay),
-      toPoint(a1x, a1y, smax < 1 ? smax : 1, vax, vay)
+      toPoint(a1x, a1y, smax < 1 ? smax : 1, vax, vay),
     ];
   }
 

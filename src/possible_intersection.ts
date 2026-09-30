@@ -3,26 +3,17 @@ import intersection from "./segment_intersection";
 import equals, { nearlyEquals } from "./equals";
 import compareEvents from "./compare_events";
 import SweepEvent from "./sweep_event";
-import {
-  NON_CONTRIBUTING,
-  SAME_TRANSITION,
-  DIFFERENT_TRANSITION,
-} from "./edge_type";
+import { NON_CONTRIBUTING, SAME_TRANSITION, DIFFERENT_TRANSITION } from "./edge_type";
 import EventQueue from "./event_queue";
 
 export default function possibleIntersection(
   se1: SweepEvent,
   se2: SweepEvent,
-  queue: Pick<EventQueue, "push">
+  queue: Pick<EventQueue, "push">,
 ): number {
   // Segments of the same polygon are checked too: self-intersecting input
   // is allowed (skipping them "did cost us half a day" in the original port)
-  const inter = intersection(
-    se1.point,
-    se1.otherEvent!.point,
-    se2.point,
-    se2.otherEvent!.point
-  );
+  const inter = intersection(se1.point, se1.otherEvent!.point, se2.point, se2.otherEvent!.point);
 
   if (inter === null) return 0; // no intersection
   const nintersections = inter.length;
@@ -31,12 +22,7 @@ export default function possibleIntersection(
   // Otherwise nearly collinear pieces keep producing new intersection points
   // just to the right of each other and the subdivision never ends (#98).
   if (nintersections === 1) {
-    const endpoints = [
-      se1.point,
-      se1.otherEvent!.point,
-      se2.point,
-      se2.otherEvent!.point,
-    ];
+    const endpoints = [se1.point, se1.otherEvent!.point, se2.point, se2.otherEvent!.point];
     for (const p of endpoints) {
       if (nearlyEquals(inter[0], p)) {
         inter[0] = p;
@@ -48,8 +34,7 @@ export default function possibleIntersection(
   // the line segments intersect at an endpoint of both line segments
   if (
     nintersections === 1 &&
-    (equals(se1.point, se2.point) ||
-      equals(se1.otherEvent!.point, se2.otherEvent!.point))
+    (equals(se1.point, se2.point) || equals(se1.otherEvent!.point, se2.otherEvent!.point))
   ) {
     return 0;
   }
@@ -62,18 +47,12 @@ export default function possibleIntersection(
   // The line segments associated to se1 and se2 intersect
   if (nintersections === 1) {
     // if the intersection point is not an endpoint of se1
-    if (
-      !equals(se1.point, inter[0]) &&
-      !equals(se1.otherEvent!.point, inter[0])
-    ) {
+    if (!equals(se1.point, inter[0]) && !equals(se1.otherEvent!.point, inter[0])) {
       divideSegment(se1, inter[0], queue);
     }
 
     // if the intersection point is not an endpoint of se2
-    if (
-      !equals(se2.point, inter[0]) &&
-      !equals(se2.otherEvent!.point, inter[0])
-    ) {
+    if (!equals(se2.point, inter[0]) && !equals(se2.otherEvent!.point, inter[0])) {
       divideSegment(se2, inter[0], queue);
     }
     return 1;

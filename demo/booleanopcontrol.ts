@@ -21,10 +21,7 @@ declare module "leaflet" {
   },
 
   onAdd: function (this: any, _map: L.Map) {
-    const container = (this._container = L.DomUtil.create(
-      "div",
-      "leaflet-bar"
-    ));
+    const container = (this._container = L.DomUtil.create("div", "leaflet-bar"));
     this._container.style.background = "#ffffff";
     this._container.style.padding = "10px";
     container.innerHTML = [
@@ -72,7 +69,7 @@ declare module "leaflet" {
       function (this: any, evt: Event) {
         L.DomEvent.stop(evt);
         const radios = Array.prototype.slice.call(
-          form.querySelectorAll("input[type=radio]")
+          form.querySelectorAll("input[type=radio]"),
         ) as HTMLInputElement[];
         for (let i = 0, len = radios.length; i < len; i++) {
           if (radios[i].checked) {
@@ -81,7 +78,7 @@ declare module "leaflet" {
           }
         }
       },
-      this
+      this,
     ).on(
       (form as any)["clear"],
       "click",
@@ -89,12 +86,10 @@ declare module "leaflet" {
         L.DomEvent.stop(evt);
         this.options.clear();
       },
-      this
+      this,
     );
 
-    L.DomEvent.disableClickPropagation(
-      this._container
-    ).disableScrollPropagation(this._container);
+    L.DomEvent.disableClickPropagation(this._container).disableScrollPropagation(this._container);
     return this._container;
   },
 });

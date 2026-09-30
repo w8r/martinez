@@ -1,7 +1,7 @@
-import compareEvents from './compare_events';
-import Contour from './contour';
-import SweepEvent from './sweep_event';
-import { Position } from './types';
+import compareEvents from "./compare_events";
+import Contour from "./contour";
+import SweepEvent from "./sweep_event";
+import { Position } from "./types";
 
 /**
  * @param  {SweepEvent[]} sortedEvents
@@ -12,8 +12,7 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
   const resultEvents: SweepEvent[] = [];
   for (i = 0, len = sortedEvents.length; i < len; i++) {
     event = sortedEvents[i];
-    if ((event.left && event.inResult) ||
-      (!event.left && event.otherEvent!.inResult)) {
+    if ((event.left && event.inResult) || (!event.left && event.otherEvent!.inResult)) {
       resultEvents.push(event);
     }
   }
@@ -22,8 +21,7 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
   while (!sorted) {
     sorted = true;
     for (i = 0, len = resultEvents.length; i < len; i++) {
-      if ((i + 1) < len &&
-        compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
+      if (i + 1 < len && compareEvents(resultEvents[i], resultEvents[i + 1]) === 1) {
         tmpEvent = resultEvents[i];
         resultEvents[i] = resultEvents[i + 1];
         resultEvents[i + 1] = tmpEvent;
@@ -31,7 +29,6 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
       }
     }
   }
-
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
     event = resultEvents[i];
@@ -52,7 +49,6 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
   return resultEvents;
 }
 
-
 /**
  * @param  {number} pos
  * @param  {SweepEvent[]} resultEvents
@@ -60,14 +56,18 @@ function orderEvents(sortedEvents: SweepEvent[]): SweepEvent[] {
  * @param  {number} origPos
  * @return {number}
  */
-function nextPos(pos: number, resultEvents: SweepEvent[], processed: Uint8Array, origPos: number): number {
+function nextPos(
+  pos: number,
+  resultEvents: SweepEvent[],
+  processed: Uint8Array,
+  origPos: number,
+): number {
   let newPos = pos + 1;
   const p = resultEvents[pos].point;
   let p1: Position = p;
   const length = resultEvents.length;
 
-  if (newPos < length)
-    p1 = resultEvents[newPos].point;
+  if (newPos < length) p1 = resultEvents[newPos].point;
 
   while (newPos < length && p1[0] === p[0] && p1[1] === p[1]) {
     if (!processed[newPos]) {
@@ -89,8 +89,11 @@ function nextPos(pos: number, resultEvents: SweepEvent[], processed: Uint8Array,
   return newPos;
 }
 
-
-function initializeContourFromContext(event: SweepEvent, contours: Contour[], contourId: number): Contour {
+function initializeContourFromContext(
+  event: SweepEvent,
+  contours: Contour[],
+  contourId: number,
+): Contour {
   const contour = new Contour();
   if (event.prevInResult != null) {
     const prevInResult = event.prevInResult;
@@ -144,7 +147,6 @@ export default function connectEdges(sortedEvents: SweepEvent[]): Contour[] {
   const contours: Contour[] = [];
 
   for (i = 0, len = resultEvents.length; i < len; i++) {
-
     if (processed[i]) {
       continue;
     }

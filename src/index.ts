@@ -12,7 +12,7 @@ import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 function trivialOperation(
   subject: MultiPolygon,
   clipping: MultiPolygon,
-  operation: number
+  operation: number,
 ): MultiPolygon | null {
   let result: MultiPolygon | null = null;
   if (subject.length * clipping.length === 0) {
@@ -36,15 +36,10 @@ function compareBBoxes(
   clipping: MultiPolygon,
   sbbox: BBox,
   cbbox: BBox,
-  operation: number
+  operation: number,
 ): MultiPolygon | null {
   let result: MultiPolygon | null = null;
-  if (
-    sbbox[0] > cbbox[2] ||
-    cbbox[0] > sbbox[2] ||
-    sbbox[1] > cbbox[3] ||
-    cbbox[1] > sbbox[3]
-  ) {
+  if (sbbox[0] > cbbox[2] || cbbox[0] > sbbox[2] || sbbox[1] > cbbox[3] || cbbox[1] > sbbox[3]) {
     if (operation === INTERSECTION) {
       result = [];
     } else if (operation === DIFFERENCE) {
@@ -84,7 +79,7 @@ function removeDegenerateRings(multiPolygon: MultiPolygon): MultiPolygon {
 export default function boolean(
   subject: Geometry,
   clipping: Geometry,
-  operation: number
+  operation: number,
 ): MultiPolygon {
   let subjectMP: MultiPolygon = subject as MultiPolygon;
   let clippingMP: MultiPolygon = clipping as MultiPolygon;
@@ -115,15 +110,13 @@ export default function boolean(
     clippingMP,
     sbbox,
     cbbox,
-    operation
+    operation,
   );
 
   const contours = connectEdges(sortedEvents);
 
   // Clean up and orient output rings; degenerate ones become null and are left out
-  const rings = contours.map((contour) =>
-    normalizeContour(contour.points, !contour.isExterior())
-  );
+  const rings = contours.map((contour) => normalizeContour(contour.points, !contour.isExterior()));
 
   // Convert contours to polygons
   const polygons: MultiPolygon = [];

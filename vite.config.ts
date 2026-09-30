@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
 
             // Copy all files from fixtures
             const files = readdirSync(fixturesSource);
-            files.forEach(file => {
+            files.forEach((file) => {
               const sourcePath = join(fixturesSource, file);
               const destPath = join(fixturesDest, file);
 
@@ -44,9 +44,9 @@ export default defineConfig(({ mode }) => {
                 console.log(`Copied fixture: ${file}`);
               }
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     };
   }
 
