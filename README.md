@@ -52,7 +52,9 @@ Operations per second, higher is better. Run `npm run bench` to reproduce: it be
 
 Apple M3, Node 22.17. The "shifted" cases clip the Asia polygon against a copy of itself moved slightly east, so that nearly every edge intersects; `demo/cases.html` shows it with a slider for the shift.
 
-![Asia minus Asia shifted 0.05° east, around Sulawesi: original outline in blue, shifted copy in red, difference in green](bench/img/asia-shifted-detail.png)
+![Asia minus a copy shifted 0.3° east, around Sulawesi: original in grey, shifted copy dashed blue, difference in red](bench/img/asia-shifted-detail.png)
+
+*The difference with a larger 0.3° shift, to make the slivers visible (the benchmark uses 0.05°).*
 
 ### Features
 
