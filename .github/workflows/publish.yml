@@ -36,11 +36,24 @@ jobs:
       - run: npm run test:run
       - run: npm run build
 
-      - run: npm publish --provenance --access public
+      # Both steps skip what is already done, so a failed run can be re-run
+      - name: Publish to npm
+        run: |
+          package=$(node -p "require('./package.json').name + '@' + require('./package.json').version")
+          if npm view "$package" version > /dev/null 2>&1; then
+            echo "::notice::$package is already on npm, skipping"
+          else
+            npm publish --provenance --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub release
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "::notice::Release $GITHUB_REF_NAME already exists, skipping"
+          else
+            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
