@@ -60,18 +60,8 @@ describe("compare segments", () => {
   });
 
   it("should handle collinear segments", () => {
-    const se1 = new SweepEvent(
-      [1, 1],
-      true,
-      new SweepEvent([5, 1], false),
-      true
-    );
-    const se2 = new SweepEvent(
-      [2, 1],
-      true,
-      new SweepEvent([3, 1], false),
-      false
-    );
+    const se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
+    const se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), false);
 
     expect(se1.isSubject).not.toBe(se2.isSubject);
     expect(compareSegments(se1, se2)).toBe(-1);
@@ -98,18 +88,8 @@ describe("compare segments", () => {
   });
 
   it("should handle collinear same polygon different left points", () => {
-    const se1 = new SweepEvent(
-      [1, 1],
-      true,
-      new SweepEvent([5, 1], false),
-      true
-    );
-    const se2 = new SweepEvent(
-      [2, 1],
-      true,
-      new SweepEvent([3, 1], false),
-      true
-    );
+    const se1 = new SweepEvent([1, 1], true, new SweepEvent([5, 1], false), true);
+    const se2 = new SweepEvent([2, 1], true, new SweepEvent([3, 1], false), true);
 
     expect(se1.isSubject).toBe(se2.isSubject);
     expect(se1.point).not.toBe(se2.point);

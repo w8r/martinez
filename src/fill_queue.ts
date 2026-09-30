@@ -15,14 +15,9 @@ function processPolygon(
   depth: number,
   Q: SweepEvent[],
   bbox: BBox,
-  isExteriorRing: boolean
+  isExteriorRing: boolean,
 ): void {
-  let i: number,
-    len: number,
-    s1: Position,
-    s2: Position,
-    e1: SweepEvent,
-    e2: SweepEvent;
+  let i: number, len: number, s1: Position, s2: Position, e1: SweepEvent, e2: SweepEvent;
   // Rings are expected to be closed (first point repeated at the end), but
   // an unclosed ring gets its closing edge added implicitly (#57).
   const last = contourOrHole.length - 1;
@@ -66,29 +61,17 @@ export default function fillQueue(
   clipping: MultiPolygon,
   sbbox: BBox,
   cbbox: BBox,
-  operation: number
+  operation: number,
 ) {
   const events: SweepEvent[] = [];
-  let polygonSet: Polygon,
-    isExteriorRing: boolean,
-    i: number,
-    ii: number,
-    j: number,
-    jj: number; //, k, kk;
+  let polygonSet: Polygon, isExteriorRing: boolean, i: number, ii: number, j: number, jj: number; //, k, kk;
 
   for (i = 0, ii = subject.length; i < ii; i++) {
     polygonSet = subject[i];
     for (j = 0, jj = polygonSet.length; j < jj; j++) {
       isExteriorRing = j === 0;
       if (isExteriorRing) contourId++;
-      processPolygon(
-        polygonSet[j],
-        true,
-        contourId,
-        events,
-        sbbox,
-        isExteriorRing
-      );
+      processPolygon(polygonSet[j], true, contourId, events, sbbox, isExteriorRing);
     }
   }
 
@@ -98,14 +81,7 @@ export default function fillQueue(
       isExteriorRing = j === 0;
       if (operation === DIFFERENCE) isExteriorRing = false;
       if (isExteriorRing) contourId++;
-      processPolygon(
-        polygonSet[j],
-        false,
-        contourId,
-        events,
-        cbbox,
-        isExteriorRing
-      );
+      processPolygon(polygonSet[j], false, contourId, events, cbbox, isExteriorRing);
     }
   }
 

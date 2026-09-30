@@ -1,7 +1,6 @@
-import { NORMAL, EdgeType } from './edge_type';
-import type { Node } from 'splaytree';
-import { Position } from './types';
-
+import { NORMAL, EdgeType } from "./edge_type";
+import type { Node } from "splaytree";
+import { Position } from "./types";
 
 export default class SweepEvent {
   // Property declarations
@@ -31,7 +30,13 @@ export default class SweepEvent {
    * @param {boolean}         isSubject
    * @param {EdgeType}        edgeType
    */
-  constructor (point: Position, left: boolean, otherEvent?: SweepEvent, isSubject?: boolean, edgeType?: EdgeType) {
+  constructor(
+    point: Position,
+    left: boolean,
+    otherEvent?: SweepEvent,
+    isSubject?: boolean,
+    edgeType?: EdgeType,
+  ) {
     this.left = left;
     this.point = point;
     this.otherEvent = otherEvent;
@@ -47,36 +52,33 @@ export default class SweepEvent {
     this.node = null;
   }
 
-
   /**
    * @param  {Position}  p
    * @return {boolean}
    */
-  isBelow (p: Position): boolean {
-    const p0 = this.point, p1 = this.otherEvent!.point;
+  isBelow(p: Position): boolean {
+    const p0 = this.point,
+      p1 = this.otherEvent!.point;
     // Inlined signed area of (p0, p1, p) for left events, (p1, p0, p) otherwise
     return this.left
       ? (p0[0] - p[0]) * (p1[1] - p[1]) - (p1[0] - p[0]) * (p0[1] - p[1]) > 0
       : (p1[0] - p[0]) * (p0[1] - p[1]) - (p0[0] - p[0]) * (p1[1] - p[1]) > 0;
   }
 
-
   /**
    * @param  {Position}  p
    * @return {boolean}
    */
-  isAbove (p: Position): boolean {
+  isAbove(p: Position): boolean {
     return !this.isBelow(p);
   }
-
 
   /**
    * @return {boolean}
    */
-  isVertical (): boolean {
+  isVertical(): boolean {
     return this.point[0] === this.otherEvent!.point[0];
   }
-
 
   /**
    * Does event belong to result?
@@ -86,17 +88,15 @@ export default class SweepEvent {
     return this.resultTransition !== 0;
   }
 
+  clone(): SweepEvent {
+    const copy = new SweepEvent(this.point, this.left, this.otherEvent, this.isSubject, this.type);
 
-  clone (): SweepEvent {
-    const copy = new SweepEvent(
-      this.point, this.left, this.otherEvent, this.isSubject, this.type);
-
-    copy.contourId        = this.contourId;
+    copy.contourId = this.contourId;
     copy.resultTransition = this.resultTransition;
-    copy.prevInResult     = this.prevInResult;
-    copy.isExteriorRing   = this.isExteriorRing;
-    copy.inOut            = this.inOut;
-    copy.otherInOut       = this.otherInOut;
+    copy.prevInResult = this.prevInResult;
+    copy.isExteriorRing = this.isExteriorRing;
+    copy.inOut = this.inOut;
+    copy.otherInOut = this.otherInOut;
 
     return copy;
   }

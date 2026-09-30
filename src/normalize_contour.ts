@@ -1,7 +1,7 @@
-import removeSpikes from './remove_spikes';
-import isDegenerateRing from './is_degenerate_ring';
-import signedArea from './signed_area';
-import { Position, Polygon, MultiPolygon } from './types';
+import removeSpikes from "./remove_spikes";
+import isDegenerateRing from "./is_degenerate_ring";
+import signedArea from "./signed_area";
+import { Position, Polygon, MultiPolygon } from "./types";
 
 /**
  * Whether a closed ring runs counter-clockwise. Uses the exact orientation of

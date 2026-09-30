@@ -1,6 +1,6 @@
-import signedArea from './signed_area';
-import SweepEvent from './sweep_event';
-import { Position } from './types';
+import signedArea from "./signed_area";
+import SweepEvent from "./sweep_event";
+import { Position } from "./types";
 
 /**
  * @param  {SweepEvent} e1
@@ -22,19 +22,17 @@ export default function compareEvents(e1: SweepEvent, e2: SweepEvent): number {
   return specialCases(e1, e2, p1);
 }
 
-
 function specialCases(e1: SweepEvent, e2: SweepEvent, p1: Position): number {
   // Same coordinates, but one is a left endpoint and the other is
   // a right endpoint. The right endpoint is processed first
-  if (e1.left !== e2.left)
-    return e1.left ? 1 : -1;
+  if (e1.left !== e2.left) return e1.left ? 1 : -1;
 
   // Same coordinates, both events are left endpoints or right endpoints,
   // and the segments are not collinear
   if (signedArea(p1, e1.otherEvent!.point, e2.otherEvent!.point) !== 0) {
     // the event associate to the bottom segment is processed first
-    return (!e1.isBelow(e2.otherEvent!.point)) ? 1 : -1;
+    return !e1.isBelow(e2.otherEvent!.point) ? 1 : -1;
   }
 
-  return (!e1.isSubject && e2.isSubject) ? 1 : -1;
+  return !e1.isSubject && e2.isSubject ? 1 : -1;
 }

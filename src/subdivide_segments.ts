@@ -15,7 +15,7 @@ export default function subdivide(
   clipping: MultiPolygon,
   sbbox: BBox,
   cbbox: BBox,
-  operation: number
+  operation: number,
 ): SweepEvent[] {
   const sweepLine = new Tree(compareSegments);
   const sortedEvents: SweepEvent[] = [];

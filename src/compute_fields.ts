@@ -1,9 +1,4 @@
-import {
-  NORMAL,
-  SAME_TRANSITION,
-  DIFFERENT_TRANSITION,
-  NON_CONTRIBUTING,
-} from "./edge_type";
+import { NORMAL, SAME_TRANSITION, DIFFERENT_TRANSITION, NON_CONTRIBUTING } from "./edge_type";
 import { INTERSECTION, UNION, DIFFERENCE, XOR } from "./operation";
 import SweepEvent from "./sweep_event";
 
@@ -15,7 +10,7 @@ import SweepEvent from "./sweep_event";
 export default function computeFields(
   event: SweepEvent,
   prev: SweepEvent | null,
-  operation: number
+  operation: number,
 ): void {
   // compute inOut and otherInOut fields
   if (prev === null) {
@@ -37,9 +32,7 @@ export default function computeFields(
     // compute prevInResult field
     if (prev) {
       event.prevInResult =
-        !inResult(prev, operation) || prev.isVertical()
-          ? prev.prevInResult
-          : prev;
+        !inResult(prev, operation) || prev.isVertical() ? prev.prevInResult : prev;
     }
   }
 
@@ -62,10 +55,7 @@ function inResult(event: SweepEvent, operation: number): boolean {
         case UNION:
           return event.otherInOut;
         case DIFFERENCE:
-          return (
-            (event.isSubject && event.otherInOut) ||
-            (!event.isSubject && !event.otherInOut)
-          );
+          return (event.isSubject && event.otherInOut) || (!event.isSubject && !event.otherInOut);
         case XOR:
           return true;
       }

@@ -6,8 +6,5 @@
     "suspicious": "warn",
     "perf": "warn"
   },
-  "allow": [
-    "no-unused-vars",
-    "prefer-const"
-  ]
+  "allow": ["no-unused-vars", "prefer-const"]
 }

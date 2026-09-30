@@ -1,5 +1,5 @@
-import {orient2d} from 'robust-predicates';
-import { Position } from './types';
+import { orient2d } from "robust-predicates";
+import { Position } from "./types";
 
 /**
  * Signed area of the triangle (p0, p1, p2)

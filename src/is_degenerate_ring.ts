@@ -1,5 +1,5 @@
-import signedArea from './signed_area';
-import { Position } from './types';
+import signedArea from "./signed_area";
+import { Position } from "./types";
 
 /**
  * Whether a ring encloses no area, i.e. all of its points are collinear

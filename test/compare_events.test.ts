@@ -83,18 +83,8 @@ describe("sweep event comparison shared start point not collinear edges", () => 
 
 describe("sweep event comparison collinear edges", () => {
   it("should process clipping before subject", () => {
-    const e1 = new SweepEvent(
-      [0.0, 0.0],
-      true,
-      new SweepEvent([1, 1], false),
-      true
-    );
-    const e2 = new SweepEvent(
-      [0.0, 0.0],
-      true,
-      new SweepEvent([2, 2], false),
-      false
-    );
+    const e1 = new SweepEvent([0.0, 0.0], true, new SweepEvent([1, 1], false), true);
+    const e2 = new SweepEvent([0.0, 0.0], true, new SweepEvent([2, 2], false), false);
 
     expect(sweepEventsComp(e1, e2)).toBe(-1);
     expect(sweepEventsComp(e2, e1)).toBe(1);
