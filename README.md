@@ -29,12 +29,15 @@ const intersection = {
 
 ### API
 
-- **`.intersection(<Geometry>, <Geometry>) => <Geometry>`**
-- **`.union(<Geometry>, <Geometry>)        => <Geometry>`**
-- **`.diff(<Geometry>, <Geometry>)         => <Geometry>`**
-- **`.xor(<Geometry>, <Geometry>)          => <Geometry>`**
+- **`.intersection(<Geometry>, <Geometry>) => <MultiPolygon>`**
+- **`.union(<Geometry>, <Geometry>)        => <MultiPolygon>`**
+- **`.diff(<Geometry>, <Geometry>)         => <MultiPolygon>`**
+- **`.xor(<Geometry>, <Geometry>)          => <MultiPolygon>`**
 
 `<Geometry>` is [GeoJSON](http://geojson.org/geojson-spec.html) [`'Polygon'`](http://geojson.org/geojson-spec.html#id4) or [`'MultiPolygon'`](http://geojson.org/geojson-spec.html#id7) <u>**coordinates**</u> structure.
+
+The result is always `'MultiPolygon'` coordinates, `[]` if it is empty. Its rings are closed and oriented as [RFC 7946](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6) requires: exterior rings counter-clockwise, holes clockwise.
+
 `<Operation>` is an enum of `{ INTERSECTION: 0, UNION: 1, DIFFERENCE: 2, XOR: 3 }` in case you have to decide programmatically
 which operation do you need
 

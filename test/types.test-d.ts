@@ -30,8 +30,12 @@ describe('operations', () => {
   it('have the same signature', () => {
     for (const operation of [union, intersection, diff, xor]) {
       expectTypeOf(operation).parameters.toEqualTypeOf<[Geometry, Geometry]>();
-      expectTypeOf(operation).returns.toEqualTypeOf<Geometry | null>();
+      expectTypeOf(operation).returns.toEqualTypeOf<MultiPolygon>();
     }
+  });
+
+  it('never return null: an empty result is an empty multipolygon', () => {
+    expectTypeOf(intersection(polygon, polygon)).not.toBeNullable();
   });
 
   it('accept polygons and multipolygons in any combination', () => {

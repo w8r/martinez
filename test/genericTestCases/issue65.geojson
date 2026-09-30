@@ -50,7 +50,7 @@
     {
       "type": "Feature",
       "properties": {"operation": "intersection"},
-      "geometry": {"type": "MultiPolygon", "coordinates": null}
+      "geometry": {"type": "MultiPolygon", "coordinates": []}
     },
     {
       "type": "Feature",

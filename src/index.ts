@@ -2,13 +2,13 @@ import subdivideSegments from "./subdivide_segments";
 import connectEdges from "./connect_edges";
 import fillQueue from "./fill_queue";
 import isDegenerateRing from "./is_degenerate_ring";
-import normalizeContour from "./normalize_contour";
+import normalizeContour, { normalizePolygons } from "./normalize_contour";
 import { INTERSECTION, DIFFERENCE, UNION, XOR } from "./operation";
 import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 
-// Marks an empty result of the trivial paths; returned as null
-const EMPTY: MultiPolygon = [];
-
+/**
+ * The result when one of the operands is empty, or null if neither is.
+ */
 function trivialOperation(
   subject: MultiPolygon,
   clipping: MultiPolygon,
@@ -17,7 +17,7 @@ function trivialOperation(
   let result: MultiPolygon | null = null;
   if (subject.length * clipping.length === 0) {
     if (operation === INTERSECTION) {
-      result = EMPTY;
+      result = [];
     } else if (operation === DIFFERENCE) {
       result = subject;
     } else if (operation === UNION || operation === XOR) {
@@ -27,6 +27,10 @@ function trivialOperation(
   return result;
 }
 
+/**
+ * The result when the bounding boxes of the operands do not overlap, or null
+ * if they do.
+ */
 function compareBBoxes(
   subject: MultiPolygon,
   clipping: MultiPolygon,
@@ -42,7 +46,7 @@ function compareBBoxes(
     cbbox[1] > sbbox[3]
   ) {
     if (operation === INTERSECTION) {
-      result = EMPTY;
+      result = [];
     } else if (operation === DIFFERENCE) {
       result = subject;
     } else if (operation === UNION || operation === XOR) {
@@ -81,7 +85,7 @@ export default function boolean(
   subject: Geometry,
   clipping: Geometry,
   operation: number
-): MultiPolygon | null {
+): MultiPolygon {
   let subjectMP: MultiPolygon = subject as MultiPolygon;
   let clippingMP: MultiPolygon = clipping as MultiPolygon;
 
@@ -93,19 +97,18 @@ export default function boolean(
   }
   subjectMP = removeDegenerateRings(subjectMP);
   clippingMP = removeDegenerateRings(clippingMP);
+  // Results of the shortcuts are cleaned up like the others below
   let trivial = trivialOperation(subjectMP, clippingMP, operation);
-  if (trivial) {
-    return trivial === EMPTY ? null : trivial;
-  }
+  if (trivial !== null) return normalizePolygons(trivial);
+
   const sbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
   const cbbox: BBox = [Infinity, Infinity, -Infinity, -Infinity];
 
   const eventQueue = fillQueue(subjectMP, clippingMP, sbbox, cbbox, operation);
 
   trivial = compareBBoxes(subjectMP, clippingMP, sbbox, cbbox, operation);
-  if (trivial) {
-    return trivial === EMPTY ? null : trivial;
-  }
+  if (trivial !== null) return normalizePolygons(trivial);
+
   const sortedEvents = subdivideSegments(
     eventQueue,
     subjectMP,
@@ -117,8 +120,10 @@ export default function boolean(
 
   const contours = connectEdges(sortedEvents);
 
-  // Clean up output rings; degenerate ones become null and are left out
-  const rings = contours.map((contour) => normalizeContour(contour.points));
+  // Clean up and orient output rings; degenerate ones become null and are left out
+  const rings = contours.map((contour) =>
+    normalizeContour(contour.points, !contour.isExterior())
+  );
 
   // Convert contours to polygons
   const polygons: MultiPolygon = [];
