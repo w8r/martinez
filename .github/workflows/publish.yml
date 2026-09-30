@@ -9,22 +9,38 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      contents: write # create the GitHub release
+      id-token: write # npm provenance
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: "https://registry.npmjs.org"
+
+      - name: Check that the tag matches package.json
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package.json version ${version}"
+            exit 1
+          fi
+
       - name: Update npm
         run: npm install -g npm@latest
       - run: npm ci
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:run
       - run: npm run build
+
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
