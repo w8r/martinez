@@ -6,7 +6,8 @@ import normalizeContour from "./normalize_contour";
 import { INTERSECTION, DIFFERENCE, UNION, XOR } from "./operation";
 import { Geometry, Polygon, MultiPolygon, BBox } from "./types";
 
-const EMPTY = [];
+// Marks an empty result of the trivial paths; returned as null
+const EMPTY: MultiPolygon = [];
 
 function trivialOperation(
   subject: MultiPolygon,
@@ -120,12 +121,13 @@ export default function boolean(
   const rings = contours.map((contour) => normalizeContour(contour.points));
 
   // Convert contours to polygons
-  const polygons = [];
+  const polygons: MultiPolygon = [];
   for (let i = 0; i < contours.length; i++) {
     const contour = contours[i];
-    if (contour.isExterior() && rings[i] !== null) {
+    const ring = rings[i];
+    if (contour.isExterior() && ring !== null) {
       // The exterior ring goes first
-      const polygon = [rings[i]];
+      const polygon: Polygon = [ring];
       // Followed by holes if any
       for (let j = 0; j < contour.holeIds.length; j++) {
         const hole = rings[contour.holeIds[j]];

@@ -10,12 +10,12 @@
     "noEmit": true,
     "jsx": "preserve",
 
-    "strict": false,
+    "strict": true,
     "skipLibCheck": true,
 
     "declaration": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "index.ts", "test/**/*"],
+  "include": ["src/**/*", "index.ts", "test/**/*", "types/**/*"],
   "exclude": ["node_modules", "dist", "demo"]
 }

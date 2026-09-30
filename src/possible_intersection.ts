@@ -24,8 +24,8 @@ export default function possibleIntersection(
     se2.otherEvent!.point
   );
 
-  const nintersections = inter ? inter.length : 0;
-  if (nintersections === 0) return 0; // no intersection
+  if (inter === null) return 0; // no intersection
+  const nintersections = inter.length;
 
   // Snap a crossing that lands a few ulps off an existing endpoint onto it.
   // Otherwise nearly collinear pieces keep producing new intersection points

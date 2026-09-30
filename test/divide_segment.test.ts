@@ -44,13 +44,13 @@ describe("divide segments", () => {
 
     const iter = intersection(
       se1.point,
-      se1.otherEvent.point,
+      se1.otherEvent!.point,
       se2.point,
-      se2.otherEvent.point
+      se2.otherEvent!.point
     );
 
-    divideSegment(se1, iter[0], q);
-    divideSegment(se2, iter[0], q);
+    divideSegment(se1, iter![0], q);
+    divideSegment(se2, iter![0], q);
 
     expect(q.length).toBe(6);
   });
@@ -77,23 +77,23 @@ describe("divide segments", () => {
     expect(possibleIntersection(se1, se2, q)).toBe(1);
     expect(q.length).toBe(4);
 
-    let e;
+    let e: SweepEvent;
 
-    e = q.pop();
+    e = q.pop()!;
     expect(e.point).toEqual([100.79403384562251, 233.41363754101192]);
-    expect(e.otherEvent.point).toEqual([56, 181]);
+    expect(e.otherEvent!.point).toEqual([56, 181]);
 
-    e = q.pop();
+    e = q.pop()!;
     expect(e.point).toEqual([100.79403384562251, 233.41363754101192]);
-    expect(e.otherEvent.point).toEqual([16, 282]);
+    expect(e.otherEvent!.point).toEqual([16, 282]);
 
-    e = q.pop();
+    e = q.pop()!;
     expect(e.point).toEqual([100.79403384562251, 233.41363754101192]);
-    expect(e.otherEvent.point).toEqual([153, 203.5]);
+    expect(e.otherEvent!.point).toEqual([153, 203.5]);
 
-    e = q.pop();
+    e = q.pop()!;
     expect(e.point).toEqual([100.79403384562251, 233.41363754101192]);
-    expect(e.otherEvent.point).toEqual([153, 294.5]);
+    expect(e.otherEvent!.point).toEqual([153, 294.5]);
   });
 
   it("should handle possible intersections on 2 polygons", () => {
@@ -111,11 +111,11 @@ describe("divide segments", () => {
     const p1 = [298, 359] as Position;
     const p2 = [156, 203.5] as Position;
 
-    const te = new SweepEvent(p0, true, null, true);
+    const te = new SweepEvent(p0, true, undefined, true);
     const te2 = new SweepEvent(p1, false, te, false);
     te.otherEvent = te2;
 
-    const te3 = new SweepEvent(p0, true, null, true);
+    const te3 = new SweepEvent(p0, true, undefined, true);
     const te4 = new SweepEvent(p2, true, te3, false);
     te3.otherEvent = te4;
 
@@ -131,7 +131,7 @@ describe("divide segments", () => {
     expect(compareSegments(te3, te)).toBe(-1);
 
     const segments = subdivideSegments(q, s, c, bbox, bbox, 0);
-    const leftSegments = [];
+    const leftSegments: SweepEvent[] = [];
     for (let i = 0; i < segments.length; i++) {
       if (segments[i].left) {
         leftSegments.push(segments[i]);
@@ -140,17 +140,26 @@ describe("divide segments", () => {
 
     expect(leftSegments.length).toBe(11);
 
-    const E = [16, 282];
-    const I = [100.79403384562252, 233.41363754101192];
-    const G = [298, 359];
-    const C = [153, 294.5];
-    const J = [203.36313843035356, 257.5101243166895];
-    const F = [153, 203.5];
-    const D = [56, 181];
-    const A = [108.5, 120];
-    const B = [241.5, 229.5];
+    const E: Position = [16, 282];
+    const I: Position = [100.79403384562252, 233.41363754101192];
+    const G: Position = [298, 359];
+    const C: Position = [153, 294.5];
+    const J: Position = [203.36313843035356, 257.5101243166895];
+    const F: Position = [153, 203.5];
+    const D: Position = [56, 181];
+    const A: Position = [108.5, 120];
+    const B: Position = [241.5, 229.5];
 
-    const intervals = {
+    interface Interval {
+      l: Position;
+      r: Position;
+      inOut: boolean;
+      otherInOut: boolean;
+      inResult: boolean;
+      prevInResult: { l: Position; r: Position; prevInResult?: null } | null;
+    }
+
+    const intervals: Record<string, Interval> = {
       EI: {
         l: E,
         r: I,
@@ -257,13 +266,15 @@ describe("divide segments", () => {
         const seg = leftSegments[x];
         if (
           equals(seg.point, data.l) &&
-          equals(seg.otherEvent.point, data.r) &&
+          equals(seg.otherEvent!.point, data.r) &&
           seg.inOut === data.inOut &&
           seg.otherInOut === data.otherInOut &&
           seg.inResult === data.inResult &&
           ((seg.prevInResult === null && data.prevInResult === null) ||
-            (equals(seg.prevInResult.point, data.prevInResult.l) &&
-              equals(seg.prevInResult.otherEvent.point, data.prevInResult.r)))
+            (seg.prevInResult !== null &&
+              data.prevInResult !== null &&
+              equals(seg.prevInResult.point, data.prevInResult.l) &&
+              equals(seg.prevInResult.otherEvent!.point, data.prevInResult.r)))
         ) {
           expect(true).toBeTruthy(); // Pass test for interval
           return;

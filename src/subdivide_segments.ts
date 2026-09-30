@@ -22,12 +22,14 @@ export default function subdivide(
 
   const rightbound = Math.min(sbbox[2], cbbox[2]);
 
-  let prev: Node<SweepEvent, unknown>,
-    next: Node<SweepEvent, unknown>,
-    begin: Node<SweepEvent, unknown>;
+  // Nodes in the sweep line always have a key, although splaytree's typings
+  // declare it optional: hence the `.key!` below.
+  let prev: Node<SweepEvent, unknown> | null,
+    next: Node<SweepEvent, unknown> | null,
+    begin: Node<SweepEvent, unknown> | null = null;
 
   while (eventQueue.length !== 0) {
-    let event: SweepEvent = eventQueue.pop();
+    let event = eventQueue.pop()!;
     sortedEvents.push(event);
 
     // optimization by bboxes for intersection and difference goes here
@@ -47,25 +49,25 @@ export default function subdivide(
 
       next = sweepLine.next(next);
 
-      const prevEvent = prev ? prev.key : null;
+      const prevEvent = prev ? prev.key! : null;
       const queueLength = eventQueue.length;
-      let prevprevEvent;
+      let prevprevEvent: SweepEvent | null;
       computeFields(event, prevEvent, operation);
       if (next) {
-        if (possibleIntersection(event, next.key, eventQueue) === 2) {
+        if (possibleIntersection(event, next.key!, eventQueue) === 2) {
           computeFields(event, prevEvent, operation);
-          computeFields(next.key, event, operation);
+          computeFields(next.key!, event, operation);
         }
       }
 
       if (prev) {
-        if (possibleIntersection(prev.key, event, eventQueue) === 2) {
-          let prevprev = prev;
+        if (possibleIntersection(prev.key!, event, eventQueue) === 2) {
+          let prevprev: Node<SweepEvent, unknown> | null = prev;
           if (prevprev !== begin) prevprev = sweepLine.prev(prevprev);
           else prevprev = null;
 
-          prevprevEvent = prevprev ? prevprev.key : null;
-          computeFields(prevEvent, prevprevEvent, operation);
+          prevprevEvent = prevprev ? prevprev.key! : null;
+          computeFields(prev.key!, prevprevEvent, operation);
           computeFields(event, prevEvent, operation);
         }
       }
@@ -88,7 +90,7 @@ export default function subdivide(
         }
       }
     } else {
-      event = event.otherEvent;
+      event = event.otherEvent!;
       // Use the node kept since insertion instead of searching the tree
       next = prev = event.node;
 
@@ -101,7 +103,7 @@ export default function subdivide(
         event.node = null;
 
         if (next && prev) {
-          possibleIntersection(prev.key, next.key, eventQueue);
+          possibleIntersection(prev.key!, next.key!, eventQueue);
         }
       }
     }
