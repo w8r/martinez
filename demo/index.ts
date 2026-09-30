@@ -242,7 +242,7 @@ map.on("editable:created", function (evt: any) {
 });
 
 const results = (window.results = L.geoJSON(null, {
-  style: function (feature) {
+  style: function () {
     return {
       color: "red",
       weight: 1,

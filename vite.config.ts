@@ -73,6 +73,14 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         external: ["robust-predicates", "splaytree", "tinyqueue"],
+        output: {
+          // Browser globals of the dependencies, for the UMD build
+          globals: {
+            "robust-predicates": "predicates",
+            splaytree: "SplayTree",
+            tinyqueue: "TinyQueue",
+          },
+        },
       },
     },
   };

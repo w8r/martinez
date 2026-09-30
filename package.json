@@ -9,9 +9,9 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/martinez.js",
-      "require": "./dist/martinez.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/martinez.cjs"
     }
   },
   "files": [
@@ -51,15 +51,10 @@
   "author": "Alex Milevski <info@w8r.name>",
   "license": "MIT",
   "devDependencies": {
-    "@turf/union": "^4.6.0",
-    "@types/geojson": "^1.0.2",
     "@types/glob": "^8.1.0",
-    "@types/jsts": "0.17.24",
     "@types/leaflet": "1.9.21",
     "@types/node": "^22.20.4",
     "@vitest/ui": "^5.0.2",
-    "benchmark": "^2.1.4",
-    "geojson-project": "^1.0.0",
     "gh-pages": "^6.1.1",
     "glob": "^11.0.3",
     "json-stringify-pretty-compact": "^2.0.0",

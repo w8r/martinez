@@ -1,7 +1,5 @@
 import { Position } from './types';
 
-//const EPS = 1e-9;
-
 /**
  * Point p + s * d, where d is the vector (dx, dy)
  *
@@ -51,7 +49,7 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   // cross product is the 0 vector. The full calculation involves relative error
   // to account for possible very small line segments. See Schneider & Eberly
   // for details.
-  if (sqrKross > 0/* EPS * sqrLenB * sqLenA */) {
+  if (sqrKross > 0) {
     // If they're not parallel, then (because these are line segments) they
     // still might not actually intersect. This code checks that the
     // intersection point of the lines is actually on both line segments.
@@ -85,7 +83,7 @@ export default function segmentIntersection(a1: Position, a2: Position, b1: Posi
   kross = ex * vay - ey * vax;
   sqrKross = kross * kross;
 
-  if (sqrKross > 0 /* EPS * sqLenB * sqLenE */) {
+  if (sqrKross > 0) {
   // Lines are just parallel, not the same. No overlap.
     return null;
   }

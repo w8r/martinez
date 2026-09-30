@@ -15,10 +15,8 @@ export default function possibleIntersection(
   se2: SweepEvent,
   queue: Pick<EventQueue, "push">
 ): number {
-  // that disallows self-intersecting polygons,
-  // did cost us half a day, so I'll leave it
-  // out of respect
-  // if (se1.isSubject === se2.isSubject) return;
+  // Segments of the same polygon are checked too: self-intersecting input
+  // is allowed (skipping them "did cost us half a day" in the original port)
   const inter = intersection(
     se1.point,
     se1.otherEvent!.point,
@@ -57,11 +55,7 @@ export default function possibleIntersection(
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
-    // if(se1.contourId === se2.contourId){
-    // console.warn('Edges of the same polygon overlap',
-    //   se1.point, se1.otherEvent.point, se2.point, se2.otherEvent.point);
-    // }
-    //throw new Error('Edges of the same polygon overlap');
+    // Overlapping edges of the same polygon are left as they are
     return 0;
   }
 
