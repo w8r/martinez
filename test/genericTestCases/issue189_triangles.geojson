@@ -1,0 +1,116 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [120.5, 120.1],
+            [120.4, 120.3],
+            [120.3, 120.4],
+            [120.5, 120.1]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [120.6, 120.1],
+            [120.4, 120.6],
+            [120.3, 120.4],
+            [120.6, 120.1]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"operation": "union"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [120.3, 120.4],
+              [120.5, 120.1],
+              [120.4, 120.3],
+              [120.6, 120.1],
+              [120.4, 120.6],
+              [120.3, 120.4]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"operation": "intersection"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"operation": "xor"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [120.3, 120.4],
+              [120.5, 120.1],
+              [120.4, 120.3],
+              [120.6, 120.1],
+              [120.4, 120.6],
+              [120.3, 120.4]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"operation": "diff"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [120.3, 120.4],
+              [120.5, 120.1],
+              [120.4, 120.3],
+              [120.3, 120.4]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"operation": "diff_ba"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [120.3, 120.4],
+              [120.4, 120.3],
+              [120.6, 120.1],
+              [120.4, 120.6],
+              [120.3, 120.4]
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
