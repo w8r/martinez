@@ -5,6 +5,31 @@ import compareEvents from "./compare_events";
 import SweepEvent from "./sweep_event";
 import { NON_CONTRIBUTING, SAME_TRANSITION, DIFFERENT_TRANSITION } from "./edge_type";
 import EventQueue from "./event_queue";
+import { Position } from "./types";
+
+/**
+ * Whether p is on the segment a1-a2, between its ends, up to floating-point noise
+ */
+function nearlyOnSegment(a1: Position, a2: Position, p: Position): boolean {
+  const dx = a2[0] - a1[0],
+    dy = a2[1] - a1[1];
+  const t = ((p[0] - a1[0]) * dx + (p[1] - a1[1]) * dy) / (dx * dx + dy * dy);
+  return t > 0 && t < 1 && nearlyEquals([a1[0] + t * dx, a1[1] + t * dy], p);
+}
+
+/**
+ * Whether two segments sharing an endpoint lie on one line up to
+ * floating-point noise, i.e. the other end of one is nearly on the other
+ */
+function nearlyCollinear(se1: SweepEvent, se2: SweepEvent): boolean {
+  const a1 = se1.point,
+    a2 = se1.otherEvent!.point,
+    b1 = se2.point,
+    b2 = se2.otherEvent!.point;
+  return equals(a1, b1)
+    ? nearlyOnSegment(a1, a2, b2) || nearlyOnSegment(b1, b2, a2)
+    : nearlyOnSegment(a1, a2, b1) || nearlyOnSegment(b1, b2, a1);
+}
 
 export default function possibleIntersection(
   se1: SweepEvent,
@@ -16,7 +41,7 @@ export default function possibleIntersection(
   const inter = intersection(se1.point, se1.otherEvent!.point, se2.point, se2.otherEvent!.point);
 
   if (inter === null) return 0; // no intersection
-  const nintersections = inter.length;
+  let nintersections = inter.length;
 
   // Snap a crossing that lands a few ulps off an existing endpoint onto it.
   // Otherwise nearly collinear pieces keep producing new intersection points
@@ -36,7 +61,11 @@ export default function possibleIntersection(
     nintersections === 1 &&
     (equals(se1.point, se2.point) || equals(se1.otherEvent!.point, se2.otherEvent!.point))
   ) {
-    return 0;
+    // Unless they are collinear up to floating-point noise: then one of them
+    // is later split at the other's far end (snapped above), leaving two equal
+    // edges that are never compared again (#189). Handle them as overlapping.
+    if (se1.isSubject === se2.isSubject || !nearlyCollinear(se1, se2)) return 0;
+    nintersections = 2;
   }
 
   if (nintersections === 2 && se1.isSubject === se2.isSubject) {
