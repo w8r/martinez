@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playground · martinez</title>
+    <meta
+      name="description"
+      content="Edit two polygons and see their union, intersection, difference or xor computed live by martinez. Load any test case, or paste your own GeoJSON."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Playground · martinez" />
+    <meta
+      property="og:description"
+      content="Edit two polygons and see their union, intersection, difference or xor computed live. Load any test case, or paste your own GeoJSON."
+    />
+    <meta property="og:url" content="https://w8r.github.io/martinez/playground.html" />
+    <meta property="og:image" content="https://w8r.github.io/martinez/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Asia minus a copy of itself shifted 0.3° east: the slivers where the two outlines differ"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='17' height='17' rx='2' fill='none' stroke='%237aa2ff' stroke-width='2.5'/%3E%3Crect x='12' y='12' width='17' height='17' rx='2' fill='none' stroke='%23ff8a7a' stroke-width='2.5'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%237fd4b0'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #0f1117;
+        --panel: #161922;
+        --line: #252a36;
+        --text: #eef1f4;
+        --muted: #8b8f99;
+        --accent: #7fd4b0;
+        --a: #7aa2ff;
+        --b: #ff8a7a;
+        --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.5 var(--sans);
+      }
+      a {
+        color: inherit;
+      }
+      #view {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+      body.dropping #view {
+        outline: 2px dashed var(--accent);
+        outline-offset: -10px;
+      }
+      .brand {
+        position: fixed;
+        left: 20px;
+        top: 16px;
+        font: 600 16px var(--mono);
+        text-decoration: none;
+      }
+      .brand span {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .panel {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        width: 330px;
+        max-height: calc(100% - 28px);
+        overflow-y: auto;
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+        background: rgba(22, 25, 34, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      .panel h2 {
+        margin: 0 0 6px;
+        font: 600 11px var(--mono);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      select {
+        width: 100%;
+        padding: 7px 10px;
+        font: 13px var(--mono);
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+      .note {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .note:empty {
+        display: none;
+      }
+      .chips {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      button {
+        font: inherit;
+        font-size: 13px;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 9px;
+        cursor: pointer;
+      }
+      button:hover {
+        color: var(--text);
+      }
+      button[aria-pressed="true"] {
+        color: var(--bg);
+        background: var(--text);
+        border-color: var(--text);
+      }
+      button.done {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .readout {
+        font: 12px/1.6 var(--mono);
+        color: var(--muted);
+      }
+      .readout code {
+        font: inherit;
+        color: var(--text);
+      }
+      .keys {
+        display: flex;
+        gap: 14px;
+        font: 12px var(--mono);
+        color: var(--muted);
+      }
+      .key::before {
+        content: "";
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 6px;
+        border: 1.5px solid var(--c);
+        background: color-mix(in srgb, var(--c) 25%, transparent);
+        border-radius: 2px;
+      }
+      .key.result::before {
+        background: color-mix(in srgb, var(--c) 60%, transparent);
+      }
+      .help {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .help b {
+        font-weight: 500;
+        color: var(--text);
+      }
+      kbd {
+        font: 11px var(--mono);
+        padding: 0 4px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+      }
+      .coords {
+        position: fixed;
+        left: 20px;
+        bottom: 14px;
+        font: 11px var(--mono);
+        color: var(--muted);
+        pointer-events: none;
+      }
+
+      @media (max-width: 760px) {
+        .panel {
+          top: auto;
+          left: 10px;
+          right: 10px;
+          bottom: 10px;
+          width: auto;
+          max-height: 46%;
+          gap: 10px;
+          padding: 12px;
+        }
+        .help,
+        .coords {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="view" aria-label="Polygons A and B and the result of the operation"></canvas>
+    <a class="brand" href="./">martinez <span>playground</span></a>
+
+    <aside class="panel" id="panel">
+      <div>
+        <h2>Case</h2>
+        <select id="case" aria-label="Test case"></select>
+        <div class="note" id="note"></div>
+      </div>
+      <div>
+        <h2>Operation</h2>
+        <div class="chips" role="group" aria-label="Operation">
+          <button data-op="union" aria-pressed="false">A ∪ B</button>
+          <button data-op="intersection" aria-pressed="true">A ∩ B</button>
+          <button data-op="diff" aria-pressed="false">A − B</button>
+          <button data-op="diff_ba" aria-pressed="false">B − A</button>
+          <button data-op="xor" aria-pressed="false">A ⊕ B</button>
+        </div>
+      </div>
+      <div>
+        <h2>Result</h2>
+        <div class="readout" id="readout">&nbsp;</div>
+      </div>
+      <div class="keys">
+        <span class="key" style="--c: var(--a)">A</span>
+        <span class="key" style="--c: var(--b)">B</span>
+        <span class="key result" style="--c: var(--accent)">result</span>
+      </div>
+      <div class="chips">
+        <button id="fit">fit</button>
+        <button id="swap">swap A ↔ B</button>
+        <button id="reset">reset</button>
+        <button
+          id="copy-input"
+          title="A and B as a GeoJSON FeatureCollection, the format of the test cases"
+        >
+          copy A, B
+        </button>
+        <button id="copy-result" title="The result as a GeoJSON Feature">copy result</button>
+      </div>
+      <ul class="help">
+        <li><b>Drag</b> a shape or a vertex; drag the background to pan, scroll to zoom</li>
+        <li><b>Double-click</b> an edge to add a vertex, a vertex to remove it</li>
+        <li><b>Paste</b> or <b>drop</b> GeoJSON: the first two polygons become A and B</li>
+        <li>
+          <kbd>1</kbd>–<kbd>5</kbd> operation · <kbd>←</kbd> <kbd>→</kbd> case · <kbd>F</kbd> fit
+        </li>
+      </ul>
+    </aside>
+    <div class="coords" id="coords"></div>
+
+    <script type="module" src="./playground/main.ts"></script>
+  </body>
+</html>

@@ -65,9 +65,10 @@ The algorithm of Martinez et al. was extended to work with multipolygons without
 
 ### Demos
 
-`npm run dev` starts the demos:
+The demos are published at [w8r.github.io/martinez](https://w8r.github.io/martinez/); `npm run dev` starts them locally:
 
-- `demo/index.html`: interactive map where you can edit the polygons.
+- `demo/index.html`: the project page, with a live example, benchmarks and links to the demos below.
+- `demo/playground.html`: edit both polygons, load any test case or fixture, or paste your own GeoJSON, and copy the inputs or the result. Drag shapes and vertices, double-click an edge to add a vertex and a vertex to remove it.
 - `demo/cases.html`: test case viewer. Pick any case from `test/genericTestCases` or `test/fixtures` and an operation to see the inputs, the computed result and, for generic test cases, whether it matches the expected result. Use ←/→ to step through cases, keys 1–5 to switch the operation, and F to fit the view. The selection is kept in the URL, so a case can be linked, e.g. `cases.html#generic%2Fissue155/xor`.
 
 ### Authors
@@ -77,7 +78,8 @@ The algorithm of Martinez et al. was extended to work with multipolygons without
 
 ### Based on
 
-- [A new algorithm for computing Boolean operations on polygons](http://www.sciencedirect.com/science/article/pii/S0965997813000379) (2008, 2013) by Francisco Martinez, Antonio Jesus Rueda, Francisco Ramon Feito (and its C++ code)
+- F. Martínez, A. J. Rueda, F. R. Feito, [A new algorithm for computing Boolean operations on polygons](https://doi.org/10.1016/j.cageo.2008.08.009), Computers & Geosciences 35(6), 1177–1185, 2009
+- F. Martínez, C. Ogayar, J. R. Jiménez, A. J. Rueda, [A simple algorithm for Boolean operations on polygons](https://doi.org/10.1016/j.advengsoft.2013.04.004), Advances in Engineering Software 64, 11–19, 2013 (and its C++ code)
 
 ### Related projects
 
