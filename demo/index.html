@@ -1,13 +1,639 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <title>Martinez Clipping</title>
-    <link rel="stylesheet" href="./styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>martinez: boolean operations on polygons</title>
+    <meta
+      name="description"
+      content="Union, intersection, difference and xor of GeoJSON polygons in JavaScript. Holes, multipolygons, self-intersections, overlapping edges. 7 KB gzipped."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="martinez: boolean operations on polygons" />
+    <meta
+      property="og:description"
+      content="Union, intersection, difference and xor of GeoJSON polygons in JavaScript. Holes, multipolygons, self-intersections, overlapping edges. 7 KB gzipped."
+    />
+    <meta property="og:url" content="https://w8r.github.io/martinez/" />
+    <meta property="og:image" content="https://w8r.github.io/martinez/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Asia minus a copy of itself shifted 0.3° east: the slivers where the two outlines differ"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='17' height='17' rx='2' fill='none' stroke='%237aa2ff' stroke-width='2.5'/%3E%3Crect x='12' y='12' width='17' height='17' rx='2' fill='none' stroke='%23ff8a7a' stroke-width='2.5'/%3E%3Crect x='12' y='12' width='8' height='8' fill='%237fd4b0'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #0f1117;
+        --panel: #161922;
+        --line: #252a36;
+        --text: #eef1f4;
+        --muted: #8b8f99;
+        --accent: #7fd4b0;
+        --a: #7aa2ff;
+        --b: #ff8a7a;
+        --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+        --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.6 var(--sans);
+      }
+      body {
+        margin: 0;
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ── Hero ─────────────────────────────────────────────── */
+      .hero {
+        position: relative;
+        height: min(86vh, 820px);
+        min-height: 560px;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+      }
+      .hero.ready canvas {
+        opacity: 1;
+      }
+      .hero-top {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-top: 28px;
+      }
+      .brand {
+        font: 600 17px var(--mono);
+        letter-spacing: -0.01em;
+        text-decoration: none;
+      }
+      .hero-top nav a {
+        margin-left: 22px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .hero-top nav a:hover {
+        color: var(--text);
+      }
+      .hero-copy {
+        position: relative;
+        max-width: 560px;
+        margin-top: 44px;
+        pointer-events: none;
+      }
+      .hero-copy h1 {
+        margin: 0 0 10px;
+        font: 400 clamp(28px, 4vw, 40px) / 1.15 var(--serif);
+      }
+      .hero-copy p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .hero-copy a {
+        pointer-events: auto;
+      }
+      .hero-copy p a:hover {
+        color: var(--text);
+      }
+      .hero-copy .cite {
+        margin-top: 12px;
+        padding-left: 12px;
+        border-left: 2px solid var(--line);
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+      .cite span {
+        display: block;
+      }
+      .cite span + span {
+        margin-top: 4px;
+      }
+      .controls {
+        position: absolute;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%);
+        width: min(1072px, calc(100% - 48px));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px 18px;
+        align-items: center;
+        padding: 14px 16px;
+        background: rgba(22, 25, 34, 0.78);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      .chips {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      button {
+        font: inherit;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 12px;
+        cursor: pointer;
+      }
+      button:hover {
+        color: var(--text);
+      }
+      button[aria-pressed="true"] {
+        color: var(--bg);
+        background: var(--text);
+        border-color: var(--text);
+      }
+      .readout {
+        flex-basis: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 18px;
+        font: 12px var(--mono);
+        color: var(--muted);
+      }
+      .readout code {
+        font: inherit;
+        color: var(--text);
+      }
+      .key::before {
+        content: "";
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 6px;
+        border: 1.5px solid var(--c);
+        background: color-mix(in srgb, var(--c) 25%, transparent);
+        border-radius: 2px;
+      }
+      .key.result::before {
+        background: color-mix(in srgb, var(--c) 60%, transparent);
+      }
+
+      /* ── Sections ─────────────────────────────────────────── */
+      section {
+        padding: 72px 0 0;
+      }
+      h2 {
+        margin: 0 0 22px;
+        font: 400 28px/1.2 var(--serif);
+      }
+      .lede {
+        max-width: 640px;
+        margin: -8px 0 24px;
+        color: var(--muted);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .stat {
+        background: var(--bg);
+        padding: 22px 20px;
+      }
+      .stat b {
+        display: block;
+        font: 400 34px/1.1 var(--serif);
+        color: var(--accent);
+      }
+      .stat span {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .code {
+        display: grid;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 28px;
+        align-items: start;
+      }
+      .code > * {
+        min-width: 0;
+      }
+      .code p {
+        color: var(--muted);
+        margin: 0 0 18px;
+      }
+      .code p code {
+        font: 13px var(--mono);
+        color: var(--text);
+      }
+      .install {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 10px 10px 16px;
+        font: 14px var(--mono);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .install span {
+        white-space: nowrap;
+        overflow-x: auto;
+      }
+      .copied {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      pre {
+        margin: 0;
+        padding: 20px 22px;
+        overflow-x: auto;
+        font: 13.5px/1.7 var(--mono);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      .k {
+        color: #c49be0;
+      }
+      .s {
+        color: #e9c48f;
+      }
+      .n {
+        color: #8fc7e9;
+      }
+      .c {
+        color: #6b7080;
+      }
+
+      /* ── Benchmarks ───────────────────────────────────────── */
+      .bench {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 26px 40px;
+      }
+      .bench h3 {
+        margin: 0 0 8px;
+        font: 600 14px var(--sans);
+      }
+      .bench h3 span {
+        margin-left: 6px;
+        font-weight: 400;
+        color: var(--muted);
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 128px 1fr 64px;
+        gap: 10px;
+        align-items: center;
+        font: 12px var(--mono);
+        color: var(--muted);
+        line-height: 20px;
+      }
+      .bar i {
+        display: block;
+        height: 8px;
+        min-width: 2px;
+        border-radius: 4px;
+        background: #3a4152;
+      }
+      .bar.me {
+        color: var(--text);
+      }
+      .bar.me i {
+        background: var(--accent);
+      }
+      .bar b {
+        font-weight: 400;
+        text-align: right;
+      }
+      .note {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .note code {
+        font: 12px var(--mono);
+      }
+
+      /* ── Demos ────────────────────────────────────────────── */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        display: block;
+        text-decoration: none;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: #3a4152;
+      }
+      .thumb {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+      }
+      .thumb canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .thumb small {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        padding: 1px 7px;
+        border-radius: 6px;
+        background: rgba(15, 17, 23, 0.85);
+        font: 11px var(--mono);
+        color: var(--muted);
+      }
+      .card > div:last-child {
+        padding: 14px 16px 16px;
+      }
+      .card h3 {
+        margin: 0 0 4px;
+        font: 600 15px var(--sans);
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .tag {
+        margin-left: 8px;
+        font: 11px var(--mono);
+        color: var(--accent);
+      }
+      .internals {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 10px 24px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .internals a {
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .internals a:hover {
+        border-color: var(--text);
+      }
+      .internals span {
+        display: block;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      footer {
+        margin-top: 88px;
+        padding: 28px 0 40px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      @media (max-width: 760px) {
+        .hero {
+          min-height: 680px;
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .code {
+          grid-template-columns: 1fr;
+        }
+        .hero-top nav a:not(:last-child) {
+          display: none;
+        }
+        .bar {
+          grid-template-columns: 112px 1fr 56px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <script type="module" src="./index.ts"></script>
+    <header class="hero" id="hero">
+      <canvas
+        id="hero-canvas"
+        aria-label="Two polygons and the result of a boolean operation on them"
+      ></canvas>
+      <div class="wrap">
+        <div class="hero-top">
+          <a class="brand" href="./">martinez</a>
+          <nav>
+            <a href="./playground.html">Playground</a>
+            <a href="#demos">Demos</a>
+            <a href="https://github.com/w8r/martinez#api">Docs</a>
+            <a href="https://github.com/w8r/martinez">GitHub</a>
+          </nav>
+        </div>
+        <div class="hero-copy" id="hero-copy">
+          <h1>Boolean operations on polygons.</h1>
+          <p>
+            Union, intersection, difference and xor of GeoJSON polygons: holes, multipolygons,
+            self-intersections, overlapping edges. Drag the shapes or their vertices, or open the
+            <a href="./playground.html">playground</a>.
+          </p>
+          <p class="cite">
+            <span
+              >F. Martínez, A. J. Rueda, F. R. Feito.
+              <a href="https://doi.org/10.1016/j.cageo.2008.08.009"
+                ><i>A new algorithm for computing Boolean operations on polygons</i></a
+              >. Computers &amp; Geosciences 35(6), 1177–1185, 2009.</span
+            >
+            <span
+              >F. Martínez, C. Ogayar, J. R. Jiménez, A. J. Rueda.
+              <a href="https://doi.org/10.1016/j.advengsoft.2013.04.004"
+                ><i>A simple algorithm for Boolean operations on polygons</i></a
+              >. Advances in Engineering Software 64, 11–19, 2013.</span
+            >
+          </p>
+        </div>
+      </div>
+      <div class="controls" id="hero-controls">
+        <div class="chips" role="group" aria-label="Operation">
+          <button data-op="union" aria-pressed="false">A ∪ B</button>
+          <button data-op="intersection" aria-pressed="true">A ∩ B</button>
+          <button data-op="diff" aria-pressed="false">A − B</button>
+          <button data-op="diff_ba" aria-pressed="false">B − A</button>
+          <button data-op="xor" aria-pressed="false">A ⊕ B</button>
+        </div>
+        <div class="chips">
+          <button id="hero-auto" aria-pressed="true">auto</button>
+          <button id="hero-reset">reset</button>
+        </div>
+        <div class="readout">
+          <span>
+            <span class="key" style="--c: var(--a)">A</span>&nbsp;
+            <span class="key" style="--c: var(--b)">B</span>&nbsp;
+            <span class="key result" style="--c: var(--accent)">result</span>
+          </span>
+          <span id="hero-readout">&nbsp;</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section>
+        <div class="stats">
+          <div class="stat"><b>7 KB</b><span>gzipped, with its three small dependencies</span></div>
+          <div class="stat">
+            <b>3×</b><span>faster than JSTS when nearly every edge intersects</span>
+          </div>
+          <div class="stat"><b>Exact</b><span>orientation tests, with robust-predicates</span></div>
+          <div class="stat">
+            <b>RFC 7946</b><span>output: closed rings, CCW exteriors, CW holes</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="code">
+        <div>
+          <h2>One call per operation</h2>
+          <p>
+            Pass GeoJSON <code>Polygon</code> or <code>MultiPolygon</code> coordinates, get
+            <code>MultiPolygon</code> coordinates back, <code>[]</code> when the result is empty.
+            Types included, ESM and CommonJS.
+          </p>
+          <div class="install">
+            <span>npm install martinez-polygon-clipping</span>
+            <button data-copy="npm install martinez-polygon-clipping">copy</button>
+          </div>
+        </div>
+        <pre><span class="k">import</span> { union, intersection, diff, xor } <span class="k">from</span> <span class="s">"martinez-polygon-clipping"</span>;
+
+<span class="k">const</span> a = [[[<span class="n">0</span>, <span class="n">0</span>], [<span class="n">4</span>, <span class="n">0</span>], [<span class="n">4</span>, <span class="n">4</span>], [<span class="n">0</span>, <span class="n">4</span>], [<span class="n">0</span>, <span class="n">0</span>]]];
+<span class="k">const</span> b = [[[<span class="n">2</span>, <span class="n">2</span>], [<span class="n">6</span>, <span class="n">2</span>], [<span class="n">6</span>, <span class="n">6</span>], [<span class="n">2</span>, <span class="n">6</span>], [<span class="n">2</span>, <span class="n">2</span>]]];
+
+union(a, b);
+<span class="c">// → [[[[0, 0], [4, 0], [4, 2], [6, 2], [6, 6],</span>
+<span class="c">//      [2, 6], [2, 4], [0, 4], [0, 0]]]]</span></pre>
+      </section>
+
+      <section>
+        <h2>Benchmarks</h2>
+        <p class="lede">
+          Operations per second, higher is better. All four libraries produce the same result areas
+          on these inputs.
+        </p>
+        <div class="bench" id="bench"></div>
+        <p class="note">
+          Apple M3, Node 22.17. Reproduce with <code>npm run bench</code>. The “shifted” cases clip
+          Asia against a copy of itself moved 0.05° east.
+        </p>
+      </section>
+
+      <section id="demos">
+        <h2>Demos</h2>
+        <p class="lede">The thumbnails are computed by the library as this page loads.</p>
+        <div class="cards">
+          <a class="card" href="./playground.html#fixtures%2Fhole_hole/intersection">
+            <div class="thumb" data-thumb="editor"><canvas></canvas><small></small></div>
+            <div>
+              <h3>Playground<span class="tag">start here</span></h3>
+              <p>
+                Edit both shapes vertex by vertex, load any test case or paste your own GeoJSON, and
+                copy the result.
+              </p>
+            </div>
+          </a>
+          <a class="card" href="./cases.html">
+            <div class="thumb" data-thumb="cases"><canvas></canvas><small></small></div>
+            <div>
+              <h3>Test case viewer<span class="tag">debug view</span></h3>
+              <p>
+                Every regression case and fixture: inputs, result and expected result. Each view has
+                its own URL.
+              </p>
+            </div>
+          </a>
+          <a class="card" href="./cases.html#synthetic%2Fasia%20shifted/diff">
+            <div class="thumb" data-thumb="asia"><canvas></canvas><small></small></div>
+            <div>
+              <h3>Asia minus Asia<span class="tag">stress test</span></h3>
+              <p>
+                28k vertices against a copy of itself shifted east, so that nearly every edge
+                intersects. Shown with a 0.3° shift.
+              </p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Under the hood</h2>
+        <ul class="internals">
+          <li>
+            <a href="https://doi.org/10.1016/j.cageo.2008.08.009">The algorithm</a>
+            <span
+              >A plane sweep in O((n + k) log n), extended here to multipolygons without
+              cascading.</span
+            >
+          </li>
+          <li>
+            <a href="https://github.com/w8r/martinez/tree/master/test/genericTestCases"
+              >Regression cases</a
+            >
+            <span>GeoJSON inputs with the expected result for each operation.</span>
+          </li>
+          <li>
+            <a href="https://github.com/w8r/martinez/blob/master/bench/martinez.bench.ts"
+              >Benchmark source</a
+            >
+            <span>The comparison above, run against the built bundle.</span>
+          </li>
+          <li>
+            <a href="https://codepen.io/w8r/pen/MjgqMx">CodePen</a>
+            <span>A playground to fork.</span>
+          </li>
+        </ul>
+      </section>
+
+      <footer>
+        MIT licensed. By
+        <a href="https://github.com/w8r/">Alexander Milevski</a> and
+        <a href="https://github.com/sh1ng/">Vladimir Ovsyannikov</a> ·
+        <a href="https://github.com/w8r/martinez">GitHub</a> ·
+        <a href="https://www.npmjs.com/package/martinez-polygon-clipping">npm</a>
+      </footer>
+    </main>
+
+    <script type="module" src="./landing/main.ts"></script>
   </body>
 </html>

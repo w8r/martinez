@@ -25,6 +25,8 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           input: {
             main: resolve(import.meta.dirname, "demo/index.html"),
+            playground: resolve(import.meta.dirname, "demo/playground.html"),
+            editor: resolve(import.meta.dirname, "demo/editor.html"),
             orthogonal: resolve(import.meta.dirname, "demo/orthogonal.html"),
             cases: resolve(import.meta.dirname, "demo/cases.html"),
           },

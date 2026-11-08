@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Playground · martinez</title>
+    <script>
+      // The Leaflet editor was replaced by the playground: forward old links,
+      // including the fixture names they used to take after the #
+      const CASES = {
+        geo: "fixtures/asia",
+        states: "fixtures/states_source",
+        trapezoid: "fixtures/trapezoid-box",
+        canada: "fixtures/canada",
+        horseshoe: "fixtures/horseshoe",
+        hourglasses: "generic/hourglasses",
+        edge_overlap: "generic/polygon_trapezoid_edge_overlap",
+        touching_boxes: "generic/touching_boxes",
+        triangles: "fixtures/two_pointed_triangles",
+        holecut: "fixtures/hole_cut",
+        overlapping_segments: "fixtures/overlapping_segments",
+        overlap_loop: "generic/overlap_loop",
+        overlap_y: "generic/overlap_y",
+        overlap_two: "fixtures/overlap_two",
+        disjoint_boxes: "fixtures/disjoint_boxes",
+        polygons_edge_overlap: "fixtures/polygons_edge_overlap",
+        vertical_boxes: "fixtures/vertical_boxes",
+        collapsed: "fixtures/collapsed",
+        fatal1: "generic/fatal1",
+        fatal2: "generic/fatal2",
+        fatal3: "generic/fatal3",
+        fatal4: "generic/fatal4",
+      };
+      const name = CASES[location.hash.slice(1)];
+      location.replace(
+        "./playground.html" + (name ? "#" + encodeURIComponent(name) + "/intersection" : ""),
+      );
+    </script>
+  </head>
+  <body>
+    <a href="./playground.html">The editor has moved to the playground</a>
+  </body>
+</html>
